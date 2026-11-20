@@ -10,7 +10,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, tu
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Put `minemenu-1.0.0.jar` in the same `mods` folder (see [Building](#building) for how to get it).
+3. Download `minemenu-1.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -69,6 +69,9 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 
 ## Building
 
+You only need this if you want to change the code. Otherwise grab the jar from [Releases](https://github.com/peachiu/MineMenu/releases).
+
+
 You need **Java 21**.
 
 ```bash
@@ -78,6 +81,14 @@ You need **Java 21**.
 The mod jar ends up in `build/libs/minemenu-1.0.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
+
+### Making a release
+
+1. Set `mod_version` in `gradle.properties` (for example `1.1.0`).
+2. Write the release notes in `.github/release-notes/v1.1.0.md`.
+3. Commit, then push a matching tag: `git tag v1.1.0 && git push origin v1.1.0`.
+
+GitHub Actions builds the mod and publishes the release with the jar attached.
 
 ## How it works (for the curious)
 
