@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "minemenu",
+  "version": "${version}",
+  "name": "MineMenu",
+  "description": "A singleplayer-only fun menu: fly, god mode, one-hit kills, mob wipes, lightning and more. Press Right Shift in a singleplayer world.",
+  "authors": ["peachiu"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/minemenu/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.minemenu.MineMenuClient"]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
