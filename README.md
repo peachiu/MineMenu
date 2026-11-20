@@ -86,9 +86,9 @@ To try it straight from the source code, run `./gradlew runClient`.
 
 1. Set `mod_version` in `gradle.properties` (for example `1.1.0`).
 2. Write the release notes in `.github/release-notes/v1.1.0.md`.
-3. Commit, then push a matching tag: `git tag v1.1.0 && git push origin v1.1.0`.
+3. Commit and push, then either push a matching tag (`git tag v1.1.0 && git push origin v1.1.0`) or go to **Actions → Release → Run workflow**.
 
-GitHub Actions builds the mod and publishes the release with the jar attached.
+GitHub Actions builds the mod, creates the tag if needed, and publishes the release with the jar attached.
 
 ## How it works (for the curious)
 

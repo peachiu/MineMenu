@@ -1,10 +1,13 @@
 name: Release
 
-# Push a tag like v1.0.0 to build the mod and publish a GitHub release with the jar attached.
+# Builds the mod and publishes a GitHub release with the jar attached. Start it either by
+# pushing a tag like v1.0.0, or from the Actions tab (Release > Run workflow), which creates
+# the tag v<mod_version> from gradle.properties for you.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,19 +28,23 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Check the tag matches mod_version
+      - name: Work out the release tag
+        id: tag
         run: |
           version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "v$version" != "$GITHUB_REF_NAME" ]; then
             echo "Tag $GITHUB_REF_NAME does not match mod_version=$version in gradle.properties"
             exit 1
           fi
+          echo "name=v$version" >> "$GITHUB_OUTPUT"
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          name: MineMenu ${{ github.ref_name }} (Minecraft 1.21.1)
-          body_path: .github/release-notes/${{ github.ref_name }}.md
+          tag_name: ${{ steps.tag.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          name: MineMenu ${{ steps.tag.outputs.name }} (Minecraft 1.21.1)
+          body_path: .github/release-notes/${{ steps.tag.outputs.name }}.md
           files: |
             build/libs/minemenu-*.jar
             !build/libs/*-sources.jar
