@@ -1,5 +1,7 @@
 package com.minemenu;
 
+import net.minecraft.util.Identifier;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +41,10 @@ public final class CheatState {
     private static final Set<Feature> ENABLED = EnumSet.noneOf(Feature.class);
     private static Size size = Size.NORMAL;
     private static boolean hudVisible = true;
+    private static boolean fpsVisible = false;
+    private static Identifier selectedMob = Identifier.ofVanilla("zombie");
+    private static int spawnAmount = 1;
+    private static final int[] SPAWN_AMOUNTS = {1, 5, 10};
 
     private CheatState() {
     }
@@ -74,5 +80,38 @@ public final class CheatState {
 
     public static synchronized void toggleHud() {
         hudVisible = !hudVisible;
+    }
+
+    public static synchronized boolean fpsVisible() {
+        return fpsVisible;
+    }
+
+    public static synchronized void toggleFps() {
+        fpsVisible = !fpsVisible;
+    }
+
+    /** The mob the "Spawn Mob" picker and keybind will spawn. */
+    public static synchronized Identifier selectedMob() {
+        return selectedMob;
+    }
+
+    public static synchronized void setSelectedMob(Identifier id) {
+        selectedMob = id;
+    }
+
+    public static synchronized int spawnAmount() {
+        return spawnAmount;
+    }
+
+    /** Cycles 1 -> 5 -> 10 -> 1. */
+    public static synchronized int cycleSpawnAmount() {
+        for (int i = 0; i < SPAWN_AMOUNTS.length; i++) {
+            if (SPAWN_AMOUNTS[i] == spawnAmount) {
+                spawnAmount = SPAWN_AMOUNTS[(i + 1) % SPAWN_AMOUNTS.length];
+                return spawnAmount;
+            }
+        }
+        spawnAmount = 1;
+        return spawnAmount;
     }
 }

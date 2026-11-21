@@ -27,6 +27,7 @@ public class MineMenuClient implements ClientModInitializer {
     private static KeyBinding toggleFlyKey;
     private static KeyBinding toggleGodKey;
     private static KeyBinding killHostileKey;
+    private static KeyBinding spawnMobKey;
 
     @Override
     public void onInitializeClient() {
@@ -35,6 +36,7 @@ public class MineMenuClient implements ClientModInitializer {
         toggleFlyKey = register("key.minemenu.toggle_fly", GLFW.GLFW_KEY_UNKNOWN);
         toggleGodKey = register("key.minemenu.toggle_god", GLFW.GLFW_KEY_UNKNOWN);
         killHostileKey = register("key.minemenu.kill_hostile", GLFW.GLFW_KEY_UNKNOWN);
+        spawnMobKey = register("key.minemenu.spawn_mob", GLFW.GLFW_KEY_UNKNOWN);
 
         ClientTickEvents.END_CLIENT_TICK.register(MineMenuClient::onClientTick);
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
@@ -75,6 +77,11 @@ public class MineMenuClient implements ClientModInitializer {
                 runAction(client, ServerCheats.Action.KILL_HOSTILE);
             }
         }
+        while (spawnMobKey.wasPressed()) {
+            if (requireSingleplayer(client)) {
+                MobSpawnScreen.spawnSelectedMob(client);
+            }
+        }
     }
 
     /** True in a private singleplayer world; otherwise tells the player why nothing happened. */
@@ -112,8 +119,21 @@ public class MineMenuClient implements ClientModInitializer {
 
     private static void renderHud(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (!CheatState.hudVisible() || client.options.hudHidden || client.getDebugHud().shouldShowDebugHud()
-                || !isSingleplayer(client)) {
+        if (client.options.hudHidden || client.getDebugHud().shouldShowDebugHud() || client.player == null) {
+            return;
+        }
+        TextRenderer font = client.textRenderer;
+        int x = 4;
+        int y = 4;
+
+        if (CheatState.fpsVisible()) {
+            int fps = client.getCurrentFps();
+            Formatting color = fps >= 60 ? Formatting.GREEN : fps >= 30 ? Formatting.YELLOW : Formatting.RED;
+            context.drawTextWithShadow(font, Text.literal(fps + " FPS").formatted(color, Formatting.BOLD), x, y, 0xFFFFFF);
+            y += 12;
+        }
+
+        if (!CheatState.hudVisible() || !isSingleplayer(client)) {
             return;
         }
         List<Feature> enabled = CheatState.enabled();
@@ -121,9 +141,6 @@ public class MineMenuClient implements ClientModInitializer {
         if (enabled.isEmpty() && size == CheatState.Size.NORMAL) {
             return;
         }
-        TextRenderer font = client.textRenderer;
-        int x = 4;
-        int y = 4;
         context.drawTextWithShadow(font, Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), x, y, 0xFFFFFF);
         y += 11;
         for (Feature feature : enabled) {

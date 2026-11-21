@@ -1,6 +1,9 @@
 package com.minemenu;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.TntEntity;
@@ -19,6 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -27,6 +31,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 
 import java.util.EnumSet;
@@ -421,6 +426,62 @@ public final class ServerCheats {
             case CLEAR_WEATHER -> world.setWeather(12000, 0, false, false);
             case THUNDER -> world.setWeather(0, 6000, true, true);
         }
+    }
+
+    /** Spawns {@code amount} of the given mob on the block the player is looking at. */
+    public static void spawnMob(MinecraftServer server, Identifier typeId, int amount) {
+        ServerPlayerEntity player = host(server);
+        if (player == null) {
+            return;
+        }
+        EntityType<?> type = Registries.ENTITY_TYPE.getOrEmpty(typeId).orElse(null);
+        if (type == null || !MobList.isSpawnable(type)) {
+            return;
+        }
+        HitResult hit = player.raycast(CROSSHAIR_RANGE, 1.0f, false);
+        if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
+            player.sendMessage(Text.literal("Look at a block to spawn a mob there").formatted(Formatting.YELLOW), true);
+            return;
+        }
+        ServerWorld world = player.getServerWorld();
+        BlockPos pos = blockHit.getBlockPos().offset(blockHit.getSide());
+
+        int spawned = 0;
+        for (int i = 0; i < amount; i++) {
+            Entity entity = type.spawn(world, pos, SpawnReason.COMMAND);
+            if (entity == null) {
+                continue;
+            }
+            spawned++;
+            if (i > 0) {
+                // Spread a group out a little so they don't all stack in one spot.
+                entity.refreshPositionAndAngles(
+                        entity.getX() + (world.random.nextDouble() - 0.5) * 3,
+                        entity.getY(),
+                        entity.getZ() + (world.random.nextDouble() - 0.5) * 3,
+                        entity.getYaw(), entity.getPitch());
+            }
+            // Face the player.
+            float yaw = player.getYaw() + 180.0f;
+            entity.setYaw(yaw);
+            entity.setHeadYaw(yaw);
+            entity.setBodyYaw(yaw);
+        }
+
+        String name = type.getName().getString();
+        if (spawned == 0) {
+            player.sendMessage(Text.literal("Couldn't spawn " + name + " there").formatted(Formatting.RED), true);
+            return;
+        }
+        Text message = Text.literal("Spawned " + (spawned == 1 ? name : spawned + "x " + name)).formatted(Formatting.GREEN);
+        if (type.getSpawnGroup() == SpawnGroup.MONSTER && world.getDifficulty() == Difficulty.PEACEFUL) {
+            message = Text.literal(name + " disappears right away on Peaceful. Change the difficulty to see it.")
+                    .formatted(Formatting.YELLOW);
+        } else if (type.getSpawnGroup() == SpawnGroup.MONSTER && CheatState.isOn(Feature.MOB_AURA)) {
+            message = Text.literal("Spawned " + name + ", but Mob Aura is on, so it won't last long!")
+                    .formatted(Formatting.YELLOW);
+        }
+        player.sendMessage(message, true);
     }
 
     private static int killAround(ServerPlayerEntity player, double radius, Predicate<LivingEntity> filter) {

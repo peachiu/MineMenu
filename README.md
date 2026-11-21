@@ -1,6 +1,6 @@
 # MineMenu
 
-A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, turn on god mode, one-shot mobs, call down lightning, rain TNT, freeze the world and more. Made for messing around and filming videos.
+A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, turn on god mode, one-shot mobs, spawn any mob, call down lightning, rain TNT, freeze the world and more. Made for messing around and filming videos.
 
 ![The MineMenu menu](docs/menu.png)
 
@@ -10,7 +10,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, tu
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-1.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-2.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -34,11 +34,13 @@ Hover any button in the game to see what it does.
 | Freeze World | Freezes all mobs, projectiles, redstone and so on. You can still move around. |
 | Size | Cycle between Normal, **Giant** (4×) and **Tiny** (¼). |
 | Show HUD | Shows the list of active cheats in the top-left corner. Turn it off for clean footage. |
+| Show FPS | Shows your frames per second in the top-left corner (green 60+, yellow 30+, red below 30). |
 
 ### Actions
 
 | Action | What it does |
 |---|---|
+| Spawn Mob... | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
 | Kill Hostile Mobs | Kills every hostile mob within 64 blocks. |
 | Kill ALL Mobs | Kills every mob within 64 blocks. Your tamed pets, armor stands and you are left alone. |
 | Smite | Lightning bolt where you're looking. |
@@ -50,6 +52,18 @@ Hover any button in the game to see what it does.
 | Set Day / Set Night | Changes the time. |
 | Clear Weather / Thunderstorm | Changes the weather. |
 
+### Spawning mobs
+
+![The Spawn Mob picker](docs/spawn-mob.png)
+
+1. Look at the block where you want the mob.
+2. Open MineMenu and click **Spawn Mob...**.
+3. Type to search (for example `creep`), then press **Enter**, double-click the mob, or click **Spawn**.
+
+Use **Amount** to spawn 1, 5 or 10 at once. Set the **Spawn Selected Mob** keybind to spawn your last pick without opening the menu.
+
+Hostile mobs disappear straight away on Peaceful, and Mob Aura kills them if it's on. MineMenu tells you when that happens.
+
 ### Keybinds
 
 Change these in **Options → Controls → Key Binds → MineMenu**.
@@ -60,6 +74,7 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 | Toggle Fly | not bound |
 | Toggle God Mode | not bound |
 | Kill Hostile Mobs | not bound |
+| Spawn Selected Mob | not bound |
 
 ## Notes
 
@@ -78,7 +93,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-1.0.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-2.0.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
@@ -96,5 +111,6 @@ MineMenu is a client mod. When you play singleplayer, Minecraft runs a small ser
 
 - `MineMenuClient`: keybinds, the HUD, and hooks into the local server.
 - `MineMenuScreen`: the menu.
+- `MobSpawnScreen` / `MobList`: the Spawn Mob picker.
 - `ServerCheats`: everything that changes the game.
 - `CheatState` / `Feature`: which toggles are on.
