@@ -181,8 +181,8 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 applyAttributes(player, feature);
             }
-            case MOB_AURA -> {
-                // handled every few ticks in tick()
+            case MOB_AURA, REVENGE -> {
+                // Mob Aura runs in tick(); Revenge reacts to deaths (see Revenge)
             }
             default -> applyAttributes(player, feature);
         }
@@ -205,7 +205,7 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 removeAttributes(player, feature);
             }
-            case GOD_MODE, MOB_AURA -> {
+            case GOD_MODE, MOB_AURA, REVENGE -> {
                 // nothing to undo
             }
             default -> removeAttributes(player, feature);

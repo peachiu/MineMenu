@@ -15,7 +15,8 @@ public enum Feature {
     INSTA_MINE("Insta-Mine", "Break blocks almost instantly."),
     LONG_REACH("Long Reach", "Reach blocks and mobs from much farther away."),
     MOB_AURA("Mob Aura", "Hostile mobs that come within 8 blocks of you die instantly."),
-    FREEZE_WORLD("Freeze World", "Freeze every mob, projectile and machine. You can still move.");
+    FREEZE_WORLD("Freeze World", "Freeze every mob, projectile and machine. You can still move."),
+    REVENGE("Revenge Mode", "If a mob kills you, lightning destroys it and you respawn right where you died.");
 
     private final String displayName;
     private final String description;

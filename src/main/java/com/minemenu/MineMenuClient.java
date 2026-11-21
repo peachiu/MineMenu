@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -43,6 +44,9 @@ public class MineMenuClient implements ClientModInitializer {
 
         // These fire for the integrated (singleplayer) server, which runs inside the client.
         ServerLifecycleEvents.SERVER_STARTED.register(ServerCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(Revenge::onServerStarted);
+        ServerLivingEntityEvents.AFTER_DEATH.register(Revenge::onDeath);
+        ServerPlayerEvents.AFTER_RESPAWN.register(Revenge::onRespawn);
         ServerLifecycleEvents.SERVER_STOPPING.register(ServerCheats::revertAll);
         ServerTickEvents.END_SERVER_TICK.register(ServerCheats::tick);
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
