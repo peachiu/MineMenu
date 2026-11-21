@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "mineboost",
+  "version": "${version}",
+  "name": "MineBoost",
+  "description": "An FPS boost menu. Press . (period) in game for one-click presets, the graphics settings that matter, and extra boosts vanilla doesn't have.",
+  "authors": ["peachiu"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/mineboost/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.mineboost.MineBoostClient"]
+  },
+  "mixins": ["mineboost.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

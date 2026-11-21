@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.mineboost.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BlockEntityRenderDispatcherMixin",
+    "EntityRenderDispatcherMixin",
+    "MinecraftClientMixin",
+    "ParticleManagerMixin",
+    "SpriteAtlasTextureMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

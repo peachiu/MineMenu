@@ -1,0 +1,11 @@
+{
+  "key.categories.mineboost": "MineBoost",
+  "key.mineboost.open": "Open MineBoost",
+  "mineboost.option.entity_distance": "Entity Distance",
+  "mineboost.option.block_entity_distance": "Chests & Signs",
+  "mineboost.option.disable_particles": "Disable All Particles",
+  "mineboost.option.hide_weather": "Hide Rain & Snow",
+  "mineboost.option.animated_textures": "Animated Textures",
+  "mineboost.option.background_fps": "Background FPS",
+  "mineboost.option.fps_overlay": "FPS Overlay"
+}
