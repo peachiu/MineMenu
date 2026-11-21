@@ -11,6 +11,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -23,6 +24,13 @@ public class MineMenuScreen extends Screen {
      */
     public static Function<Screen, List<ButtonWidget>> tabs;
 
+    /**
+     * Set by MineMeBoost: true while another FPS counter (MineBoost's FPS Overlay) is on,
+     * so "Show FPS" can't be turned on as well. Null in the standalone MineMenu mod.
+     */
+    public static BooleanSupplier otherFpsCounterOn;
+    public static String otherFpsCounterReason = "Another FPS counter is on. Turn it off first.";
+
     private static final int BUTTON_WIDTH = 102;
     private static final int BUTTON_HEIGHT = 20;
     private static final int GAP = 2;
@@ -32,7 +40,11 @@ public class MineMenuScreen extends Screen {
     private boolean hasTabs;
 
     /** One button in a grid: a label that can change, what clicking does, and a tooltip. */
-    private record Spec(Supplier<Text> label, Consumer<ButtonWidget> onClick, String tooltip) {
+    private record Spec(Supplier<Text> label, Consumer<ButtonWidget> onClick, String tooltip,
+                        BooleanSupplier locked, String lockedTooltip) {
+        Spec(Supplier<Text> label, Consumer<ButtonWidget> onClick, String tooltip) {
+            this(label, onClick, tooltip, () -> false, null);
+        }
     }
 
     private int togglesHeaderY;
@@ -53,7 +65,10 @@ public class MineMenuScreen extends Screen {
         specs.add(new Spec(() -> onOff("Show HUD", CheatState.hudVisible()), b -> CheatState.toggleHud(),
                 "Show the list of active cheats in the top-left corner."));
         specs.add(new Spec(() -> onOff("Show FPS", CheatState.fpsVisible()), b -> CheatState.toggleFps(),
-                "Show your frames per second in the top-left corner."));
+                "Show your frames per second in the top-left corner.",
+                // Only blocks turning it ON: if both are somehow on, you can still turn this one off.
+                () -> otherFpsCounterOn != null && otherFpsCounterOn.getAsBoolean() && !CheatState.fpsVisible(),
+                otherFpsCounterReason));
         return specs;
     }
 
@@ -121,13 +136,15 @@ public class MineMenuScreen extends Screen {
             Spec spec = specs.get(i);
             int x = left + (i % columns) * (BUTTON_WIDTH + GAP);
             int y = top + (i / columns) * (BUTTON_HEIGHT + GAP);
-            addDrawableChild(ButtonWidget.builder(spec.label().get(), b -> {
+            boolean locked = spec.locked().getAsBoolean();
+            ButtonWidget button = addDrawableChild(ButtonWidget.builder(spec.label().get(), b -> {
                         spec.onClick().accept(b);
                         b.setMessage(spec.label().get());
                     })
                     .dimensions(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
-                    .tooltip(Tooltip.of(Text.literal(spec.tooltip())))
+                    .tooltip(Tooltip.of(Text.literal(locked ? spec.lockedTooltip() : spec.tooltip())))
                     .build());
+            button.active = !locked;
         }
         return top + rows(specs.size(), columns) * (BUTTON_HEIGHT + GAP);
     }

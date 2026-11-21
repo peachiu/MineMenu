@@ -13,13 +13,21 @@ Press **Right Shift** and the menu has two tabs at the top:
 
 Right Shift reopens the tab you used last. **`.`** still opens MineBoost directly.
 
+### One FPS counter at a time
+
+MineMenu's **Show FPS** and MineBoost's **FPS Overlay** can't both be on. While one is on, the other is greyed out; hover it to see why. Turn the first one off and the other unlocks.
+
+| FPS Overlay greyed out (Show FPS is on) | Show FPS greyed out (FPS Overlay is on) |
+|---|---|
+| ![FPS Overlay greyed out](docs/fps-lock-mineboost.png) | ![Show FPS greyed out](docs/fps-lock-minemenu.png) |
+
 MineMenu only works in your own singleplayer worlds. On a server, Right Shift opens MineBoost and the MineMenu tab is greyed out. MineBoost works everywhere.
 
 ## Install
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemeboost-2.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemeboost-2.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoost already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over.
@@ -37,7 +45,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/minemeboost-2.0.0.jar`.
+The jar ends up in `minemeboost/build/libs/minemeboost-2.0.1.jar`.
 
 ### Making a release
 

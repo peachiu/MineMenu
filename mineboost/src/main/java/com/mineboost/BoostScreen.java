@@ -4,6 +4,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.option.GameOptions;
@@ -13,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
 /**
@@ -25,6 +27,13 @@ public class BoostScreen extends GameOptionsScreen {
      * shown above the menu. Null in the standalone MineBoost mod.
      */
     public static Function<Screen, List<ButtonWidget>> tabs;
+
+    /**
+     * Set by MineMeBoost: true while another FPS counter (MineMenu's Show FPS) is on,
+     * so the FPS Overlay can't be turned on as well. Null in the standalone MineBoost mod.
+     */
+    public static BooleanSupplier otherFpsCounterOn;
+    public static String otherFpsCounterReason = "Another FPS counter is on. Turn it off first.";
 
     private final int mipmapsOnOpen;
     private final double initialScroll;
@@ -80,7 +89,9 @@ public class BoostScreen extends GameOptionsScreen {
     @Override
     protected void addOptions() {
         // MineBoost extras first: these are the ones vanilla doesn't have.
-        this.body.addAll(BoostOptions.all());
+        SimpleOption<?>[] extras = BoostOptions.all();
+        this.body.addAll(extras);
+        lockFpsOverlayIfNeeded(extras[extras.length - 1]);
 
         // Then the vanilla settings that matter most for FPS, biggest impact first.
         GameOptions o = this.gameOptions;
@@ -106,6 +117,17 @@ public class BoostScreen extends GameOptionsScreen {
     public void applyPendingValues() {
         if (this.body != null) {
             this.body.applyAllPendingValues();
+        }
+    }
+
+    /** Greys out the FPS Overlay while another FPS counter is on (only blocks turning it on). */
+    private void lockFpsOverlayIfNeeded(SimpleOption<?> fpsOverlayOption) {
+        boolean locked = otherFpsCounterOn != null && otherFpsCounterOn.getAsBoolean()
+                && !BoostConfig.get().fpsOverlay;
+        ClickableWidget widget = this.body.getWidgetFor(fpsOverlayOption);
+        if (locked && widget != null) {
+            widget.active = false;
+            widget.setTooltip(Tooltip.of(Text.literal(otherFpsCounterReason)));
         }
     }
 
