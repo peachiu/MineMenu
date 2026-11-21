@@ -10,7 +10,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, tu
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-2.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-2.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -41,6 +41,7 @@ Hover any button in the game to see what it does.
 | Action | What it does |
 |---|---|
 | Spawn Mob... | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
+| Give XP... | Type a number of levels (for example `64`) and press Enter to have exactly that many levels. **Add Levels** adds them on top instead, and **Reset to 0** removes all your XP. |
 | Kill Hostile Mobs | Kills every hostile mob within 64 blocks. |
 | Kill ALL Mobs | Kills every mob within 64 blocks. Your tamed pets, armor stands and you are left alone. |
 | Smite | Lightning bolt where you're looking. |
@@ -63,6 +64,16 @@ Hover any button in the game to see what it does.
 Use **Amount** to spawn 1, 5 or 10 at once. Set the **Spawn Selected Mob** keybind to spawn your last pick without opening the menu.
 
 Hostile mobs disappear straight away on Peaceful, and Mob Aura kills them if it's on. MineMenu tells you when that happens.
+
+### Giving yourself XP
+
+![The Give XP screen](docs/give-xp.png)
+
+1. Open MineMenu and click **Give XP...**.
+2. Type how many levels you want, for example `64`.
+3. Press **Enter** (or **Set Level**) and you'll have exactly 64 levels. Use **Add Levels** to add them to what you already have.
+
+The box only accepts numbers, up to 100,000 levels.
 
 ### Keybinds
 
@@ -93,7 +104,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-2.0.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-2.0.1.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
@@ -112,5 +123,6 @@ MineMenu is a client mod. When you play singleplayer, Minecraft runs a small ser
 - `MineMenuClient`: keybinds, the HUD, and hooks into the local server.
 - `MineMenuScreen`: the menu.
 - `MobSpawnScreen` / `MobList`: the Spawn Mob picker.
+- `XpScreen`: the Give XP screen.
 - `ServerCheats`: everything that changes the game.
 - `CheatState` / `Feature`: which toggles are on.

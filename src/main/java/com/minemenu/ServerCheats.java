@@ -58,6 +58,8 @@ public final class ServerCheats {
     private static final double MOB_AURA_RADIUS = 8.0;
     private static final double KILL_RADIUS = 64.0;
     private static final double CROSSHAIR_RANGE = 160.0;
+    /** High enough for anything fun; the XP bar stops working properly far above this. */
+    public static final int MAX_XP_LEVELS = 100_000;
 
     /** Features whose effect is currently applied to the player. */
     private static final Set<Feature> applied = EnumSet.noneOf(Feature.class);
@@ -482,6 +484,22 @@ public final class ServerCheats {
                     .formatted(Formatting.YELLOW);
         }
         player.sendMessage(message, true);
+    }
+
+    /** Sets the player's XP level to {@code levels}, or adds that many when {@code set} is false. */
+    public static void giveXp(MinecraftServer server, int levels, boolean set) {
+        ServerPlayerEntity player = host(server);
+        if (player == null || levels < 0) {
+            return;
+        }
+        if (set) {
+            player.setExperienceLevel(levels);
+            player.setExperiencePoints(0); // start of the level, not part-way through
+        } else {
+            long total = (long) player.experienceLevel + levels;
+            player.setExperienceLevel((int) Math.min(total, MAX_XP_LEVELS));
+        }
+        player.sendMessage(Text.literal("You now have " + player.experienceLevel + " levels").formatted(Formatting.GREEN), true);
     }
 
     private static int killAround(ServerPlayerEntity player, double radius, Predicate<LivingEntity> filter) {

@@ -53,6 +53,9 @@ public class MineMenuScreen extends Screen {
                 b -> this.client.setScreen(new MobSpawnScreen(this)),
                 "Pick any mob and spawn it where you're looking. Last picked: "
                         + Registries.ENTITY_TYPE.get(CheatState.selectedMob()).getName().getString() + "."));
+        specs.add(new Spec(() -> Text.literal("Give XP...").formatted(Formatting.AQUA),
+                b -> this.client.setScreen(new XpScreen(this)),
+                "Type a number of levels and get that much XP, e.g. 64."));
         for (ServerCheats.Action action : ServerCheats.Action.values()) {
             specs.add(new Spec(() -> Text.literal(action.displayName()),
                     b -> MineMenuClient.runAction(this.client, action), action.description()));
