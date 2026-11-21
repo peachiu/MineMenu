@@ -1,0 +1,54 @@
+name: Release MineMeBoost
+
+# Builds the MineMeBoost mod (in minemeboost/) and publishes a GitHub release with the jar attached.
+# Run it from the Actions tab (Release MineMeBoost > Run workflow). It creates the tag
+# minemeboost-v<mod_version> from minemeboost/gradle.properties.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: minemeboost
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: minemeboost
+
+      - name: Build
+        run: |
+          ./gradlew build
+          mkdir dist
+          cp build/libs/*.jar dist/
+          rm dist/*-sources.jar
+          ls -l dist
+
+      - name: Work out the release tag
+        id: tag
+        run: |
+          version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "name=minemeboost-v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          name: MineMeBoost v${{ steps.tag.outputs.version }} (Minecraft 1.21.1)
+          body_path: minemeboost/release-notes/v${{ steps.tag.outputs.version }}.md
+          files: minemeboost/dist/*.jar
+          fail_on_unmatched_files: true
+          make_latest: true

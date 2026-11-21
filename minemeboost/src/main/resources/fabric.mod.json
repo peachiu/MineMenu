@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "minemeboost",
+  "version": "${version}",
+  "name": "MineMeBoost",
+  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with two tabs: MineMenu (singleplayer fun cheats) and MineBoost (FPS boost). The . key still opens MineBoost directly.",
+  "authors": ["peachiu"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/minemeboost/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.minemeboost.MineMeBoostClient"]
+  },
+  "mixins": ["mineboost.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "breaks": {
+    "minemenu": "*",
+    "mineboost": "*"
+  }
+}

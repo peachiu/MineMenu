@@ -24,6 +24,12 @@ import java.util.List;
 public class MineMenuClient implements ClientModInitializer {
     private static final String CATEGORY = "key.categories.minemenu";
 
+    /**
+     * Set by MineMeBoost (MineMenu + MineBoost in one mod): what Right Shift does instead of
+     * opening MineMenu directly. Null in the standalone MineMenu mod.
+     */
+    public static Runnable openMenuOverride;
+
     private static KeyBinding openMenuKey;
     private static KeyBinding toggleFlyKey;
     private static KeyBinding toggleGodKey;
@@ -62,7 +68,9 @@ public class MineMenuClient implements ClientModInitializer {
 
     private static void onClientTick(MinecraftClient client) {
         while (openMenuKey.wasPressed()) {
-            if (requireSingleplayer(client)) {
+            if (openMenuOverride != null) {
+                openMenuOverride.run();
+            } else if (requireSingleplayer(client)) {
                 client.setScreen(new MineMenuScreen());
             }
         }

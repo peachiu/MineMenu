@@ -12,14 +12,24 @@ import net.minecraft.util.Formatting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /** The menu itself: a grid of toggles on top and a grid of one-shot actions below. */
 public class MineMenuScreen extends Screen {
+    /**
+     * Set by MineMeBoost (MineMenu + MineBoost in one mod): builds the tab buttons
+     * shown above the menu. Null in the standalone MineMenu mod.
+     */
+    public static Function<Screen, List<ButtonWidget>> tabs;
+
     private static final int BUTTON_WIDTH = 102;
     private static final int BUTTON_HEIGHT = 20;
     private static final int GAP = 2;
-    private static final int HEADER_HEIGHT = 12;
+    private static final int TAB_ROW_HEIGHT = 24;
+
+    private int headerHeight = 12;
+    private boolean hasTabs;
 
     /** One button in a grid: a label that can change, what clicking does, and a tooltip. */
     private record Spec(Supplier<Text> label, Consumer<ButtonWidget> onClick, String tooltip) {
@@ -68,6 +78,20 @@ public class MineMenuScreen extends Screen {
         List<Spec> toggles = toggleSpecs();
         List<Spec> actions = actionSpecs();
 
+        List<ButtonWidget> tabButtons = tabs != null ? tabs.apply(this) : List.of();
+        hasTabs = !tabButtons.isEmpty();
+        if (hasTabs) {
+            // The tabs replace the title, so squeeze the section labels a little to fit small screens.
+            headerHeight = 10;
+            int rowWidth = tabButtons.stream().mapToInt(ButtonWidget::getWidth).sum() + 4 * (tabButtons.size() - 1);
+            int x = (this.width - rowWidth) / 2;
+            for (ButtonWidget tab : tabButtons) {
+                tab.setPosition(x, 2);
+                addDrawableChild(tab);
+                x += tab.getWidth() + 4;
+            }
+        }
+
         // Use 4 columns when they fit, otherwise 3.
         int columns = this.width >= 4 * BUTTON_WIDTH + 3 * GAP + 8 ? 4 : 3;
         int gridWidth = columns * BUTTON_WIDTH + (columns - 1) * GAP;
@@ -75,15 +99,16 @@ public class MineMenuScreen extends Screen {
 
         int toggleRows = rows(toggles.size(), columns);
         int actionRows = rows(actions.size(), columns);
-        int totalHeight = HEADER_HEIGHT + toggleRows * (BUTTON_HEIGHT + GAP)
-                + HEADER_HEIGHT + actionRows * (BUTTON_HEIGHT + GAP) + BUTTON_HEIGHT;
-        // Leave room above for the title.
-        int top = Math.max(18, (this.height - totalHeight) / 2 + 8);
+        int totalHeight = headerHeight + toggleRows * (BUTTON_HEIGHT + GAP)
+                + headerHeight + actionRows * (BUTTON_HEIGHT + GAP) + BUTTON_HEIGHT;
+        // Leave room above for the title (or the tabs).
+        int minTop = hasTabs ? TAB_ROW_HEIGHT : 18;
+        int top = Math.max(minTop, (this.height - totalHeight) / 2 + (hasTabs ? TAB_ROW_HEIGHT / 2 : 8));
 
         togglesHeaderY = top;
-        int y = addGrid(toggles, left, top + HEADER_HEIGHT, columns);
+        int y = addGrid(toggles, left, top + headerHeight, columns);
         actionsHeaderY = y;
-        y = addGrid(actions, left, y + HEADER_HEIGHT, columns);
+        y = addGrid(actions, left, y + headerHeight, columns);
 
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
                 .dimensions(this.width / 2 - 75, y, 150, BUTTON_HEIGHT)
@@ -133,9 +158,11 @@ public class MineMenuScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
-                this.width / 2, togglesHeaderY - 13, 0xFFFFFF);
+        if (!hasTabs) {
+            context.drawCenteredTextWithShadow(this.textRenderer,
+                    Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+                    this.width / 2, togglesHeaderY - 13, 0xFFFFFF);
+        }
         context.drawCenteredTextWithShadow(this.textRenderer,
                 Text.literal("Toggles").formatted(Formatting.YELLOW), this.width / 2, togglesHeaderY + 1, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer,

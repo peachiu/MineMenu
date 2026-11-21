@@ -6,7 +6,11 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, tu
 
 > MineMenu only works in your own singleplayer worlds. It refuses to work on multiplayer servers, and it switches itself off if you open your world to LAN.
 
-> **Also in this repo: [MineBoost](mineboost/README.md)**, an FPS boost menu (press `.` in game) with one-click presets and extra boosts. It's a separate mod with its own jar on the [Releases page](https://github.com/peachiu/MineMenu/releases).
+> **Also in this repo:**
+> - **[MineBoost](mineboost/README.md)**: an FPS boost menu (press `.` in game) with one-click presets and extra boosts.
+> - **[MineMeBoost](minemeboost/README.md)**: MineMenu and MineBoost in one mod, with MineMenu and MineBoost tabs on Right Shift.
+>
+> Each has its own jar on the [Releases page](https://github.com/peachiu/MineMenu/releases). Install only one of the three.
 
 ## Install
 

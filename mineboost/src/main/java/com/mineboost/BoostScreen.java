@@ -1,6 +1,5 @@
 package com.mineboost;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -13,24 +12,48 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * The MineBoost menu (press "."): presets on top, then MineBoost's own boosts,
  * then the vanilla graphics settings that affect FPS the most.
  */
 public class BoostScreen extends GameOptionsScreen {
+    /**
+     * Set by MineMeBoost (MineMenu + MineBoost in one mod): builds the tab buttons
+     * shown above the menu. Null in the standalone MineBoost mod.
+     */
+    public static Function<Screen, List<ButtonWidget>> tabs;
+
     private final int mipmapsOnOpen;
+    private final double initialScroll;
+    /** True while being replaced by a fresh copy of itself (after applying a preset). */
+    private boolean refreshing;
     private TextWidget fpsLine;
 
     public BoostScreen(Screen parent, GameOptions options) {
+        this(parent, options, options.getMipmapLevels().getValue(), 0);
+    }
+
+    private BoostScreen(Screen parent, GameOptions options, int mipmapsOnOpen, double initialScroll) {
         super(parent, options, Text.literal("MineBoost").formatted(Formatting.GREEN, Formatting.BOLD));
-        this.mipmapsOnOpen = options.getMipmapLevels().getValue();
+        this.mipmapsOnOpen = mipmapsOnOpen;
+        this.initialScroll = initialScroll;
     }
 
     @Override
     protected void initHeader() {
-        layout.setHeaderHeight(58);
+        List<ButtonWidget> tabButtons = tabs != null ? tabs.apply(this) : List.of();
+        layout.setHeaderHeight(tabButtons.isEmpty() ? 58 : 82);
         DirectionalLayoutWidget header = DirectionalLayoutWidget.vertical().spacing(4);
         header.getMainPositioner().alignHorizontalCenter();
+
+        if (!tabButtons.isEmpty()) {
+            DirectionalLayoutWidget tabRow = DirectionalLayoutWidget.horizontal().spacing(4);
+            tabButtons.forEach(tabRow::add);
+            header.add(tabRow);
+        }
 
         DirectionalLayoutWidget titleRow = DirectionalLayoutWidget.horizontal().spacing(8);
         titleRow.add(new TextWidget(this.title, this.textRenderer));
@@ -71,12 +94,29 @@ public class BoostScreen extends GameOptionsScreen {
                 o.getMipmapLevels(), o.getMenuBackgroundBlurriness());
     }
 
-    private void applyPreset(Preset preset) {
+    @Override
+    protected void init() {
+        super.init();
+        if (this.body != null && initialScroll > 0) {
+            this.body.setScrollAmount(initialScroll);
+        }
+    }
+
+    /** Applies sliders that are still being dragged; call before leaving the screen. */
+    public void applyPendingValues() {
         if (this.body != null) {
             this.body.applyAllPendingValues();
         }
+    }
+
+    private void applyPreset(Preset preset) {
+        applyPendingValues();
         preset.apply(this.client);
-        clearAndInit(); // refresh every slider and button to the new values
+        // Open a fresh copy so every slider and button shows the new values. (Re-running init()
+        // on the same screen would stack a second copy of the menu on top of the first.)
+        double scroll = this.body != null ? this.body.getScrollAmount() : 0;
+        refreshing = true;
+        this.client.setScreen(new BoostScreen(this.parent, this.gameOptions, mipmapsOnOpen, scroll));
     }
 
     private Text fpsText() {
@@ -94,15 +134,11 @@ public class BoostScreen extends GameOptionsScreen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-    }
-
-    @Override
     public void removed() {
         // Same as vanilla's Video Settings: mipmap changes need a texture reload.
+        // Skipped while swapping in a refreshed copy; the copy does it when it closes.
         int mipmaps = this.gameOptions.getMipmapLevels().getValue();
-        if (mipmaps != mipmapsOnOpen) {
+        if (!refreshing && mipmaps != mipmapsOnOpen) {
             this.client.setMipmapLevels(mipmaps);
             this.client.reloadResourcesConcurrently();
         }

@@ -1,0 +1,71 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+// MineMeBoost is MineMenu + MineBoost in one jar. It builds straight from both mods' code
+// (no copies), plus the small glue in this folder that adds the tabs.
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', '../src/main/java', '../mineboost/src/main/java']
+        }
+    }
+}
+
+processResources {
+    // Assets (lang files, icons) and MineBoost's mixin config, without the two mods' own fabric.mod.json.
+    from('../src/main/resources') { exclude 'fabric.mod.json' }
+    from('../mineboost/src/main/resources') { exclude 'fabric.mod.json' }
+    // Loom only adds the refmap to mixin configs in this project's own resources, so point
+    // MineBoost's mixin config at this jar's refmap. Without it the mixins fail in a normal install.
+    filesMatching('mineboost.mixins.json') {
+        filter { String line ->
+            line.contains('"required"') ? line + '\n  "refmap": "minemeboost-refmap.json",' : line
+        }
+    }
+
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}

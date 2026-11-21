@@ -15,7 +15,7 @@ Works in singleplayer and on servers. It only changes what your own game draws.
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `mineboost-1.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `mineboost-1.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile, join a world and press **`.`**.
 
 You can change the key in **Options → Controls → Key Binds → MineBoost**.
@@ -87,7 +87,7 @@ cd mineboost
 ./gradlew build
 ```
 
-The jar ends up in `mineboost/build/libs/mineboost-1.0.0.jar`.
+The jar ends up in `mineboost/build/libs/mineboost-1.0.1.jar`.
 
 ### Making a release
 
