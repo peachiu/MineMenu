@@ -55,6 +55,8 @@ public class MineMenuClient implements ClientModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(ServerCheats::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(Revenge::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(ExtraCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> DeleteMode.reset());
+        DeleteMode.register();
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
                 ExtraCheats.afterBlockBreak(world, player, pos, state));
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {

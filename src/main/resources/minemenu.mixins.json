@@ -6,6 +6,10 @@
   "mixins": [
     "PlayerEntityMixin"
   ],
+  "client": [
+    "HandledScreenAccessor",
+    "HandledScreenMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

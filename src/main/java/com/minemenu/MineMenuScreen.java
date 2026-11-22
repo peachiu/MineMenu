@@ -84,6 +84,10 @@ public class MineMenuScreen extends Screen {
             specs.add(new Spec(() -> Text.literal("Give Item...").formatted(Formatting.AQUA),
                     b -> this.client.setScreen(new ItemGiveScreen(this)),
                     "Pick any item and get it in your inventory, or dropped on the ground where you're looking."));
+            specs.add(new Spec(() -> Text.literal("Delete Items...").formatted(Formatting.RED),
+                    b -> DeleteMode.open(this.client),
+                    "Opens your inventory in delete mode: right-click any item to delete it. "
+                            + "Undo Delete gives it back. Closing the inventory ends delete mode."));
             specs.add(new Spec(() -> Text.literal("Give XP...").formatted(Formatting.AQUA),
                     b -> this.client.setScreen(new XpScreen(this)),
                     "Type a number of levels and get that much XP, e.g. 64."));

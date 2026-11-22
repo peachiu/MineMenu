@@ -96,6 +96,7 @@ public final class ExtraCheats {
 
     public static void onServerStarted(MinecraftServer server) {
         lastClearedJunk = List.of();
+        deletedItems.clear();
         oreMarkers.clear();
         lastOreScanCenter = null;
         originalKeepInventory = null;
@@ -594,6 +595,50 @@ public final class ExtraCheats {
         }
         lastClearedJunk = List.of();
         player.sendMessage(Text.literal("Gave back " + total + " items").formatted(Formatting.GREEN), true);
+    }
+
+    /** Items deleted with Delete Items, newest last, with the slot they came from (server thread only). */
+    private record DeletedItem(int slot, ItemStack stack) {
+    }
+
+    private static final List<DeletedItem> deletedItems = new ArrayList<>();
+    private static final int MAX_UNDO = 64;
+
+    /** Delete Items mode: deletes whatever is in that inventory slot (0-35 main, 36-39 armor, 40 off hand). */
+    public static void deleteInventorySlot(ServerPlayerEntity player, int slot) {
+        var inventory = player.getInventory();
+        if (slot < 0 || slot >= inventory.size()) {
+            return;
+        }
+        ItemStack stack = inventory.getStack(slot);
+        if (stack.isEmpty()) {
+            return;
+        }
+        deletedItems.add(new DeletedItem(slot, stack.copy()));
+        if (deletedItems.size() > MAX_UNDO) {
+            deletedItems.remove(0);
+        }
+        inventory.setStack(slot, ItemStack.EMPTY);
+        inventory.markDirty();
+    }
+
+    /** Gives back the last deleted item: into its old slot if that's still empty, otherwise wherever it fits. */
+    public static void undoDelete(ServerPlayerEntity player) {
+        if (deletedItems.isEmpty()) {
+            return;
+        }
+        DeletedItem last = deletedItems.remove(deletedItems.size() - 1);
+        var inventory = player.getInventory();
+        if (inventory.getStack(last.slot()).isEmpty()) {
+            inventory.setStack(last.slot(), last.stack());
+        } else {
+            ItemStack leftover = last.stack().copy();
+            inventory.insertStack(leftover);
+            if (!leftover.isEmpty()) {
+                player.dropItem(leftover, false, false);
+            }
+        }
+        inventory.markDirty();
     }
 
     public static void repairAll(ServerPlayerEntity player) {

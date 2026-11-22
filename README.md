@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.0.4.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.0.4.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -82,6 +82,7 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | Give XP... *(action)* | Type a number of levels (for example `64`) and press Enter to have exactly that many levels. **Add Levels** adds them on top instead, and **Reset to 0** removes all your XP. |
 | **Super Enchant** *(action)* | Puts every enchantment that fits on the item in your hand, at max level. When two clash, the best one wins (Sharpness, Protection, Efficiency, Fortune, Mending...). No curses. |
 | **Repair All** *(action)* | Fully repairs every item in your inventory. |
+| **Delete Items...** *(action)* | Opens your inventory in delete mode: **right-click any item to delete it** (armor and off hand too). The slot under the mouse turns red. **Undo Delete** gives items back one by one, into the slot they came from. Left-click works as normal, and closing the inventory ends delete mode. Works in creative too. |
 | **Clear Junk** *(action)* | Deletes junk from your inventory: rotten flesh, poisonous potatoes, spider eyes, dirt, gravel, granite, diorite, andesite, tuff, cobbled deepslate and netherrack. Armor and items you renamed on an anvil are never touched. Chat shows what was removed. |
 | **Undo Clear** *(action)* | Gives back everything the last Clear Junk removed. |
 | **Netherite Kit** *(action)* | A full set of super-enchanted netherite armor (worn if the slot is free), sword, pickaxe, axe, shovel, a bow and 64 arrows. |
@@ -113,6 +114,15 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | `madeira`, `lã`, `cama`, `flores`, `disco`, `barco`, `carrinho`, `corante`, `cabeça`, `balde`, `livro`, `vidro` | Wood, wool, beds, flowers, music discs, boats, minecarts and rails, dyes, heads, buckets, books, glass |
 
 The start of a word is enough too (`armad` already means armor). Normal search by name still works, in your game's language or in English.
+
+### Deleting items
+
+![Delete mode in the inventory](docs/delete-items.png)
+
+1. Open MineMenu, go to the **Items** page and click **Delete Items...**.
+2. Your inventory opens with **DELETE MODE** at the top. Right-click an item to delete it.
+3. Deleted something by mistake? Click **Undo Delete** (it remembers your last 64 deletes).
+4. Close the inventory and everything is back to normal: right-click splits stacks again.
 
 ### Ore Vision
 
@@ -184,7 +194,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.0.4.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.0.4.1.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
