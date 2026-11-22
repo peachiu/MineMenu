@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -74,12 +74,21 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 
 | | What it does |
 |---|---|
+| **Give Item...** *(action)* | Pick any item from a searchable list with icons. Choose 1, 16, 32 or 64 (tools and armor come one at a time) and where it goes: **Inventory** (if it's full, the rest drops at your feet) or **Ground** (dropped on the block you're looking at). Press Enter, double-click or click Give; the list stays open so you can grab several things. |
 | **Infinite Items** | The stack in your hands never runs out and your tools never break. |
 | **Keep Inventory** | Keep your items and XP when you die. |
 | Give XP... *(action)* | Type a number of levels (for example `64`) and press Enter to have exactly that many levels. **Add Levels** adds them on top instead, and **Reset to 0** removes all your XP. |
 | **Super Enchant** *(action)* | Puts every enchantment that fits on the item in your hand, at max level. When two clash, the best one wins (Sharpness, Protection, Efficiency, Fortune, Mending...). No curses. |
 | **Repair All** *(action)* | Fully repairs every item in your inventory. |
 | **Netherite Kit** *(action)* | A full set of super-enchanted netherite armor (worn if the slot is free), sword, pickaxe, axe, shovel, a bow and 64 arrows. |
+
+### Giving yourself items
+
+![The Give Item picker](docs/give-item.png)
+
+1. Open MineMenu, go to the **Items** page and click **Give Item...**.
+2. Type to search (for example `diamond`, `elytra` or `totem`). The best match is picked for you.
+3. Set **Amount** and **To: Inventory / Ground**, then press **Enter** (or **Give**).
 
 ### Ore Vision
 
@@ -151,7 +160,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.0.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.0.1.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
@@ -171,6 +180,7 @@ MineMenu is a client mod. When you play singleplayer, Minecraft runs a small ser
 - `MineMenuScreen`: the menu.
 - `MobSpawnScreen` / `MobList`: the Spawn Mob picker.
 - `XpScreen`: the Give XP screen.
+- `ItemGiveScreen`: the Give Item picker.
 - `ExtraCheats`: the 3.0 hacks (Ore Vision, Vein Miner, Magnet, Mob Glow, and so on).
 - `Category`: the menu pages.
 - `Revenge`: Revenge Mode.

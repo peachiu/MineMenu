@@ -81,6 +81,9 @@ public class MineMenuScreen extends Screen {
                             + Registries.ENTITY_TYPE.get(CheatState.selectedMob()).getName().getString() + "."));
         }
         if (category == Category.ITEMS) {
+            specs.add(new Spec(() -> Text.literal("Give Item...").formatted(Formatting.AQUA),
+                    b -> this.client.setScreen(new ItemGiveScreen(this)),
+                    "Pick any item and get it in your inventory, or dropped on the ground where you're looking."));
             specs.add(new Spec(() -> Text.literal("Give XP...").formatted(Formatting.AQUA),
                     b -> this.client.setScreen(new XpScreen(this)),
                     "Type a number of levels and get that much XP, e.g. 64."));

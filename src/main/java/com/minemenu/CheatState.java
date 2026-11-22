@@ -45,6 +45,10 @@ public final class CheatState {
     private static Identifier selectedMob = Identifier.ofVanilla("zombie");
     private static int spawnAmount = 1;
     private static final int[] SPAWN_AMOUNTS = {1, 5, 10};
+    private static Identifier selectedItem = Identifier.ofVanilla("diamond");
+    private static int giveAmount = 64;
+    private static final int[] GIVE_AMOUNTS = {1, 16, 32, 64};
+    private static boolean giveToGround = false;
 
     private CheatState() {
     }
@@ -113,5 +117,39 @@ public final class CheatState {
         }
         spawnAmount = 1;
         return spawnAmount;
+    }
+
+    /** The item the "Give Item" picker gives. */
+    public static synchronized Identifier selectedItem() {
+        return selectedItem;
+    }
+
+    public static synchronized void setSelectedItem(Identifier id) {
+        selectedItem = id;
+    }
+
+    public static synchronized int giveAmount() {
+        return giveAmount;
+    }
+
+    /** Cycles 1 -> 16 -> 32 -> 64 -> 1. */
+    public static synchronized int cycleGiveAmount() {
+        for (int i = 0; i < GIVE_AMOUNTS.length; i++) {
+            if (GIVE_AMOUNTS[i] == giveAmount) {
+                giveAmount = GIVE_AMOUNTS[(i + 1) % GIVE_AMOUNTS.length];
+                return giveAmount;
+            }
+        }
+        giveAmount = 64;
+        return giveAmount;
+    }
+
+    /** True: drop the item on the ground where you're looking. False: put it in your inventory. */
+    public static synchronized boolean giveToGround() {
+        return giveToGround;
+    }
+
+    public static synchronized void toggleGiveToGround() {
+        giveToGround = !giveToGround;
     }
 }

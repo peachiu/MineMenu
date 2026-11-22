@@ -33,6 +33,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.AffineTransformation;
 import net.minecraft.util.math.BlockPos;
@@ -490,6 +491,49 @@ public final class ExtraCheats {
             added++;
         }
         return added;
+    }
+
+    /**
+     * Gives {@code amount} of an item (capped at what it stacks to), either into the inventory
+     * (anything that doesn't fit drops at your feet) or dropped on the block you're looking at.
+     */
+    public static void giveItem(ServerPlayerEntity player, Identifier itemId, int amount, boolean toGround) {
+        Item item = net.minecraft.registry.Registries.ITEM.getOrEmpty(itemId).orElse(null);
+        ServerWorld world = player.getServerWorld();
+        if (item == null || item == Items.AIR || !item.isEnabled(world.getEnabledFeatures())) {
+            return;
+        }
+        ItemStack stack = new ItemStack(item, Math.max(1, Math.min(amount, item.getMaxCount())));
+        String what = stack.getCount() + "x " + stack.getName().getString();
+
+        if (!toGround) {
+            // insertStack takes what fits and leaves the rest in the stack it was given.
+            ItemStack leftover = stack.copy();
+            player.getInventory().insertStack(leftover);
+            if (!leftover.isEmpty()) {
+                player.dropItem(leftover, false, false);
+                player.sendMessage(Text.literal("Inventory full: " + leftover.getCount() + " dropped at your feet")
+                        .formatted(Formatting.YELLOW), true);
+            } else {
+                player.sendMessage(Text.literal("Got " + what).formatted(Formatting.GREEN), true);
+            }
+            return;
+        }
+
+        // Drop it on top of the block you're looking at (or a little in front of you).
+        HitResult hit = player.raycast(160, 1.0f, false);
+        Vec3d pos;
+        if (hit instanceof net.minecraft.util.hit.BlockHitResult blockHit && hit.getType() != HitResult.Type.MISS) {
+            BlockPos above = blockHit.getBlockPos().offset(blockHit.getSide());
+            pos = Vec3d.ofBottomCenter(above).add(0, 0.1, 0);
+        } else {
+            pos = player.getEyePos().add(player.getRotationVector().multiply(2));
+        }
+        ItemEntity entity = new ItemEntity(world, pos.x, pos.y, pos.z, stack);
+        entity.setVelocity(Vec3d.ZERO);
+        entity.setPickupDelay(40); // same as items you throw yourself: you get to see it land
+        world.spawnEntity(entity);
+        player.sendMessage(Text.literal("Dropped " + what).formatted(Formatting.GREEN), true);
     }
 
     public static void repairAll(ServerPlayerEntity player) {
