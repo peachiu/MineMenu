@@ -35,8 +35,8 @@ processResources {
     from('../src/main/resources') { exclude 'fabric.mod.json' }
     from('../mineboost/src/main/resources') { exclude 'fabric.mod.json' }
     // Loom only adds the refmap to mixin configs in this project's own resources, so point
-    // MineBoost's mixin config at this jar's refmap. Without it the mixins fail in a normal install.
-    filesMatching('mineboost.mixins.json') {
+    // both mods' mixin configs at this jar's refmap. Without it the mixins fail in a normal install.
+    filesMatching(['mineboost.mixins.json', 'minemenu.mixins.json']) {
         filter { String line ->
             line.contains('"required"') ? line + '\n  "refmap": "minemeboost-refmap.json",' : line
         }

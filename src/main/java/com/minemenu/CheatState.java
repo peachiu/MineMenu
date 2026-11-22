@@ -65,6 +65,19 @@ public final class CheatState {
         return false;
     }
 
+    /** True when every on/off hack is on. */
+    public static synchronized boolean allOn() {
+        return ENABLED.size() == Feature.values().length;
+    }
+
+    /** Turns every on/off hack on or off at once. */
+    public static synchronized void setAll(boolean on) {
+        ENABLED.clear();
+        if (on) {
+            ENABLED.addAll(EnumSet.allOf(Feature.class));
+        }
+    }
+
     public static synchronized List<Feature> enabled() {
         return List.copyOf(ENABLED);
     }

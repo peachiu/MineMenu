@@ -16,19 +16,21 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.0.2.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.0.3.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
 ## What's in the menu
 
-The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click a page at the top. **Show HUD** and **Show FPS** are always at the bottom, next to Done. Hover any button in the game to see what it does.
+The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click a page at the top. The bottom row is always there: **Show HUD**, **Enable All**, **Done** and **Show FPS**.
+
+**Enable All** turns every ON/OFF hack on at once, on all four pages, and then changes to **Disable All**, which turns them all off again. Show HUD, Show FPS and Size aren't changed. Hover any button in the game to see what it does.
 
 ### Player
 
 | | What it does |
 |---|---|
-| Fly | Creative-style flight, even in survival. Double-tap jump to take off. |
+| Fly | Creative-style flight, even in survival. Double-tap jump to take off. While Fly is on, you mine just as fast in the air as on the ground (normally Minecraft makes it 5× slower). |
 | God Mode | No damage, no hunger, no drowning, no burning. (The void and `/kill` still work so you can't get stuck.) |
 | Speed | Walk and fly 3× faster. |
 | Super Jump | Jump really high. No fall damage while it's on. |
@@ -180,7 +182,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.0.2.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.0.3.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 

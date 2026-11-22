@@ -142,21 +142,36 @@ public class MineMenuScreen extends Screen {
             addGrid(actions, left, y + headerHeight, columns);
         }
 
-        // Always at the bottom: the two display toggles either side of Done.
+        // Always at the bottom: Show HUD, Enable/Disable All, Done, Show FPS.
         int bottom = this.height - BUTTON_HEIGHT - 4;
-        int sideWidth = 100;
-        int doneWidth = 150;
-        int rowLeft = (this.width - (sideWidth * 2 + doneWidth + 8)) / 2;
+        int w = 100;
+        int rowLeft = (this.width - (w * 4 + 12)) / 2;
         addGrid(List.of(new Spec(() -> onOff("Show HUD", CheatState.hudVisible()), b -> CheatState.toggleHud(),
-                "Show the list of active cheats in the top-left corner.")), rowLeft, bottom, 1, sideWidth);
+                "Show the list of active cheats in the top-left corner.")), rowLeft, bottom, 1, w);
+        addDrawableChild(ButtonWidget.builder(allLabel(), b -> {
+                    boolean turnOn = !CheatState.allOn();
+                    CheatState.setAll(turnOn);
+                    clearAndInit(); // refresh every ON/OFF label on the page
+                })
+                .dimensions(rowLeft + (w + 4), bottom, w, BUTTON_HEIGHT)
+                .tooltip(Tooltip.of(Text.literal("Turn every ON/OFF hack on at once (on all four pages). "
+                        + "Click again to turn them all off. Show HUD, Show FPS and Size aren't changed.")))
+                .build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
-                .dimensions(rowLeft + sideWidth + 4, bottom, doneWidth, BUTTON_HEIGHT)
+                .dimensions(rowLeft + 2 * (w + 4), bottom, w, BUTTON_HEIGHT)
                 .build());
         addGrid(List.of(new Spec(() -> onOff("Show FPS", CheatState.fpsVisible()), b -> CheatState.toggleFps(),
                 "Show your frames per second in the top-left corner.",
                 // Only blocks turning it ON: if both are somehow on, you can still turn this one off.
                 () -> otherFpsCounterOn != null && otherFpsCounterOn.getAsBoolean() && !CheatState.fpsVisible(),
-                otherFpsCounterReason)), rowLeft + sideWidth + doneWidth + 8, bottom, 1, sideWidth);
+                otherFpsCounterReason)), rowLeft + 3 * (w + 4), bottom, 1, w);
+    }
+
+    /** "Enable All" until every hack is on, then "Disable All". */
+    private static Text allLabel() {
+        return CheatState.allOn()
+                ? Text.literal("Disable All").formatted(Formatting.RED)
+                : Text.literal("Enable All").formatted(Formatting.GREEN);
     }
 
     /** Adds buttons in a centred row at {@code y} and returns the y just below it. */
