@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.0.2.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -90,6 +90,26 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 2. Type to search (for example `diamond`, `elytra` or `totem`). The best match is picked for you.
 3. Set **Amount** and **To: Inventory / Ground**, then press **Enter** (or **Give**).
 
+**Categories:** type a kind of item instead of a name and you get all of them. Portuguese and English both work, with or without accents, and you can add words to narrow it down: `armadura diamante` gives the 4 diamond armor pieces, `espada netherite` the netherite sword.
+
+![Searching "comida" shows every food](docs/item-categories.png)
+
+| Type | You get |
+|---|---|
+| `comida`, `food` | Every food |
+| `bebida`, `poção`, `potion` | Potions, milk, honey |
+| `armadura`, `roupa`, `armor` | Armor you wear (and elytra) |
+| `capacete`, `peitoral`, `calças`, `botas` | One armor slot |
+| `espada`, `picareta`, `machado`, `pá`, `enxada` | That tool or weapon in every material |
+| `arma`, `weapon` | Swords, axes, bows, crossbows, tridents, maces, arrows |
+| `ferramentas`, `tools` | Everything in the creative Tools tab |
+| `combate`, `blocos`, `cores`, `natureza`, `funcional`, `redstone`, `ingredientes`, `operador` | The matching creative tab |
+| `minério`, `ore` | Every ore (and ancient debris) |
+| `ovos`, `spawn egg` | Every spawn egg |
+| `madeira`, `lã`, `cama`, `flores`, `disco`, `barco`, `carrinho`, `corante`, `cabeça`, `balde`, `livro`, `vidro` | Wood, wool, beds, flowers, music discs, boats, minecarts and rails, dyes, heads, buckets, books, glass |
+
+The start of a word is enough too (`armad` already means armor). Normal search by name still works, in your game's language or in English.
+
 ### Ore Vision
 
 Ore Vision places a glowing copy over every ore it finds, so the outline shows through walls. Diamonds glow aqua, emeralds green, gold yellow, iron tan, redstone red, lapis blue and ancient debris purple. Coal and copper are left out because there are far too many. It shows the 300 closest ores within 20 blocks and updates as you move and mine. The glowing copies are never saved to your world.
@@ -160,7 +180,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.0.1.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.0.2.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 

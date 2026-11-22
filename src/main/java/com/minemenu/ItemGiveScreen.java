@@ -22,7 +22,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Give yourself any item: search the list, pick an amount and where it goes (your inventory or the
@@ -35,6 +34,8 @@ public class ItemGiveScreen extends Screen {
     /** Every item, sorted by name; rebuilt only when the world's enabled features change. */
     private static List<ItemEntryData> allItems;
     private static FeatureSet allItemsFeatures;
+    /** Item names follow the game language, so a language change means rebuilding the list too. */
+    private static String allItemsLanguage;
 
     private record ItemEntryData(Identifier id, Item item, String name, String searchText) {
     }
@@ -44,6 +45,8 @@ public class ItemGiveScreen extends Screen {
     private ItemListWidget list;
     private ButtonWidget giveButton;
     private Text status = Text.empty();
+    /** What the current search found, e.g. "Category: Armor (40 items)". */
+    private Text searchInfo = Text.empty();
 
     public ItemGiveScreen(Screen parent) {
         super(Text.literal("Give Item"));
@@ -53,7 +56,9 @@ public class ItemGiveScreen extends Screen {
     private static List<ItemEntryData> items(MinecraftClient client) {
         // Skip experimental items the world doesn't have turned on (e.g. the bundle in 1.21.1).
         FeatureSet features = client.world != null ? client.world.getEnabledFeatures() : FeatureSet.empty();
-        if (allItems == null || !features.equals(allItemsFeatures)) {
+        String language = client.options.language;
+        if (allItems == null || !features.equals(allItemsFeatures) || !language.equals(allItemsLanguage)) {
+            ItemCategories.refreshGroups(client);
             List<ItemEntryData> result = new ArrayList<>();
             for (Item item : Registries.ITEM) {
                 if (item == Items.AIR || !item.isEnabled(features)) {
@@ -61,11 +66,14 @@ public class ItemGiveScreen extends Screen {
                 }
                 Identifier id = Registries.ITEM.getId(item);
                 String name = new ItemStack(item).getName().getString();
-                result.add(new ItemEntryData(id, item, name, (name + " " + id.getPath()).toLowerCase(Locale.ROOT)));
+                // Search both the name in your language and the English id, without accents.
+                result.add(new ItemEntryData(id, item, name,
+                        ItemCategories.normalize(name + " " + id.getPath().replace('_', ' ') + " " + id.getPath())));
             }
             result.sort(Comparator.comparing(ItemEntryData::name));
             allItems = result;
             allItemsFeatures = features;
+            allItemsLanguage = language;
         }
         return allItems;
     }
@@ -77,7 +85,7 @@ public class ItemGiveScreen extends Screen {
 
         String previousSearch = search != null ? search.getText() : "";
         search = new TextFieldWidget(this.textRenderer, left, top, PANEL_WIDTH, 18, Text.literal("Search"));
-        search.setPlaceholder(Text.literal("Search items... (e.g. diamond, elytra, totem)").formatted(Formatting.DARK_GRAY));
+        search.setPlaceholder(Text.literal("Search an item or a category: comida, armadura, ferramentas...").formatted(Formatting.DARK_GRAY));
         search.setText(previousSearch);
         addDrawableChild(search);
 
@@ -185,7 +193,8 @@ public class ItemGiveScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer,
                 Text.literal("Give Item").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                 this.width / 2, 7, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, status, this.width / 2, this.height - 38, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, status.getString().isEmpty() ? searchInfo : status,
+                this.width / 2, this.height - 38, 0xFFFFFF);
     }
 
     @Override
@@ -207,18 +216,57 @@ public class ItemGiveScreen extends Screen {
             super(client, width, height, y, ROW_HEIGHT);
         }
 
+        /**
+         * Words are matched separately, so "sword diamond" works as well as "diamond sword". A category
+         * word ("comida", "armadura", "tools"...) shows that whole category; any other words then
+         * narrow it down ("armadura diamante" = diamond armor).
+         */
         void filter(String query) {
-            String q = query.trim().toLowerCase(Locale.ROOT);
-            List<ItemEntryData> matches = new ArrayList<>();
-            for (ItemEntryData data : items(this.client)) {
-                if (q.isEmpty() || data.searchText().contains(q)) {
-                    matches.add(data);
+            String q = ItemCategories.normalize(query.trim());
+            List<String> words = new ArrayList<>(List.of(q.isEmpty() ? new String[0] : q.split("\\s+")));
+            ItemCategories.ItemCategory category = null;
+            for (String word : words) {
+                category = ItemCategories.match(word);
+                if (category != null) {
+                    words.remove(word);
+                    break;
                 }
             }
-            if (!q.isEmpty()) {
-                // Best match first: exact name, then names starting with the search, then the rest.
-                matches.sort(Comparator.comparingInt((ItemEntryData d) -> rank(d, q)));
+            List<ItemEntryData> all = items(this.client);
+            List<ItemEntryData> matches = new ArrayList<>();
+            if (category != null) {
+                for (ItemEntryData data : all) {
+                    if (category.test().test(data.item()) && containsAll(data, words)) {
+                        matches.add(data);
+                    }
+                }
+                // A lone word that's also part of item names ("redstone", "la"): add those items after the category.
+                if (words.isEmpty()) {
+                    for (ItemEntryData data : all) {
+                        if (!matches.contains(data) && data.searchText().contains(q)) {
+                            matches.add(data);
+                        }
+                    }
+                }
+            } else {
+                List<String> allWords = q.isEmpty() ? List.of() : List.of(q.split("\\s+"));
+                for (ItemEntryData data : all) {
+                    if (containsAll(data, allWords)) {
+                        matches.add(data);
+                    }
+                }
+                if (!q.isEmpty()) {
+                    // Best match first: exact name, then names starting with the search, then the rest.
+                    matches.sort(Comparator.comparingInt((ItemEntryData d) -> rank(d, q)));
+                }
             }
+            status = Text.empty();
+            searchInfo = category != null
+                    ? Text.literal("Category: ").formatted(Formatting.GRAY)
+                            .append(Text.literal(category.name()).formatted(Formatting.AQUA))
+                            .append(Text.literal(" (" + matches.size() + " items)").formatted(Formatting.GRAY))
+                    : Text.literal(matches.size() + " items").formatted(Formatting.GRAY);
+
             clearEntries();
             ItemEntry toSelect = null;
             Identifier selectedId = CheatState.selectedItem();
@@ -239,12 +287,22 @@ public class ItemGiveScreen extends Screen {
             }
         }
 
+        private boolean containsAll(ItemEntryData data, List<String> words) {
+            for (String word : words) {
+                if (!data.searchText().contains(word)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private int rank(ItemEntryData data, String q) {
-            String name = data.name().toLowerCase(Locale.ROOT);
-            if (name.equals(q) || data.id().getPath().equals(q)) {
+            String name = ItemCategories.normalize(data.name());
+            String id = data.id().getPath().replace('_', ' ');
+            if (name.equals(q) || id.equals(q)) {
                 return 0;
             }
-            if (name.startsWith(q) || data.id().getPath().startsWith(q)) {
+            if (name.startsWith(q) || id.startsWith(q)) {
                 return 1;
             }
             return 2;
