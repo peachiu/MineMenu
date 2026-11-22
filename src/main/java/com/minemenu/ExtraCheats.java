@@ -95,6 +95,7 @@ public final class ExtraCheats {
     }
 
     public static void onServerStarted(MinecraftServer server) {
+        lastClearedJunk = List.of();
         oreMarkers.clear();
         lastOreScanCenter = null;
         originalKeepInventory = null;
@@ -534,6 +535,65 @@ public final class ExtraCheats {
         entity.setPickupDelay(40); // same as items you throw yourself: you get to see it land
         world.spawnEntity(entity);
         player.sendMessage(Text.literal("Dropped " + what).formatted(Formatting.GREEN), true);
+    }
+
+    /** What Clear Junk deletes: useless mob drops and the stone you dig through while mining. */
+    private static final Set<Item> JUNK = Set.of(
+            Items.ROTTEN_FLESH, Items.POISONOUS_POTATO, Items.SPIDER_EYE,
+            Items.DIRT, Items.GRAVEL, Items.GRANITE, Items.DIORITE, Items.ANDESITE, Items.TUFF,
+            Items.COBBLED_DEEPSLATE, Items.NETHERRACK);
+
+    /** What the last Clear Junk removed, so Undo Clear can give it back (server thread only). */
+    private static List<ItemStack> lastClearedJunk = List.of();
+
+    /** Deletes junk from the main inventory and off hand. Armor and renamed items are left alone. */
+    public static void clearJunk(ServerPlayerEntity player) {
+        var inventory = player.getInventory();
+        List<ItemStack> removed = new ArrayList<>();
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        List<net.minecraft.util.collection.DefaultedList<ItemStack>> lists = List.of(inventory.main, inventory.offHand);
+        for (var list : lists) {
+            for (int i = 0; i < list.size(); i++) {
+                ItemStack stack = list.get(i);
+                if (stack.isEmpty() || !JUNK.contains(stack.getItem())
+                        || stack.contains(net.minecraft.component.DataComponentTypes.CUSTOM_NAME)) {
+                    continue;
+                }
+                removed.add(stack.copy());
+                counts.merge(stack.getName().getString(), stack.getCount(), Integer::sum);
+                list.set(i, ItemStack.EMPTY);
+            }
+        }
+        if (removed.isEmpty()) {
+            player.sendMessage(Text.literal("No junk to clear").formatted(Formatting.YELLOW), true);
+            return;
+        }
+        lastClearedJunk = removed;
+        inventory.markDirty();
+        StringBuilder summary = new StringBuilder();
+        counts.forEach((name, count) -> summary.append(summary.isEmpty() ? "" : ", ").append(count).append("x ").append(name));
+        player.sendMessage(Text.literal("Cleared: ").formatted(Formatting.GREEN)
+                .append(Text.literal(summary.toString()).formatted(Formatting.WHITE))
+                .append(Text.literal("  (Undo Clear brings it back)").formatted(Formatting.GRAY)), false);
+    }
+
+    /** Gives back what the last Clear Junk removed (anything that doesn't fit drops at your feet). */
+    public static void undoClearJunk(ServerPlayerEntity player) {
+        if (lastClearedJunk.isEmpty()) {
+            player.sendMessage(Text.literal("Nothing to undo").formatted(Formatting.YELLOW), true);
+            return;
+        }
+        int total = 0;
+        for (ItemStack stack : lastClearedJunk) {
+            total += stack.getCount();
+            ItemStack leftover = stack.copy();
+            player.getInventory().insertStack(leftover);
+            if (!leftover.isEmpty()) {
+                player.dropItem(leftover, false, false);
+            }
+        }
+        lastClearedJunk = List.of();
+        player.sendMessage(Text.literal("Gave back " + total + " items").formatted(Formatting.GREEN), true);
     }
 
     public static void repairAll(ServerPlayerEntity player) {

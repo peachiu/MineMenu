@@ -367,6 +367,10 @@ public final class ServerCheats {
         // Items
         SUPER_ENCHANT(Category.ITEMS, "Super Enchant", "Put every enchantment that fits on the item in your hand, at max level."),
         REPAIR_ALL(Category.ITEMS, "Repair All", "Fully repair every item in your inventory."),
+        CLEAR_JUNK(Category.ITEMS, "Clear Junk", "Delete junk from your inventory: rotten flesh, poisonous potatoes, spider eyes, "
+                + "dirt, gravel, granite, diorite, andesite, tuff, cobbled deepslate and netherrack. "
+                + "Armor and items you renamed are never touched. Undo Clear brings it all back."),
+        UNDO_CLEAR(Category.ITEMS, "Undo Clear", "Get back everything the last Clear Junk removed."),
         NETHERITE_KIT(Category.ITEMS, "Netherite Kit", "Get a full set of super-enchanted netherite armor and tools.");
 
         private final Category category;
@@ -447,6 +451,8 @@ public final class ServerCheats {
             case ARROW_RAIN -> ExtraCheats.arrowRain(player);
             case SUPER_ENCHANT -> ExtraCheats.superEnchantHeld(player);
             case REPAIR_ALL -> ExtraCheats.repairAll(player);
+            case CLEAR_JUNK -> ExtraCheats.clearJunk(player);
+            case UNDO_CLEAR -> ExtraCheats.undoClearJunk(player);
             case NETHERITE_KIT -> ExtraCheats.netheriteKit(player);
             case DAY -> world.setTimeOfDay(1000);
             case NIGHT -> world.setTimeOfDay(13000);
