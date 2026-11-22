@@ -53,12 +53,36 @@ public final class FpsOverlay {
                 .append(Text.literal(String.valueOf(avgFps)).formatted(color(avgFps)))
                 .append(Text.literal("  1% low ").formatted(Formatting.GRAY))
                 .append(Text.literal(String.valueOf(lowFps)).formatted(color(lowFps)));
+        if (BoostConfig.get().fpsTarget > 0) {
+            line = line.copy().append(Text.literal("  RD " + client.options.getViewDistance().getValue())
+                    .formatted(Formatting.AQUA));
+        }
 
         int width = client.textRenderer.getWidth(line);
         int x = context.getScaledWindowWidth() - width - 4;
         int y = 4 + effectRowsHeight(client);
         context.fill(x - 3, y - 3, x + width + 3, y + 11, 0x90000000);
         context.drawTextWithShadow(client.textRenderer, line, x, y, 0xFFFFFF);
+    }
+
+    /** Average FPS over the last {@code windowNanos}, or 0 if there aren't enough frames yet. */
+    public static int averageFps(long windowNanos) {
+        long now = System.nanoTime();
+        int n = 0;
+        long total = 0;
+        for (int i = 0; i < count; i++) {
+            int idx = Math.floorMod(next - 1 - i, SAMPLES);
+            if (now - frameEnds[idx] > windowNanos) {
+                break;
+            }
+            n++;
+            total += frameTimes[idx];
+        }
+        // Need most of the window covered, or the number means nothing (e.g. just unpaused).
+        if (n < 10 || total < windowNanos / 2) {
+            return 0;
+        }
+        return (int) Math.round(n * 1e9 / total);
     }
 
     private static void refreshStats(long now) {

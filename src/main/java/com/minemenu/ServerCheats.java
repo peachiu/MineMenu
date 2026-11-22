@@ -165,6 +165,7 @@ public final class ServerCheats {
         if (tickCounter % 20 == 0) {
             reapplyAttributes(player);
         }
+        ExtraCheats.tick(player, applied, tickCounter);
     }
 
     private static void enable(MinecraftServer server, ServerPlayerEntity player, Feature feature) {
@@ -184,6 +185,7 @@ public final class ServerCheats {
             case MOB_AURA, REVENGE -> {
                 // Mob Aura runs in tick(); Revenge reacts to deaths (see Revenge)
             }
+            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
             default -> applyAttributes(player, feature);
         }
     }
@@ -208,6 +210,7 @@ public final class ServerCheats {
             case GOD_MODE, MOB_AURA, REVENGE -> {
                 // nothing to undo
             }
+            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
             default -> removeAttributes(player, feature);
         }
     }
@@ -285,6 +288,8 @@ public final class ServerCheats {
                 disable(server, player, feature);
             } else if (feature == Feature.FREEZE_WORLD) {
                 server.getTickManager().setFrozen(false);
+            } else {
+                ExtraCheats.disable(server, null, feature); // restores game rules, removes Ore Vision markers
             }
         }
         applied.clear();
@@ -342,25 +347,40 @@ public final class ServerCheats {
     // ------------------------------------------------------------------
 
     public enum Action {
-        KILL_HOSTILE("Kill Hostile Mobs", "Kill every hostile mob within 64 blocks."),
-        KILL_ALL("Kill ALL Mobs", "Kill every mob within 64 blocks (not you, pets or armor stands)."),
-        SMITE("Smite", "Strike lightning where you're looking."),
-        EXPLODE("Explode", "Cause an explosion where you're looking. Turn on God Mode first!"),
-        TNT_RAIN("TNT Rain", "Drop a ring of lit TNT around you. Turn on God Mode first!"),
-        TELEPORT("Teleport", "Teleport to the block you're looking at."),
-        LAUNCH("Launch Me", "Shoot yourself into the sky."),
-        HEAL("Heal & Feed", "Restore full health and hunger."),
-        DAY("Set Day", "Set the time to morning."),
-        NIGHT("Set Night", "Set the time to night."),
-        CLEAR_WEATHER("Clear Weather", "Stop rain and thunder."),
-        THUNDER("Thunderstorm", "Start a thunderstorm.");
+        // Player
+        TELEPORT(Category.PLAYER, "Teleport", "Teleport to the block you're looking at."),
+        LAUNCH(Category.PLAYER, "Launch Me", "Shoot yourself into the sky."),
+        HEAL(Category.PLAYER, "Heal & Feed", "Restore full health and hunger."),
+        // Combat
+        KILL_HOSTILE(Category.COMBAT, "Kill Hostile Mobs", "Kill every hostile mob within 64 blocks."),
+        KILL_ALL(Category.COMBAT, "Kill ALL Mobs", "Kill every mob within 64 blocks (not you, pets or armor stands)."),
+        SMITE(Category.COMBAT, "Smite", "Strike lightning where you're looking."),
+        FIREBALL(Category.COMBAT, "Fireball", "Shoot an exploding fireball where you're looking."),
+        ARROW_RAIN(Category.COMBAT, "Arrow Rain", "50 arrows fall from the sky where you're looking."),
+        // World
+        EXPLODE(Category.WORLD, "Explode", "Cause an explosion where you're looking. Turn on God Mode first!"),
+        TNT_RAIN(Category.WORLD, "TNT Rain", "Drop a ring of lit TNT around you. Turn on God Mode first!"),
+        DAY(Category.WORLD, "Set Day", "Set the time to morning."),
+        NIGHT(Category.WORLD, "Set Night", "Set the time to night."),
+        CLEAR_WEATHER(Category.WORLD, "Clear Weather", "Stop rain and thunder."),
+        THUNDER(Category.WORLD, "Thunderstorm", "Start a thunderstorm."),
+        // Items
+        SUPER_ENCHANT(Category.ITEMS, "Super Enchant", "Put every enchantment that fits on the item in your hand, at max level."),
+        REPAIR_ALL(Category.ITEMS, "Repair All", "Fully repair every item in your inventory."),
+        NETHERITE_KIT(Category.ITEMS, "Netherite Kit", "Get a full set of super-enchanted netherite armor and tools.");
 
+        private final Category category;
         private final String displayName;
         private final String description;
 
-        Action(String displayName, String description) {
+        Action(Category category, String displayName, String description) {
+            this.category = category;
             this.displayName = displayName;
             this.description = description;
+        }
+
+        public Category category() {
+            return category;
         }
 
         public String displayName() {
@@ -423,6 +443,11 @@ public final class ServerCheats {
                 player.extinguish();
                 player.setAir(player.getMaxAir());
             }
+            case FIREBALL -> ExtraCheats.fireball(player);
+            case ARROW_RAIN -> ExtraCheats.arrowRain(player);
+            case SUPER_ENCHANT -> ExtraCheats.superEnchantHeld(player);
+            case REPAIR_ALL -> ExtraCheats.repairAll(player);
+            case NETHERITE_KIT -> ExtraCheats.netheriteKit(player);
             case DAY -> world.setTimeOfDay(1000);
             case NIGHT -> world.setTimeOfDay(13000);
             case CLEAR_WEATHER -> world.setWeather(12000, 0, false, false);

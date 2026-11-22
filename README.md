@@ -1,6 +1,6 @@
 # MineMenu
 
-A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, turn on god mode, one-shot mobs, spawn any mob, call down lightning, rain TNT, freeze the world and more. Made for messing around and filming videos.
+A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, god mode, X-ray style Ore Vision, Vein Miner, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
 
 ![The MineMenu menu](docs/menu.png)
 
@@ -16,49 +16,74 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, tu
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-2.0.2.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
 ## What's in the menu
 
-Hover any button in the game to see what it does.
+The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click a page at the top. **Show HUD** and **Show FPS** are always at the bottom, next to Done. Hover any button in the game to see what it does.
 
-### Toggles
+### Player
 
-| Toggle | What it does |
+| | What it does |
 |---|---|
 | Fly | Creative-style flight, even in survival. Double-tap jump to take off. |
 | God Mode | No damage, no hunger, no drowning, no burning. (The void and `/kill` still work so you can't get stuck.) |
-| One-Hit Kill | +1000 attack damage. Everything dies in one hit. |
 | Speed | Walk and fly 3× faster. |
 | Super Jump | Jump really high. No fall damage while it's on. |
 | Night Vision | See in the dark and underwater. |
-| Insta-Mine | Break blocks almost instantly. |
 | Long Reach | Reach blocks and mobs from about 20 blocks away. |
-| Mob Aura | Hostile mobs within 8 blocks of you die automatically. |
-| Freeze World | Freezes all mobs, projectiles, redstone and so on. You can still move around. |
-| Revenge Mode | If a mob kills you, lightning strikes it and it dies, and you respawn right where you died. See [Revenge Mode](#revenge-mode). |
+| **Item Magnet** | Dropped items and XP orbs within 12 blocks fly to you. |
 | Size | Cycle between Normal, **Giant** (4×) and **Tiny** (¼). |
-| Show HUD | Shows the list of active cheats in the top-left corner. Turn it off for clean footage. |
-| Show FPS | Shows your frames per second in the top-left corner (green 60+, yellow 30+, red below 30). |
+| Teleport *(action)* | Teleports you to the block you're looking at (up to 160 blocks away). |
+| Launch Me *(action)* | Shoots you into the sky. |
+| Heal & Feed *(action)* | Full health and hunger. |
 
-### Actions
+### Combat
 
-| Action | What it does |
+| | What it does |
 |---|---|
-| Spawn Mob... | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
-| Give XP... | Type a number of levels (for example `64`) and press Enter to have exactly that many levels. **Add Levels** adds them on top instead, and **Reset to 0** removes all your XP. |
-| Kill Hostile Mobs | Kills every hostile mob within 64 blocks. |
-| Kill ALL Mobs | Kills every mob within 64 blocks. Your tamed pets, armor stands and you are left alone. |
-| Smite | Lightning bolt where you're looking. |
-| Explode | TNT-sized explosion where you're looking. It breaks blocks, so turn on God Mode first. |
-| TNT Rain | Drops a ring of 12 lit TNT around you. |
-| Teleport | Teleports you to the block you're looking at (up to 160 blocks away). |
-| Launch Me | Shoots you into the sky. |
-| Heal & Feed | Full health and hunger. |
-| Set Day / Set Night | Changes the time. |
-| Clear Weather / Thunderstorm | Changes the weather. |
+| One-Hit Kill | +1000 attack damage. Everything dies in one hit. |
+| Mob Aura | Hostile mobs within 8 blocks of you die automatically. |
+| **Mega Knockback** | Every mob you hit goes flying (about 25 blocks). |
+| **Mob Glow** | Every mob within 64 blocks glows, so you can see it through walls. |
+| Revenge Mode | If a mob kills you, lightning strikes it and it dies, and you respawn right where you died. See [Revenge Mode](#revenge-mode). |
+| Kill Hostile Mobs *(action)* | Kills every hostile mob within 64 blocks. |
+| Kill ALL Mobs *(action)* | Kills every mob within 64 blocks. Your tamed pets, armor stands and you are left alone. |
+| Smite *(action)* | Lightning bolt where you're looking. |
+| **Fireball** *(action)* | Shoots an exploding fireball where you're looking. |
+| **Arrow Rain** *(action)* | 50 arrows fall from the sky where you're looking. |
+
+### World
+
+| | What it does |
+|---|---|
+| Freeze World | Freezes all mobs, projectiles, redstone and so on. You can still move around. |
+| **Always Day** | Stops time at midday and keeps the weather clear. |
+| **Ore Vision** | Diamonds, gold, iron, emeralds, redstone, lapis and ancient debris within 20 blocks glow through walls, each in its own colour. See [Ore Vision](#ore-vision). |
+| **Vein Miner** | Break one log or ore and the whole tree or vein comes down, with your tool's Fortune or Silk Touch. Sneak to break just one block. |
+| Insta-Mine | Break blocks almost instantly. |
+| Spawn Mob... *(action)* | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
+| Explode *(action)* | TNT-sized explosion where you're looking. It breaks blocks, so turn on God Mode first. |
+| TNT Rain *(action)* | Drops a ring of 12 lit TNT around you. |
+| Set Day / Set Night *(actions)* | Changes the time. |
+| Clear Weather / Thunderstorm *(actions)* | Changes the weather. |
+
+### Items
+
+| | What it does |
+|---|---|
+| **Infinite Items** | The stack in your hands never runs out and your tools never break. |
+| **Keep Inventory** | Keep your items and XP when you die. |
+| Give XP... *(action)* | Type a number of levels (for example `64`) and press Enter to have exactly that many levels. **Add Levels** adds them on top instead, and **Reset to 0** removes all your XP. |
+| **Super Enchant** *(action)* | Puts every enchantment that fits on the item in your hand, at max level. When two clash, the best one wins (Sharpness, Protection, Efficiency, Fortune, Mending...). No curses. |
+| **Repair All** *(action)* | Fully repairs every item in your inventory. |
+| **Netherite Kit** *(action)* | A full set of super-enchanted netherite armor (worn if the slot is free), sword, pickaxe, axe, shovel, a bow and 64 arrows. |
+
+### Ore Vision
+
+Ore Vision places a glowing copy over every ore it finds, so the outline shows through walls. Diamonds glow aqua, emeralds green, gold yellow, iron tan, redstone red, lapis blue and ancient debris purple. Coal and copper are left out because there are far too many. It shows the 300 closest ores within 20 blocks and updates as you move and mine. The glowing copies are never saved to your world.
 
 ### Spawning mobs
 
@@ -113,6 +138,7 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 - The menu doesn't pause the game, so you can watch things happen behind it.
 - Toggles stay on when you switch worlds. Everything is undone before the world saves, so nothing sticks to your save file (no permanent flying or giant size if you remove the mod).
 - Explosions and TNT break blocks. Make a backup or use a test world if you care about your build.
+- **Keep Inventory** and **Always Day** change your world's game rules while they're on. Turning them off, or leaving the world, puts the old values back. If the game crashes while one is on, the rule stays changed; turn the toggle on and off again to reset it, or use `/gamerule`.
 
 ## Building
 
@@ -125,7 +151,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-2.0.2.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.0.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
@@ -145,6 +171,8 @@ MineMenu is a client mod. When you play singleplayer, Minecraft runs a small ser
 - `MineMenuScreen`: the menu.
 - `MobSpawnScreen` / `MobList`: the Spawn Mob picker.
 - `XpScreen`: the Give XP screen.
+- `ExtraCheats`: the 3.0 hacks (Ore Vision, Vein Miner, Magnet, Mob Glow, and so on).
+- `Category`: the menu pages.
 - `Revenge`: Revenge Mode.
 - `ServerCheats`: everything that changes the game.
 - `CheatState` / `Feature`: which toggles are on.

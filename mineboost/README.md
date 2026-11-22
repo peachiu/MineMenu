@@ -7,6 +7,9 @@ An **FPS boost menu** for **Minecraft Java 1.21.1** (Fabric). Press **`.`** (per
 - **One-click presets:** Potato, Low, Balanced, High and Ultra.
 - **The graphics settings that matter for FPS**, all on one screen, biggest impact first.
 - **Extra boosts vanilla doesn't have:** turn off all particles, hide rain and snow, limit how far mobs, chests and signs are drawn, freeze animated textures, and drop FPS when the game is in the background.
+- **Smart Render Distance:** pick an FPS target and MineBoost lowers or raises your render distance by itself to hold it.
+- **Max Particles:** caps how many particles exist at once, so TNT and big farms don't tank your FPS.
+- **Benchmark:** measures your FPS for 10 seconds and posts the average, 1% low and worst frame in chat.
 - **FPS overlay** with average FPS and 1% low, so you can see what each setting does.
 
 Works in singleplayer and on servers. It only changes what your own game draws.
@@ -15,7 +18,7 @@ Works in singleplayer and on servers. It only changes what your own game draws.
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `mineboost-1.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `mineboost-2.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile, join a world and press **`.`**.
 
 You can change the key in **Options → Controls → Key Binds → MineBoost**.
@@ -64,6 +67,8 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 
 | Setting | What it does |
 |---|---|
+| FPS Target (Smart Render Distance) | Pick 30, 45, 60, 75, 90, 120 or 144 FPS. Once a second MineBoost checks your average FPS over the last 3 seconds: below 90% of the target it lowers the render distance (by 2 if you're far below), and well above it raises it again, but never above the distance you chose and never below 4. It waits 5 seconds after each change for the chunks to reload, and only adjusts while you're playing (not in menus or alt-tabbed). With it on, the FPS overlay also shows the current render distance. |
+| Max Particles | Most particles on screen at once: 250, 500, 1000, 2000, 4000 or Unlimited. Normal particles still show; huge bursts get cut off. |
 | Entity Distance | Mobs, animals, dropped items and item frames farther than this aren't drawn. Players, the Ender Dragon and the Wither are always drawn. One of the biggest boosts near farms and mob grinders. |
 | Chests & Signs | Chests, signs, banners, heads and beds farther than this aren't drawn. Great for big bases and storage rooms. |
 | Disable All Particles | No particles at all, including ones already on screen. Stronger than vanilla's Particles: Minimal. |
@@ -71,6 +76,8 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 | Animated Textures | Off freezes water, lava, fire and portal animations. Small boost. |
 | Background FPS | FPS limit when Minecraft isn't the window you're using. Minimized always drops to 1 FPS. Frees your PC for OBS, Discord or your browser. |
 | FPS Overlay | FPS, average FPS and 1% low in the top-right corner. The 1% low shows how bad the stutters are. |
+
+**Benchmark (10s)** is the button next to Done. It closes the menu and measures your FPS for 10 seconds while you play normally, then posts the average FPS, 1% low and worst frame in chat, with your preset and render distance. Run it with different presets to see which one suits your PC.
 
 Settings are saved to `config/mineboost.json`. Vanilla settings are saved to `options.txt` as usual.
 
@@ -87,7 +94,7 @@ cd mineboost
 ./gradlew build
 ```
 
-The jar ends up in `mineboost/build/libs/mineboost-1.0.1.jar`.
+The jar ends up in `mineboost/build/libs/mineboost-2.0.0.jar`.
 
 ### Making a release
 

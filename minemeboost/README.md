@@ -8,8 +8,12 @@ Press **Right Shift** and the menu has two tabs at the top:
 |---|---|
 | ![The MineMenu tab](docs/minemenu-tab.png) | ![The MineBoost tab](docs/mineboost-tab.png) |
 
-- **MineMenu:** singleplayer fun cheats (fly, god mode, one-hit kill, spawn any mob, give XP, Revenge Mode, lightning, TNT rain and more).
-- **MineBoost:** FPS boost (Potato/Low/Balanced/High/Ultra presets, graphics settings, extra boosts and an FPS overlay).
+- **MineMenu:** singleplayer hacks on four pages (Player, Combat, World, Items): fly, god mode, Ore Vision, Vein Miner, Item Magnet, Mob Glow, Mega Knockback, Infinite Items, Keep Inventory, Always Day, fireballs, arrow rain, Super Enchant, Netherite Kit, spawn any mob, give XP, Revenge Mode and more.
+- **MineBoost:** FPS boost: Potato/Low/Balanced/High/Ultra presets, Smart Render Distance (holds an FPS target by itself), Max Particles, a 10-second benchmark, the graphics settings that matter, extra boosts and an FPS overlay.
+
+| Ore Vision | Benchmark result |
+|---|---|
+| ![Ores glowing through the stone](docs/ore-vision.png) | ![Benchmark result in chat](docs/benchmark.png) |
 
 Right Shift reopens the tab you used last. **`.`** still opens MineBoost directly.
 
@@ -27,7 +31,7 @@ MineMenu only works in your own singleplayer worlds. On a server, Right Shift op
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemeboost-2.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemeboost-3.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoost already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over.
@@ -45,7 +49,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/minemeboost-2.0.1.jar`.
+The jar ends up in `minemeboost/build/libs/minemeboost-3.0.0.jar`.
 
 ### Making a release
 

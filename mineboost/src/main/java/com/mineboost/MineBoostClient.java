@@ -18,6 +18,7 @@ public class MineBoostClient implements ClientModInitializer {
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.mineboost.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, "key.categories.mineboost"));
 
+        ClientTickEvents.END_CLIENT_TICK.register(SmartRenderDistance::tick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
@@ -26,6 +27,9 @@ public class MineBoostClient implements ClientModInitializer {
             }
         });
 
-        HudRenderCallback.EVENT.register((context, tickCounter) -> FpsOverlay.render(context));
+        HudRenderCallback.EVENT.register((context, tickCounter) -> {
+            FpsOverlay.render(context);
+            Benchmark.onFrame(context);
+        });
     }
 }

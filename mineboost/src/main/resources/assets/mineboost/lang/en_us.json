@@ -7,5 +7,7 @@
   "mineboost.option.hide_weather": "Hide Rain & Snow",
   "mineboost.option.animated_textures": "Animated Textures",
   "mineboost.option.background_fps": "Background FPS",
-  "mineboost.option.fps_overlay": "FPS Overlay"
+  "mineboost.option.fps_overlay": "FPS Overlay",
+  "mineboost.option.fps_target": "FPS Target",
+  "mineboost.option.particle_limit": "Max Particles"
 }

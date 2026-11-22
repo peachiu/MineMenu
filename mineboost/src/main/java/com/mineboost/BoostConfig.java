@@ -37,6 +37,15 @@ public final class BoostConfig {
     /** FPS cap while the game isn't the focused window. 0 = no cap. */
     public int backgroundFps = 15;
     public boolean fpsOverlay = false;
+    /** Smart Render Distance: FPS to aim for (one of {@link #FPS_TARGETS}); 0 = off. */
+    public int fpsTarget = 0;
+    /** The highest render distance Smart Render Distance may go back up to. */
+    public int autoRenderMax = 12;
+    /** Most particles allowed at once (one of {@link #PARTICLE_LIMITS}); -1 = no limit. */
+    public int particleLimit = -1;
+
+    public static final int[] FPS_TARGETS = {0, 30, 45, 60, 75, 90, 120, 144};
+    public static final int[] PARTICLE_LIMITS = {250, 500, 1000, 2000, 4000, -1};
 
     public static BoostConfig get() {
         return instance;
@@ -69,6 +78,22 @@ public final class BoostConfig {
         entityDistance = Math.max(2, Math.min(ENTITY_DISTANCE_UNLIMITED, entityDistance));
         blockEntityDistance = Math.max(1, Math.min(BLOCK_ENTITY_DISTANCE_VANILLA, blockEntityDistance));
         backgroundFps = Math.max(0, Math.min(60, backgroundFps));
+        if (indexOf(FPS_TARGETS, fpsTarget) < 0) {
+            fpsTarget = 0;
+        }
+        if (indexOf(PARTICLE_LIMITS, particleLimit) < 0) {
+            particleLimit = -1;
+        }
+        autoRenderMax = Math.max(2, Math.min(32, autoRenderMax));
+    }
+
+    public static int indexOf(int[] values, int value) {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == value) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Removes particles already on screen, so "Disable All Particles" takes effect instantly. */

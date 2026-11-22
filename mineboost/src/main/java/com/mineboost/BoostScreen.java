@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -36,18 +37,21 @@ public class BoostScreen extends GameOptionsScreen {
     public static String otherFpsCounterReason = "Another FPS counter is on. Turn it off first.";
 
     private final int mipmapsOnOpen;
+    private final int renderDistanceOnOpen;
     private final double initialScroll;
     /** True while being replaced by a fresh copy of itself (after applying a preset). */
     private boolean refreshing;
     private TextWidget fpsLine;
 
     public BoostScreen(Screen parent, GameOptions options) {
-        this(parent, options, options.getMipmapLevels().getValue(), 0);
+        this(parent, options, options.getMipmapLevels().getValue(), options.getViewDistance().getValue(), 0);
     }
 
-    private BoostScreen(Screen parent, GameOptions options, int mipmapsOnOpen, double initialScroll) {
+    private BoostScreen(Screen parent, GameOptions options, int mipmapsOnOpen, int renderDistanceOnOpen,
+                        double initialScroll) {
         super(parent, options, Text.literal("MineBoost").formatted(Formatting.GREEN, Formatting.BOLD));
         this.mipmapsOnOpen = mipmapsOnOpen;
+        this.renderDistanceOnOpen = renderDistanceOnOpen;
         this.initialScroll = initialScroll;
     }
 
@@ -89,6 +93,7 @@ public class BoostScreen extends GameOptionsScreen {
     @Override
     protected void addOptions() {
         // MineBoost extras first: these are the ones vanilla doesn't have.
+        this.body.addAll(BoostOptions.smart(this.gameOptions));
         SimpleOption<?>[] extras = BoostOptions.all();
         this.body.addAll(extras);
         lockFpsOverlayIfNeeded(extras[extras.length - 1]);
@@ -103,6 +108,22 @@ public class BoostScreen extends GameOptionsScreen {
                 o.getParticles(), o.getEntityShadows(),
                 o.getEntityDistanceScaling(), o.getBiomeBlendRadius(),
                 o.getMipmapLevels(), o.getMenuBackgroundBlurriness());
+    }
+
+    @Override
+    protected void initFooter() {
+        DirectionalLayoutWidget footer = DirectionalLayoutWidget.horizontal().spacing(8);
+        footer.add(ButtonWidget.builder(Text.literal("Benchmark (10s)").formatted(Formatting.GREEN), b -> {
+                    applyPendingValues();
+                    close();
+                    Benchmark.start();
+                })
+                .width(120)
+                .tooltip(Tooltip.of(Text.literal("Closes the menu and measures your FPS for 10 seconds. "
+                        + "Keep playing normally; the result shows up in chat. Try it with different presets!")))
+                .build());
+        footer.add(ButtonWidget.builder(ScreenTexts.DONE, b -> close()).width(150).build());
+        layout.addFooter(footer);
     }
 
     @Override
@@ -138,7 +159,8 @@ public class BoostScreen extends GameOptionsScreen {
         // on the same screen would stack a second copy of the menu on top of the first.)
         double scroll = this.body != null ? this.body.getScrollAmount() : 0;
         refreshing = true;
-        this.client.setScreen(new BoostScreen(this.parent, this.gameOptions, mipmapsOnOpen, scroll));
+        this.client.setScreen(new BoostScreen(this.parent, this.gameOptions, mipmapsOnOpen,
+                this.gameOptions.getViewDistance().getValue(), scroll));
     }
 
     private Text fpsText() {
@@ -164,6 +186,11 @@ public class BoostScreen extends GameOptionsScreen {
             this.client.setMipmapLevels(mipmaps);
             this.client.reloadResourcesConcurrently();
         }
+        // You moved the render distance slider yourself: that's Smart Render Distance's new maximum.
+        int renderDistance = this.gameOptions.getViewDistance().getValue();
+        if (!refreshing && BoostConfig.get().fpsTarget > 0 && renderDistance != renderDistanceOnOpen) {
+            SmartRenderDistance.restartFrom(renderDistance);
+        }
         BoostConfig.save();
         super.removed();
     }
@@ -171,6 +198,41 @@ public class BoostScreen extends GameOptionsScreen {
     /** MineBoost's own settings as vanilla-style options, so they look and work like the rest. */
     static final class BoostOptions {
         private BoostOptions() {
+        }
+
+        /** The two biggest new boosts, shown first. */
+        static SimpleOption<?>[] smart(GameOptions gameOptions) {
+            BoostConfig c = BoostConfig.get();
+            return new SimpleOption<?>[]{
+                    new SimpleOption<>("mineboost.option.fps_target",
+                            SimpleOption.constantTooltip(Text.literal(
+                                    "Smart Render Distance. Pick the FPS you want: when the game drops below it, "
+                                            + "MineBoost lowers the render distance, and raises it again (up to the "
+                                            + "distance you chose) when there's FPS to spare.")),
+                            (prefix, index) -> GameOptions.getGenericValueText(prefix,
+                                    BoostConfig.FPS_TARGETS[index] == 0 ? Text.literal("Off")
+                                            : Text.literal(BoostConfig.FPS_TARGETS[index] + " FPS")),
+                            new SimpleOption.ValidatingIntSliderCallbacks(0, BoostConfig.FPS_TARGETS.length - 1),
+                            Math.max(0, BoostConfig.indexOf(BoostConfig.FPS_TARGETS, c.fpsTarget)),
+                            index -> {
+                                boolean wasOff = c.fpsTarget == 0;
+                                c.fpsTarget = BoostConfig.FPS_TARGETS[index];
+                                if (wasOff && c.fpsTarget > 0) {
+                                    // Start from the distance you have now; never go above it.
+                                    SmartRenderDistance.restartFrom(gameOptions.getViewDistance().getValue());
+                                }
+                            }),
+                    new SimpleOption<>("mineboost.option.particle_limit",
+                            SimpleOption.constantTooltip(Text.literal(
+                                    "Most particles on screen at once. Stops TNT, big farms and potion clouds "
+                                            + "from tanking your FPS, while normal particles still show.")),
+                            (prefix, index) -> GameOptions.getGenericValueText(prefix,
+                                    BoostConfig.PARTICLE_LIMITS[index] < 0 ? Text.literal("Unlimited")
+                                            : Text.literal(String.valueOf(BoostConfig.PARTICLE_LIMITS[index]))),
+                            new SimpleOption.ValidatingIntSliderCallbacks(0, BoostConfig.PARTICLE_LIMITS.length - 1),
+                            Math.max(0, BoostConfig.indexOf(BoostConfig.PARTICLE_LIMITS, c.particleLimit)),
+                            index -> c.particleLimit = BoostConfig.PARTICLE_LIMITS[index]),
+            };
         }
 
         static SimpleOption<?>[] all() {

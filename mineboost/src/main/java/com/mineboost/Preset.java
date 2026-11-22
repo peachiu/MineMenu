@@ -122,6 +122,8 @@ public enum Preset {
         c.hideWeather = hideWeather;
         c.animatedTextures = animatedTextures;
         c.backgroundFps = backgroundFps;
+        // Smart Render Distance (if on) now works below this preset's distance.
+        SmartRenderDistance.restartFrom(clampedRenderDistance(o));
         BoostConfig.save();
         if (disableParticles) {
             BoostConfig.clearParticles();
@@ -133,7 +135,8 @@ public enum Preset {
         GameOptions o = client.options;
         BoostConfig c = BoostConfig.get();
         return o.getGraphicsMode().getValue() == graphics
-                && o.getViewDistance().getValue() == clampedRenderDistance(o)
+                // With Smart Render Distance on, the distance moves by itself: compare its maximum instead.
+                && (c.fpsTarget > 0 ? c.autoRenderMax : o.getViewDistance().getValue()) == clampedRenderDistance(o)
                 && o.getSimulationDistance().getValue() == simulationDistance
                 && o.getAo().getValue() == smoothLighting
                 && o.getCloudRenderMode().getValue() == clouds

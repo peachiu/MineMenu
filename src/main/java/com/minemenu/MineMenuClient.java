@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -16,6 +18,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
@@ -51,6 +54,13 @@ public class MineMenuClient implements ClientModInitializer {
         // These fire for the integrated (singleplayer) server, which runs inside the client.
         ServerLifecycleEvents.SERVER_STARTED.register(ServerCheats::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(Revenge::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(ExtraCheats::onServerStarted);
+        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
+                ExtraCheats.afterBlockBreak(world, player, pos, state));
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            ExtraCheats.onAttack(player, world, entity);
+            return ActionResult.PASS;
+        });
         ServerLivingEntityEvents.AFTER_DEATH.register(Revenge::onDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(Revenge::onRespawn);
         ServerLifecycleEvents.SERVER_STOPPING.register(ServerCheats::revertAll);
