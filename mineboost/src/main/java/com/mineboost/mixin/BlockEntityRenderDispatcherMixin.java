@@ -1,6 +1,7 @@
 package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
+import com.mineboost.Culling;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -24,11 +25,18 @@ public class BlockEntityRenderDispatcherMixin {
     private <E extends BlockEntity> void mineboost$limitDistance(E blockEntity, float tickDelta, MatrixStack matrices,
                                                               VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         BoostConfig config = BoostConfig.get();
-        if (config.blockEntityDistance >= BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA || camera == null) {
+        if (camera == null) {
             return;
         }
-        double max = config.blockEntityDistanceBlocks();
-        if (Vec3d.ofCenter(blockEntity.getPos()).squaredDistanceTo(camera.getPos()) > max * max) {
+        if (config.blockEntityDistance < BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA) {
+            double max = config.blockEntityDistanceBlocks();
+            if (Vec3d.ofCenter(blockEntity.getPos()).squaredDistanceTo(camera.getPos()) > max * max) {
+                ci.cancel();
+                return;
+            }
+        }
+        // Smart Culling: a chest or sign behind solid blocks isn't drawn.
+        if (config.smartCulling && !Culling.isBlockEntityVisible(blockEntity.getPos(), camera.getPos())) {
             ci.cancel();
         }
     }

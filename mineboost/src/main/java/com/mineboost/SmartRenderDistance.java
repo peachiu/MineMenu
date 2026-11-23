@@ -25,7 +25,7 @@ public final class SmartRenderDistance {
         BoostConfig config = BoostConfig.get();
         int target = config.fpsTarget;
         // Only judge FPS during normal play: menus, loading and alt-tab all distort it.
-        if (target <= 0 || client.world == null || client.player == null || client.currentScreen != null
+        if (target <= 0 || AutoPreset.isRunning() || Benchmark.isRunning() || client.world == null || client.player == null || client.currentScreen != null
                 || !client.isWindowFocused()) {
             cooldown = Math.max(cooldown, 40);
             return;

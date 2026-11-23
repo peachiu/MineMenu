@@ -14,10 +14,15 @@ public enum Feature {
     NIGHT_VISION(Category.PLAYER, "Night Vision", "See clearly in the dark and underwater."),
     LONG_REACH(Category.PLAYER, "Long Reach", "Reach blocks and mobs from much farther away."),
     ITEM_MAGNET(Category.PLAYER, "Item Magnet", "Dropped items and XP orbs within 12 blocks fly to you."),
+    WATER_WALK(Category.PLAYER, "Water Walk", "Walk on water and lava as if they were solid ground. Sneak to sink in."),
+    SPIDER_CLIMB(Category.PLAYER, "Spider Climb", "Walk into a wall to climb straight up it, like a spider."),
+    NO_FALL_DAMAGE(Category.PLAYER, "No Fall Damage", "Falling never hurts, from any height."),
     // Combat
     ONE_HIT_KILL(Category.COMBAT, "One-Hit Kill", "Every hit you land does massive damage."),
     MOB_AURA(Category.COMBAT, "Mob Aura", "Hostile mobs that come within 8 blocks of you die instantly."),
     MEGA_KNOCKBACK(Category.COMBAT, "Mega Knockback", "Every mob you hit goes flying."),
+    THOR_MODE(Category.COMBAT, "Thor Mode", "Every mob you hit is struck by lightning (8 extra damage and fire; it never hurts you or burns the area)."),
+    EXPLOSIVE_ARROWS(Category.COMBAT, "Explosive Arrows", "Your arrows explode like a creeper when they hit something. They break blocks!"),
     MOB_GLOW(Category.COMBAT, "Mob Glow", "Every mob within 64 blocks glows, so you can see it through walls."),
     REVENGE(Category.COMBAT, "Revenge Mode", "If a mob kills you, lightning destroys it and you respawn right where you died."),
     // World
@@ -26,6 +31,7 @@ public enum Feature {
     ORE_VISION(Category.WORLD, "Ore Vision", "Diamonds, gold, iron, emeralds, redstone, lapis and ancient debris within 20 blocks glow through walls."),
     VEIN_MINER(Category.WORLD, "Vein Miner", "Break one log or ore and the whole tree or vein comes down. Sneak to break just one block."),
     INSTA_MINE(Category.WORLD, "Insta-Mine", "Break blocks almost instantly."),
+    AUTO_SMELT(Category.WORLD, "Auto Smelt", "Blocks you mine drop already smelted: iron, gold and copper ingots, glass, stone and more. Works with Vein Miner."),
     // Items
     INFINITE_ITEMS(Category.ITEMS, "Infinite Items", "The stack in your hands never runs out and your tools never break."),
     KEEP_INVENTORY(Category.ITEMS, "Keep Inventory", "Keep your items and XP when you die.");

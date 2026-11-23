@@ -81,7 +81,7 @@ public class BoostScreen extends GameOptionsScreen {
                 label = Text.literal("✔ ").formatted(Formatting.WHITE).append(label);
             }
             presets.add(ButtonWidget.builder(label, b -> applyPreset(preset))
-                    .width(62)
+                    .width(60)
                     .tooltip(Tooltip.of(Text.literal(preset.description()
                             + (active ? "\n\nThis preset is active." : "\n\nClick to apply."))))
                     .build());
@@ -112,17 +112,27 @@ public class BoostScreen extends GameOptionsScreen {
 
     @Override
     protected void initFooter() {
-        DirectionalLayoutWidget footer = DirectionalLayoutWidget.horizontal().spacing(8);
+        DirectionalLayoutWidget footer = DirectionalLayoutWidget.horizontal().spacing(4);
+        footer.add(ButtonWidget.builder(Text.literal("Auto Preset").formatted(Formatting.AQUA), b -> {
+                    applyPendingValues();
+                    close();
+                    AutoPreset.start(this.client);
+                })
+                .width(100)
+                .tooltip(Tooltip.of(Text.literal("Closes the menu and tries the presets from Ultra down (about 7 seconds "
+                        + "each), then keeps the best looking one that reaches your FPS Target (or 60 FPS if that's off). "
+                        + "Keep playing normally while it runs.")))
+                .build());
         footer.add(ButtonWidget.builder(Text.literal("Benchmark (10s)").formatted(Formatting.GREEN), b -> {
                     applyPendingValues();
                     close();
                     Benchmark.start();
                 })
-                .width(120)
+                .width(100)
                 .tooltip(Tooltip.of(Text.literal("Closes the menu and measures your FPS for 10 seconds. "
                         + "Keep playing normally; the result shows up in chat. Try it with different presets!")))
                 .build());
-        footer.add(ButtonWidget.builder(ScreenTexts.DONE, b -> close()).width(150).build());
+        footer.add(ButtonWidget.builder(ScreenTexts.DONE, b -> close()).width(100).build());
         layout.addFooter(footer);
     }
 
@@ -290,6 +300,13 @@ public class BoostScreen extends GameOptionsScreen {
                             new SimpleOption.ValidatingIntSliderCallbacks(0, 60),
                             c.backgroundFps,
                             value -> c.backgroundFps = value),
+                    SimpleOption.ofBoolean("mineboost.option.smart_culling",
+                            SimpleOption.constantTooltip(Text.literal(
+                                    "Don't draw mobs, items, chests and signs that are completely hidden behind "
+                                            + "solid blocks. Big boost in caves, villages and bases. Glass and leaves "
+                                            + "never hide anything, and things close to you are always drawn.")),
+                            c.smartCulling,
+                            value -> c.smartCulling = value),
                     SimpleOption.ofBoolean("mineboost.option.fps_overlay",
                             SimpleOption.constantTooltip(Text.literal(
                                     "Show FPS, average FPS and 1% low in the top-right corner. "

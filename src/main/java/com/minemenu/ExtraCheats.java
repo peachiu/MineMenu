@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -340,14 +341,26 @@ public final class ExtraCheats {
 
     /** After the host breaks a block: take the rest of the tree or ore vein with it. */
     public static void afterBlockBreak(World world, PlayerEntity player, BlockPos pos, BlockState state) {
-        if (!(world instanceof ServerWorld serverWorld) || !(player instanceof ServerPlayerEntity serverPlayer)
-                || !CheatState.isOn(Feature.VEIN_MINER) || player.isSneaking()) {
+        if (!(world instanceof ServerWorld serverWorld) || !(player instanceof ServerPlayerEntity serverPlayer)) {
             return;
         }
         MinecraftServer server = serverWorld.getServer();
         if (ServerCheats.host(server) != serverPlayer) {
             return;
         }
+        List<BlockPos> brokenPositions = new ArrayList<>();
+        brokenPositions.add(pos);
+        if (CheatState.isOn(Feature.VEIN_MINER) && !player.isSneaking()) {
+            veinMine(serverWorld, serverPlayer, pos, state, brokenPositions);
+        }
+        if (CheatState.isOn(Feature.AUTO_SMELT)) {
+            // The drops are spawned during the break; smelt them once this tick's breaking is done.
+            server.execute(() -> smeltDropsAt(serverWorld, brokenPositions));
+        }
+    }
+
+    private static void veinMine(ServerWorld serverWorld, ServerPlayerEntity serverPlayer, BlockPos pos, BlockState state,
+                                 List<BlockPos> brokenPositions) {
         boolean log = state.isIn(BlockTags.LOGS);
         boolean ore = oreColor(state) != null || isOtherOre(state);
         if (!log && !ore) {
@@ -383,7 +396,28 @@ public final class ExtraCheats {
                 nextState.onStacksDropped(serverWorld, nextPos, tool, true);
                 serverWorld.breakBlock(nextPos, false, serverPlayer);
                 broken++;
+                brokenPositions.add(nextPos);
                 queue.add(nextPos);
+            }
+        }
+    }
+
+    private static final String SMELTED_TAG = "minemenu_smelted";
+
+    /** Auto Smelt: turns fresh drops at these positions into what a furnace would make of them. */
+    private static void smeltDropsAt(ServerWorld world, List<BlockPos> positions) {
+        for (BlockPos pos : positions) {
+            for (ItemEntity item : world.getEntitiesByClass(ItemEntity.class, new Box(pos).expand(0.75),
+                    e -> e.isAlive() && e.age < 20 && !e.getCommandTags().contains(SMELTED_TAG))) {
+                ItemStack stack = item.getStack();
+                var recipe = world.getRecipeManager().getFirstMatch(net.minecraft.recipe.RecipeType.SMELTING,
+                        new net.minecraft.recipe.input.SingleStackRecipeInput(stack), world);
+                if (recipe.isPresent()) {
+                    ItemStack result = recipe.get().value().getResult(world.getRegistryManager()).copy();
+                    result.setCount(Math.min(result.getMaxCount(), result.getCount() * stack.getCount()));
+                    item.setStack(result);
+                }
+                item.addCommandTag(SMELTED_TAG);
             }
         }
     }
@@ -396,12 +430,18 @@ public final class ExtraCheats {
 
     /** When the host hits a mob: send it flying (applied after vanilla's own knockback). */
     public static void onAttack(PlayerEntity player, World world, Entity target) {
-        if (world.isClient() || !(player instanceof ServerPlayerEntity serverPlayer)
-                || !CheatState.isOn(Feature.MEGA_KNOCKBACK) || !(target instanceof LivingEntity)) {
+        if (world.isClient() || !(player instanceof ServerPlayerEntity serverPlayer) || !(target instanceof LivingEntity living)) {
             return;
         }
         MinecraftServer server = serverPlayer.getServer();
         if (server == null || ServerCheats.host(server) != serverPlayer) {
+            return;
+        }
+        if (CheatState.isOn(Feature.THOR_MODE)) {
+            // After the normal hit lands: a (harmless-to-you) lightning bolt, 8 extra damage and fire.
+            server.execute(() -> thorStrike(serverPlayer, living));
+        }
+        if (!CheatState.isOn(Feature.MEGA_KNOCKBACK)) {
             return;
         }
         Vec3d look = serverPlayer.getRotationVector();
@@ -415,9 +455,58 @@ public final class ExtraCheats {
         });
     }
 
+    private static void thorStrike(ServerPlayerEntity player, LivingEntity target) {
+        if (!target.isAlive() || !(target.getWorld() instanceof ServerWorld world)) {
+            return;
+        }
+        // Cosmetic bolt: the real one would also hit you (you're within its 3 block range) and set fires.
+        LightningEntity bolt = EntityType.LIGHTNING_BOLT.create(world);
+        if (bolt != null) {
+            bolt.refreshPositionAfterTeleport(target.getPos());
+            bolt.setCosmetic(true);
+            world.spawnEntity(bolt);
+        }
+        target.timeUntilRegen = 0; // the normal hit just made it briefly immune
+        target.damage(world.getDamageSources().lightningBolt(), 8.0f);
+        target.setOnFireFor(4.0f);
+    }
+
     // ------------------------------------------------------------------
     // Actions
     // ------------------------------------------------------------------
+
+    public static void wolfArmy(ServerPlayerEntity player) {
+        ServerWorld world = player.getServerWorld();
+        int spawned = 0;
+        for (int i = 0; i < 5; i++) {
+            net.minecraft.entity.passive.WolfEntity wolf = EntityType.WOLF.create(world);
+            if (wolf == null) {
+                continue;
+            }
+            double angle = Math.PI * 2 * i / 5;
+            wolf.refreshPositionAndAngles(player.getX() + Math.cos(angle) * 2, player.getY(),
+                    player.getZ() + Math.sin(angle) * 2, player.getYaw(), 0);
+            wolf.setOwner(player);
+            wolf.setHealth(wolf.getMaxHealth());
+            world.spawnEntity(wolf);
+            spawned++;
+        }
+        player.sendMessage(Text.literal(spawned + " wolves are on your side!").formatted(Formatting.GREEN), true);
+    }
+
+    public static void clearGroundItems(ServerPlayerEntity player) {
+        Box box = player.getBoundingBox().expand(64);
+        int cleared = 0;
+        for (Entity entity : player.getServerWorld().getOtherEntities(player, box,
+                // Arrows yes; tridents no (that's your weapon, not litter).
+                e -> e instanceof ItemEntity || (e instanceof PersistentProjectileEntity
+                        && !(e instanceof net.minecraft.entity.projectile.TridentEntity)))) {
+            entity.discard();
+            cleared++;
+        }
+        player.sendMessage(Text.literal(cleared == 0 ? "Nothing on the ground"
+                : "Cleared " + cleared + " item" + (cleared == 1 ? "" : "s") + " from the ground").formatted(Formatting.GREEN), true);
+    }
 
     public static void fireball(ServerPlayerEntity player) {
         Vec3d look = player.getRotationVector();

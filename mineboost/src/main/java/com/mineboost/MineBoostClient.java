@@ -30,6 +30,7 @@ public class MineBoostClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             FpsOverlay.render(context);
             Benchmark.onFrame(context);
+            AutoPreset.onFrame(context);
         });
     }
 }

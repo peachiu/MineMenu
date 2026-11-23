@@ -48,6 +48,7 @@ public final class ServerCheats {
     private static final Identifier DAMAGE_ID = id("one_hit_kill");
     private static final Identifier JUMP_ID = id("super_jump");
     private static final Identifier FALL_ID = id("no_fall_damage");
+    private static final Identifier NO_FALL_ID = id("no_fall_damage_toggle");
     private static final Identifier MINE_ID = id("insta_mine");
     private static final Identifier BLOCK_REACH_ID = id("block_reach");
     private static final Identifier ENTITY_REACH_ID = id("entity_reach");
@@ -182,8 +183,8 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 applyAttributes(player, feature);
             }
-            case MOB_AURA, REVENGE -> {
-                // Mob Aura runs in tick(); Revenge reacts to deaths (see Revenge)
+            case MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT -> {
+                // Mob Aura runs in tick(); the rest react to events and mixins (Revenge, ExtraCheats, mixin package)
             }
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
             default -> applyAttributes(player, feature);
@@ -207,7 +208,7 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 removeAttributes(player, feature);
             }
-            case GOD_MODE, MOB_AURA, REVENGE -> {
+            case GOD_MODE, MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT -> {
                 // nothing to undo
             }
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
@@ -229,6 +230,8 @@ public final class ServerCheats {
             }
             case INSTA_MINE -> setModifier(player, EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, MINE_ID, 299.0,
                     EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            case NO_FALL_DAMAGE -> setModifier(player, EntityAttributes.GENERIC_FALL_DAMAGE_MULTIPLIER, NO_FALL_ID, -1.0,
+                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             case LONG_REACH -> {
                 setModifier(player, EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, BLOCK_REACH_ID, 15.5,
                         EntityAttributeModifier.Operation.ADD_VALUE);
@@ -249,6 +252,7 @@ public final class ServerCheats {
                 removeModifier(player, EntityAttributes.GENERIC_FALL_DAMAGE_MULTIPLIER, FALL_ID);
             }
             case INSTA_MINE -> removeModifier(player, EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, MINE_ID);
+            case NO_FALL_DAMAGE -> removeModifier(player, EntityAttributes.GENERIC_FALL_DAMAGE_MULTIPLIER, NO_FALL_ID);
             case LONG_REACH -> {
                 removeModifier(player, EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, BLOCK_REACH_ID);
                 removeModifier(player, EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, ENTITY_REACH_ID);
@@ -357,6 +361,7 @@ public final class ServerCheats {
         SMITE(Category.COMBAT, "Smite", "Strike lightning where you're looking."),
         FIREBALL(Category.COMBAT, "Fireball", "Shoot an exploding fireball where you're looking."),
         ARROW_RAIN(Category.COMBAT, "Arrow Rain", "50 arrows fall from the sky where you're looking."),
+        WOLF_ARMY(Category.COMBAT, "Wolf Army", "5 tamed wolves appear around you and fight for you."),
         // World
         EXPLODE(Category.WORLD, "Explode", "Cause an explosion where you're looking. Turn on God Mode first!"),
         TNT_RAIN(Category.WORLD, "TNT Rain", "Drop a ring of lit TNT around you. Turn on God Mode first!"),
@@ -364,6 +369,7 @@ public final class ServerCheats {
         NIGHT(Category.WORLD, "Set Night", "Set the time to night."),
         CLEAR_WEATHER(Category.WORLD, "Clear Weather", "Stop rain and thunder."),
         THUNDER(Category.WORLD, "Thunderstorm", "Start a thunderstorm."),
+        CLEAR_GROUND_ITEMS(Category.WORLD, "Clear Ground Items", "Remove every dropped item and stuck arrow within 64 blocks (handy after explosions)."),
         // Items
         SUPER_ENCHANT(Category.ITEMS, "Super Enchant", "Put every enchantment that fits on the item in your hand, at max level."),
         REPAIR_ALL(Category.ITEMS, "Repair All", "Fully repair every item in your inventory."),
@@ -448,6 +454,8 @@ public final class ServerCheats {
                 player.setAir(player.getMaxAir());
             }
             case FIREBALL -> ExtraCheats.fireball(player);
+            case WOLF_ARMY -> ExtraCheats.wolfArmy(player);
+            case CLEAR_GROUND_ITEMS -> ExtraCheats.clearGroundItems(player);
             case ARROW_RAIN -> ExtraCheats.arrowRain(player);
             case SUPER_ENCHANT -> ExtraCheats.superEnchantHeld(player);
             case REPAIR_ALL -> ExtraCheats.repairAll(player);

@@ -1,6 +1,6 @@
 # MineMenu
 
-A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, god mode, X-ray style Ore Vision, Vein Miner, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
+A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, god mode, X-ray style Ore Vision, Vein Miner, Water Walk, Spider Climb, Thor Mode, explosive arrows, auto smelt, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
 
 ![The MineMenu menu](docs/menu.png)
 
@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.0.4.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.1.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -37,6 +37,9 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | Night Vision | See in the dark and underwater. |
 | Long Reach | Reach blocks and mobs from about 20 blocks away. |
 | **Item Magnet** | Dropped items and XP orbs within 12 blocks fly to you. |
+| **Water Walk** | Walk on water and lava as if they were solid ground. Sneak to sink in. |
+| **Spider Climb** | Walk into a wall to climb straight up it. |
+| **No Fall Damage** | Falling never hurts, from any height. |
 | Size | Cycle between Normal, **Giant** (4×) and **Tiny** (¼). |
 | Teleport *(action)* | Teleports you to the block you're looking at (up to 160 blocks away). |
 | Launch Me *(action)* | Shoots you into the sky. |
@@ -49,6 +52,8 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | One-Hit Kill | +1000 attack damage. Everything dies in one hit. |
 | Mob Aura | Hostile mobs within 8 blocks of you die automatically. |
 | **Mega Knockback** | Every mob you hit goes flying (about 25 blocks). |
+| **Thor Mode** | Every mob you hit is struck by lightning: 8 extra damage and it catches fire. The lightning never hurts you and never sets the ground on fire. |
+| **Explosive Arrows** | Your arrows explode like a creeper when they hit a block or a mob. They break blocks! |
 | **Mob Glow** | Every mob within 64 blocks glows, so you can see it through walls. |
 | Revenge Mode | If a mob kills you, lightning strikes it and it dies, and you respawn right where you died. See [Revenge Mode](#revenge-mode). |
 | Kill Hostile Mobs *(action)* | Kills every hostile mob within 64 blocks. |
@@ -56,6 +61,7 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | Smite *(action)* | Lightning bolt where you're looking. |
 | **Fireball** *(action)* | Shoots an exploding fireball where you're looking. |
 | **Arrow Rain** *(action)* | 50 arrows fall from the sky where you're looking. |
+| **Wolf Army** *(action)* | 5 tamed wolves appear around you and fight for you. |
 
 ### World
 
@@ -66,11 +72,13 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | **Ore Vision** | Diamonds, gold, iron, emeralds, redstone, lapis and ancient debris within 20 blocks glow through walls, each in its own colour. See [Ore Vision](#ore-vision). |
 | **Vein Miner** | Break one log or ore and the whole tree or vein comes down, with your tool's Fortune or Silk Touch. Sneak to break just one block. |
 | Insta-Mine | Break blocks almost instantly. |
+| **Auto Smelt** | Blocks you mine drop already smelted: iron, gold and copper ingots, glass, stone and more. Works with Vein Miner. |
 | Spawn Mob... *(action)* | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
 | Explode *(action)* | TNT-sized explosion where you're looking. It breaks blocks, so turn on God Mode first. |
 | TNT Rain *(action)* | Drops a ring of 12 lit TNT around you. |
 | Set Day / Set Night *(actions)* | Changes the time. |
 | Clear Weather / Thunderstorm *(actions)* | Changes the weather. |
+| **Clear Ground Items** *(action)* | Removes every dropped item and stuck arrow within 64 blocks. Your thrown trident is left alone. |
 
 ### Items
 
@@ -194,7 +202,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.0.4.1.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.1.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 

@@ -14,26 +14,30 @@ import net.minecraft.util.Formatting;
  * Max FPS, VSync, GUI scale and brightness are personal, so presets leave them alone.
  */
 public enum Preset {
+    TOASTER("Toaster", Formatting.DARK_RED,
+            "The absolute minimum: 2 chunk view distance, nothing extra drawn. For PCs that can barely run Minecraft.",
+            GraphicsMode.FAST, 2, 5, false, CloudRenderMode.OFF, ParticlesMode.MINIMAL, false, 0, 0, 0.5, 0,
+            2, 1, true, true, false, 5, true),
     POTATO("Potato", Formatting.RED,
             "Maximum FPS for very weak PCs. Looks rough: short view distance, no particles, no rain.",
             GraphicsMode.FAST, 4, 5, false, CloudRenderMode.OFF, ParticlesMode.MINIMAL, false, 0, 0, 0.5, 0,
-            4, 2, true, true, false, 5),
+            4, 2, true, true, false, 5, true),
     LOW("Low", Formatting.GOLD,
             "Big FPS boost that still looks like Minecraft.",
             GraphicsMode.FAST, 6, 6, false, CloudRenderMode.OFF, ParticlesMode.DECREASED, false, 1, 1, 0.75, 0,
-            6, 4, false, true, true, 10),
+            6, 4, false, true, true, 10, true),
     BALANCED("Balanced", Formatting.YELLOW,
             "Good looks and smooth FPS on most PCs.",
             GraphicsMode.FANCY, 10, 8, true, CloudRenderMode.FAST, ParticlesMode.DECREASED, true, 2, 2, 1.0, 3,
-            10, 6, false, false, true, 15),
+            10, 6, false, false, true, 15, true),
     HIGH("High", Formatting.GREEN,
             "Close to Minecraft's defaults, a bit farther. For decent PCs.",
             GraphicsMode.FANCY, 16, 12, true, CloudRenderMode.FANCY, ParticlesMode.ALL, true, 3, 4, 1.0, 5,
-            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30),
+            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, true),
     ULTRA("Ultra", Formatting.AQUA,
             "Everything turned up, long view distance. For strong PCs.",
             GraphicsMode.FANCY, 24, 16, true, CloudRenderMode.FANCY, ParticlesMode.ALL, true, 5, 4, 1.5, 5,
-            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30);
+            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, false);
 
     private final String displayName;
     private final Formatting color;
@@ -57,13 +61,14 @@ public enum Preset {
     private final boolean hideWeather;
     private final boolean animatedTextures;
     private final int backgroundFps;
+    private final boolean smartCulling;
 
     Preset(String displayName, Formatting color, String description,
            GraphicsMode graphics, int renderDistance, int simulationDistance, boolean smoothLighting,
            CloudRenderMode clouds, ParticlesMode particles, boolean entityShadows, int biomeBlend, int mipmaps,
            double entityDistanceScaling, int menuBlur,
            int entityDistance, int blockEntityDistance, boolean disableParticles, boolean hideWeather,
-           boolean animatedTextures, int backgroundFps) {
+           boolean animatedTextures, int backgroundFps, boolean smartCulling) {
         this.displayName = displayName;
         this.color = color;
         this.description = description;
@@ -84,6 +89,7 @@ public enum Preset {
         this.hideWeather = hideWeather;
         this.animatedTextures = animatedTextures;
         this.backgroundFps = backgroundFps;
+        this.smartCulling = smartCulling;
     }
 
     public String displayName() {
@@ -122,6 +128,7 @@ public enum Preset {
         c.hideWeather = hideWeather;
         c.animatedTextures = animatedTextures;
         c.backgroundFps = backgroundFps;
+        c.smartCulling = smartCulling;
         // Smart Render Distance (if on) now works below this preset's distance.
         SmartRenderDistance.restartFrom(clampedRenderDistance(o));
         BoostConfig.save();
@@ -151,7 +158,8 @@ public enum Preset {
                 && c.disableParticles == disableParticles
                 && c.hideWeather == hideWeather
                 && c.animatedTextures == animatedTextures
-                && c.backgroundFps == backgroundFps;
+                && c.backgroundFps == backgroundFps
+                && c.smartCulling == smartCulling;
     }
 
     /** Same rule as vanilla: under 1 GB of memory caps render distance at 16. */

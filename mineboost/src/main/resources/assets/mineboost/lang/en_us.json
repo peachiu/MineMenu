@@ -9,5 +9,6 @@
   "mineboost.option.background_fps": "Background FPS",
   "mineboost.option.fps_overlay": "FPS Overlay",
   "mineboost.option.fps_target": "FPS Target",
-  "mineboost.option.particle_limit": "Max Particles"
+  "mineboost.option.particle_limit": "Max Particles",
+  "mineboost.option.smart_culling": "Smart Culling"
 }

@@ -4,7 +4,10 @@
   "package": "com.minemenu.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerEntityMixin"
+    "FluidBlockMixin",
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ProjectileEntityMixin"
   ],
   "client": [
     "HandledScreenAccessor",

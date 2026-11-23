@@ -37,6 +37,8 @@ public final class BoostConfig {
     /** FPS cap while the game isn't the focused window. 0 = no cap. */
     public int backgroundFps = 15;
     public boolean fpsOverlay = false;
+    /** Smart Culling: skip drawing entities and chests that are hidden behind solid blocks. */
+    public boolean smartCulling = true;
     /** Smart Render Distance: FPS to aim for (one of {@link #FPS_TARGETS}); 0 = off. */
     public int fpsTarget = 0;
     /** The highest render distance Smart Render Distance may go back up to. */
