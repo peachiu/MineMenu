@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, go
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.1.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.2.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -40,10 +40,14 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | **Water Walk** | Walk on water and lava as if they were solid ground. Sneak to sink in. |
 | **Spider Climb** | Walk into a wall to climb straight up it. |
 | **No Fall Damage** | Falling never hurts, from any height. |
+| **Jetpack** | Hold jump to fly upwards (about 20 blocks in a second and a half), no Fly needed. No fall damage while it's on. |
+| **Feather Fall** | Slow Falling: you fall about 9 times slower. |
 | Size | Cycle between Normal, **Giant** (4×) and **Tiny** (¼). |
 | Teleport *(action)* | Teleports you to the block you're looking at (up to 160 blocks away). |
 | Launch Me *(action)* | Shoots you into the sky. |
 | Heal & Feed *(action)* | Full health and hunger. |
+| **Ride Mob** *(action)* | Ride the mob you're looking at (up to 32 blocks away). Sneak to get off. |
+| **Set Home** / **Go Home** *(actions)* | Remember a spot, then teleport back to it from anywhere, even another dimension. Saved in the world folder, so each world has its own. |
 
 ### Combat
 
@@ -52,6 +56,7 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | One-Hit Kill | +1000 attack damage. Everything dies in one hit. |
 | Mob Aura | Hostile mobs within 8 blocks of you die automatically. |
 | **Mega Knockback** | Every mob you hit goes flying (about 25 blocks). |
+| **Stun Hits** | Every mob you hit freezes in place for 10 seconds. |
 | **Thor Mode** | Every mob you hit is struck by lightning: 8 extra damage and it catches fire. The lightning never hurts you and never sets the ground on fire. |
 | **Explosive Arrows** | Your arrows explode like a creeper when they hit a block or a mob. They break blocks! |
 | **Mob Glow** | Every mob within 64 blocks glows, so you can see it through walls. |
@@ -62,6 +67,8 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | **Fireball** *(action)* | Shoots an exploding fireball where you're looking. |
 | **Arrow Rain** *(action)* | 50 arrows fall from the sky where you're looking. |
 | **Wolf Army** *(action)* | 5 tamed wolves appear around you and fight for you. |
+| **Mob Rain** *(action)* | 20 random mobs fall from the sky around you (no bosses). |
+| **Resize Mob** *(action)* | The mob you're looking at becomes giant (4x), then tiny (1/4), then normal again. It stays that size. |
 
 ### World
 
@@ -72,12 +79,15 @@ The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click 
 | **Ore Vision** | Diamonds, gold, iron, emeralds, redstone, lapis and ancient debris within 20 blocks glow through walls, each in its own colour. See [Ore Vision](#ore-vision). |
 | **Vein Miner** | Break one log or ore and the whole tree or vein comes down, with your tool's Fortune or Silk Touch. Sneak to break just one block. |
 | Insta-Mine | Break blocks almost instantly. |
+| **Auto Replant** | Harvest a fully grown crop (wheat, carrots, potatoes, beetroot, nether wart) and it plants itself again. |
+| **Peace Mode** | No new mobs spawn (the doMobSpawning game rule, put back when you turn it off or leave the world). |
 | **Auto Smelt** | Blocks you mine drop already smelted: iron, gold and copper ingots, glass, stone and more. Works with Vein Miner. |
 | Spawn Mob... *(action)* | Opens a list of every mob (82 of them, including the hidden Giant and Illusioner). Search, pick one, choose 1, 5 or 10, and it spawns on the block you're looking at. |
 | Explode *(action)* | TNT-sized explosion where you're looking. It breaks blocks, so turn on God Mode first. |
 | TNT Rain *(action)* | Drops a ring of 12 lit TNT around you. |
 | Set Day / Set Night *(actions)* | Changes the time. |
 | Clear Weather / Thunderstorm *(actions)* | Changes the weather. |
+| **Grow Plants** *(action)* | Every crop, sapling, stem, berry bush, bamboo and mushroom within 8 blocks grows fully. Saplings become trees. |
 | **Clear Ground Items** *(action)* | Removes every dropped item and stuck arrow within 64 blocks. Your thrown trident is left alone. |
 
 ### Items
@@ -189,7 +199,7 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 - The menu doesn't pause the game, so you can watch things happen behind it.
 - Toggles stay on when you switch worlds. Everything is undone before the world saves, so nothing sticks to your save file (no permanent flying or giant size if you remove the mod).
 - Explosions and TNT break blocks. Make a backup or use a test world if you care about your build.
-- **Keep Inventory** and **Always Day** change your world's game rules while they're on. Turning them off, or leaving the world, puts the old values back. If the game crashes while one is on, the rule stays changed; turn the toggle on and off again to reset it, or use `/gamerule`.
+- **Keep Inventory**, **Always Day** and **Peace Mode** change your world's game rules while they're on. Turning them off, or leaving the world, puts the old values back. If the game crashes while one is on, the rule stays changed; turn the toggle on and off again to reset it, or use `/gamerule`.
 
 ## Building
 
@@ -202,7 +212,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.1.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.2.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 

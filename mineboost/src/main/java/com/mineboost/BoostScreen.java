@@ -294,8 +294,9 @@ public class BoostScreen extends GameOptionsScreen {
                             c.blockEntityDistance,
                             value -> c.blockEntityDistance = value),
                     listSlider("mineboost.option.item_distance",
-                            "Dropped items farther than this aren't drawn. Farms and explosions leave lots of them around.",
-                            BoostConfig.DISTANCES, c.itemDistance, v -> v < 0 ? "All" : v + " blocks",
+                            "Dropped items farther than this aren't drawn (normally Minecraft draws them up to about "
+                                    + "16 blocks). Farms and explosions leave lots of them around.",
+                            BoostConfig.ITEM_DISTANCES, c.itemDistance, v -> v < 0 ? "Normal" : v + " blocks",
                             v -> c.itemDistance = v),
                     toggle("mineboost.option.simple_items",
                             "Draw a stack of dropped items as one item instead of a pile of up to five. "

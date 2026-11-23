@@ -19,7 +19,7 @@ Works in singleplayer and on servers. It only changes what your own game draws.
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `mineboost-2.1.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `mineboost-2.2.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile, join a world and press **`.`**.
 
 You can change the key in **Options → Controls → Key Binds → MineBoost**.
@@ -60,6 +60,10 @@ No mod can promise a fixed number like "50× more FPS". The biggest gains come f
 | **Animated textures** | Off | Off | On | On | On | On |
 | **Background FPS** | 5 | 5 | 10 | 15 | 30 | 30 |
 | **Smart Culling** | On | On | On | On | On | Off |
+| **Max Entities** | 50 | 100 | 200 | All | All | All |
+| **Item Distance** | 4 blocks | 6 blocks | 8 blocks | 12 blocks | Normal | Normal |
+| **Simple Items** | On | On | On | Off | Off | Off |
+| **Particle Range** | 16 blocks | 24 blocks | 32 blocks | Any | Any | Any |
 
 Every preset also sets **Chunk Updates** to *Threaded*, so building chunks never freezes a frame. Presets don't touch Max Framerate, VSync, GUI scale or brightness, because those are personal.
 
@@ -71,6 +75,16 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 |---|---|
 | FPS Target (Smart Render Distance) | Pick 30, 45, 60, 75, 90, 120 or 144 FPS. Once a second MineBoost checks your average FPS over the last 3 seconds: below 90% of the target it lowers the render distance (by 2 if you're far below), and well above it raises it again, but never above the distance you chose and never below 4. It waits 5 seconds after each change for the chunks to reload, and only adjusts while you're playing (not in menus or alt-tabbed). With it on, the FPS overlay also shows the current render distance. |
 | Smart Culling | Mobs, animals, items, chests and signs that are completely hidden behind solid blocks aren't drawn. Biggest help in caves, villages and bases. Glass, leaves, slabs and other see-through blocks never hide anything; things within 6 blocks, players, bosses, glowing mobs (Mob Glow) and Ore Vision markers are always drawn. Each answer is re-checked 10 times a second, so things pop back as soon as they come into view. |
+| Max Entities | Draw only this many of the closest mobs, animals and items (25 to 400, or All). For farms and mob grinders. Players, bosses and glowing mobs are always drawn. |
+| Particle Range | Particles farther away than this (8 to 64 blocks) aren't created at all. |
+| Item Distance | Dropped items farther than 4, 6, 8 or 12 blocks aren't drawn. (Minecraft already stops at about 16 blocks.) |
+| Simple Items | A dropped stack is drawn as 1 item instead of a pile of up to 5. |
+| Menu FPS | FPS limit (30 or 60) while an inventory, chest or the pause menu is open. Your PC runs cooler and quieter; it doesn't change FPS while playing. Chat isn't limited. |
+| Hide Sky | No sky, sun, moon or stars; the background is the fog colour. |
+| Hide Beacon Beams | The beacon works, its beam isn't drawn. |
+| Hide Decorations | Armor stands, item frames and paintings aren't drawn. |
+| Hide Name Tags | No names above players and named mobs. |
+| Hide Vignette | No dark shading at the screen edges. A small saving. |
 | Max Particles | Most particles on screen at once: 250, 500, 1000, 2000, 4000 or Unlimited. Normal particles still show; huge bursts get cut off. |
 | Entity Distance | Mobs, animals, dropped items and item frames farther than this aren't drawn. Players, the Ender Dragon and the Wither are always drawn. One of the biggest boosts near farms and mob grinders. |
 | Chests & Signs | Chests, signs, banners, heads and beds farther than this aren't drawn. Great for big bases and storage rooms. |
@@ -83,6 +97,10 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 **Auto Preset** is the first button at the bottom. It closes the menu and tries the presets from Ultra down, about 7 seconds each (3 to let the chunks reload, 4 to measure), and keeps the best looking one that reaches your FPS Target (or 60 FPS if FPS Target is off). The result is posted in chat. Keep playing normally while it runs.
 
 **Benchmark (10s)** is the button next to Done. It closes the menu and measures your FPS for 10 seconds while you play normally, then posts the average FPS, 1% low and worst frame in chat, with your preset and render distance. Run it with different presets to see which one suits your PC.
+
+| Hide Beacon Beams off | Hide Beacon Beams on |
+|---|---|
+| ![Beacon beam](../minemeboost/docs/beacon-beam-off.png) | ![No beacon beam](../minemeboost/docs/beacon-beam-on.png) |
 
 Settings are saved to `config/mineboost.json`. Vanilla settings are saved to `options.txt` as usual.
 
@@ -99,7 +117,7 @@ cd mineboost
 ./gradlew build
 ```
 
-The jar ends up in `mineboost/build/libs/mineboost-2.1.0.jar`.
+The jar ends up in `mineboost/build/libs/mineboost-2.2.0.jar`.
 
 ### Making a release
 

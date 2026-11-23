@@ -49,7 +49,10 @@ public final class BoostConfig {
     // --- MineBoost 2.2 ---
     /** Draw only this many of the closest entities (one of {@link #MAX_ENTITIES}); -1 = all. */
     public int maxEntities = -1;
-    /** Dropped items farther than this many blocks aren't drawn (one of {@link #DISTANCES}); -1 = no limit. */
+    /**
+     * Dropped items farther than this many blocks aren't drawn (one of {@link #ITEM_DISTANCES}); -1 = no limit.
+     * Vanilla already stops at about 16 blocks (items are small), so only shorter distances make sense.
+     */
     public int itemDistance = -1;
     /** Draw a stack of dropped items as one item instead of up to five. */
     public boolean simpleItems = false;
@@ -65,6 +68,7 @@ public final class BoostConfig {
 
     public static final int[] MAX_ENTITIES = {25, 50, 100, 200, 400, -1};
     public static final int[] DISTANCES = {8, 16, 24, 32, 48, 64, -1};
+    public static final int[] ITEM_DISTANCES = {4, 6, 8, 12, -1};
     public static final int[] MENU_FPS = {0, 30, 60};
 
     public static final int[] FPS_TARGETS = {0, 30, 45, 60, 75, 90, 120, 144};
@@ -111,7 +115,7 @@ public final class BoostConfig {
         if (indexOf(MAX_ENTITIES, maxEntities) < 0) {
             maxEntities = -1;
         }
-        if (indexOf(DISTANCES, itemDistance) < 0) {
+        if (indexOf(ITEM_DISTANCES, itemDistance) < 0) {
             itemDistance = -1;
         }
         if (indexOf(DISTANCES, particleRange) < 0) {
