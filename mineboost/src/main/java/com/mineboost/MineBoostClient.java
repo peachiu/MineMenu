@@ -19,6 +19,7 @@ public class MineBoostClient implements ClientModInitializer {
                 "key.mineboost.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, "key.categories.mineboost"));
 
         ClientTickEvents.END_CLIENT_TICK.register(SmartRenderDistance::tick);
+        ClientTickEvents.END_CLIENT_TICK.register(EntityBudget::tick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {

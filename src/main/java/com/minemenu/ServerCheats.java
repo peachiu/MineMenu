@@ -167,6 +167,7 @@ public final class ServerCheats {
             reapplyAttributes(player);
         }
         ExtraCheats.tick(player, applied, tickCounter);
+        MoreCheats.tick(player, applied, tickCounter);
     }
 
     private static void enable(MinecraftServer server, ServerPlayerEntity player, Feature feature) {
@@ -183,9 +184,10 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 applyAttributes(player, feature);
             }
-            case MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT -> {
-                // Mob Aura runs in tick(); the rest react to events and mixins (Revenge, ExtraCheats, mixin package)
+            case MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT, JETPACK, AUTO_REPLANT -> {
+                // Mob Aura runs in tick(); the rest react to events and mixins (Revenge, ExtraCheats, MoreCheats, mixin package)
             }
+            case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.enable(server, player, feature);
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
             default -> applyAttributes(player, feature);
         }
@@ -208,9 +210,10 @@ public final class ServerCheats {
                 player.sendAbilitiesUpdate();
                 removeAttributes(player, feature);
             }
-            case GOD_MODE, MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT -> {
+            case GOD_MODE, MOB_AURA, REVENGE, WATER_WALK, SPIDER_CLIMB, THOR_MODE, EXPLOSIVE_ARROWS, AUTO_SMELT, JETPACK, AUTO_REPLANT -> {
                 // nothing to undo
             }
+            case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.disable(server, player, feature);
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
             default -> removeAttributes(player, feature);
         }
@@ -294,6 +297,7 @@ public final class ServerCheats {
                 server.getTickManager().setFrozen(false);
             } else {
                 ExtraCheats.disable(server, null, feature); // restores game rules, removes Ore Vision markers
+                MoreCheats.disable(server, null, feature);  // Peace Mode's game rule, stunned mobs
             }
         }
         applied.clear();
@@ -355,6 +359,9 @@ public final class ServerCheats {
         TELEPORT(Category.PLAYER, "Teleport", "Teleport to the block you're looking at."),
         LAUNCH(Category.PLAYER, "Launch Me", "Shoot yourself into the sky."),
         HEAL(Category.PLAYER, "Heal & Feed", "Restore full health and hunger."),
+        RIDE_MOB(Category.PLAYER, "Ride Mob", "Ride the mob you're looking at (up to 32 blocks away). Sneak to get off."),
+        SET_HOME(Category.PLAYER, "Set Home", "Remember where you're standing. Saved with the world."),
+        GO_HOME(Category.PLAYER, "Go Home", "Teleport back to your home, even from another dimension."),
         // Combat
         KILL_HOSTILE(Category.COMBAT, "Kill Hostile Mobs", "Kill every hostile mob within 64 blocks."),
         KILL_ALL(Category.COMBAT, "Kill ALL Mobs", "Kill every mob within 64 blocks (not you, pets or armor stands)."),
@@ -362,6 +369,8 @@ public final class ServerCheats {
         FIREBALL(Category.COMBAT, "Fireball", "Shoot an exploding fireball where you're looking."),
         ARROW_RAIN(Category.COMBAT, "Arrow Rain", "50 arrows fall from the sky where you're looking."),
         WOLF_ARMY(Category.COMBAT, "Wolf Army", "5 tamed wolves appear around you and fight for you."),
+        MOB_RAIN(Category.COMBAT, "Mob Rain", "20 random mobs fall from the sky around you. Chaos!"),
+        RESIZE_MOB(Category.COMBAT, "Resize Mob", "The mob you're looking at becomes giant, then tiny, then normal again. It stays that size."),
         // World
         EXPLODE(Category.WORLD, "Explode", "Cause an explosion where you're looking. Turn on God Mode first!"),
         TNT_RAIN(Category.WORLD, "TNT Rain", "Drop a ring of lit TNT around you. Turn on God Mode first!"),
@@ -369,6 +378,7 @@ public final class ServerCheats {
         NIGHT(Category.WORLD, "Set Night", "Set the time to night."),
         CLEAR_WEATHER(Category.WORLD, "Clear Weather", "Stop rain and thunder."),
         THUNDER(Category.WORLD, "Thunderstorm", "Start a thunderstorm."),
+        GROW_PLANTS(Category.WORLD, "Grow Plants", "Every crop, sapling and plant within 8 blocks grows fully, right now. Saplings become trees!"),
         CLEAR_GROUND_ITEMS(Category.WORLD, "Clear Ground Items", "Remove every dropped item and stuck arrow within 64 blocks (handy after explosions)."),
         // Items
         SUPER_ENCHANT(Category.ITEMS, "Super Enchant", "Put every enchantment that fits on the item in your hand, at max level."),
@@ -455,6 +465,12 @@ public final class ServerCheats {
             }
             case FIREBALL -> ExtraCheats.fireball(player);
             case WOLF_ARMY -> ExtraCheats.wolfArmy(player);
+            case MOB_RAIN -> MoreCheats.mobRain(player);
+            case RESIZE_MOB -> MoreCheats.resizeMob(player);
+            case RIDE_MOB -> MoreCheats.rideMob(player);
+            case SET_HOME -> MoreCheats.setHome(player);
+            case GO_HOME -> MoreCheats.goHome(player);
+            case GROW_PLANTS -> MoreCheats.growPlants(player);
             case CLEAR_GROUND_ITEMS -> ExtraCheats.clearGroundItems(player);
             case ARROW_RAIN -> ExtraCheats.arrowRain(player);
             case SUPER_ENCHANT -> ExtraCheats.superEnchantHeld(player);

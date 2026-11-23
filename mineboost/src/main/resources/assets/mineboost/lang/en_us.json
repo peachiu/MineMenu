@@ -10,5 +10,15 @@
   "mineboost.option.fps_overlay": "FPS Overlay",
   "mineboost.option.fps_target": "FPS Target",
   "mineboost.option.particle_limit": "Max Particles",
-  "mineboost.option.smart_culling": "Smart Culling"
+  "mineboost.option.smart_culling": "Smart Culling",
+  "mineboost.option.max_entities": "Max Entities",
+  "mineboost.option.particle_range": "Particle Range",
+  "mineboost.option.item_distance": "Item Distance",
+  "mineboost.option.simple_items": "Simple Items",
+  "mineboost.option.menu_fps": "Menu FPS",
+  "mineboost.option.hide_sky": "Hide Sky",
+  "mineboost.option.hide_beacon_beams": "Hide Beacon Beams",
+  "mineboost.option.hide_decorations": "Hide Decorations",
+  "mineboost.option.hide_name_tags": "Hide Name Tags",
+  "mineboost.option.hide_vignette": "Hide Vignette"
 }

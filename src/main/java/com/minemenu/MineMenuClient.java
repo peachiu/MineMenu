@@ -55,12 +55,16 @@ public class MineMenuClient implements ClientModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(ServerCheats::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(Revenge::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(ExtraCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(MoreCheats::onServerStarted);
+        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
+                MoreCheats.afterBlockBreak(world, player, pos, state));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> DeleteMode.reset());
         DeleteMode.register();
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
                 ExtraCheats.afterBlockBreak(world, player, pos, state));
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             ExtraCheats.onAttack(player, world, entity);
+            MoreCheats.onAttack(player, world, entity);
             return ActionResult.PASS;
         });
         ServerLivingEntityEvents.AFTER_DEATH.register(Revenge::onDeath);
@@ -78,7 +82,24 @@ public class MineMenuClient implements ClientModInitializer {
         return KeyBindingHelper.registerKeyBinding(new KeyBinding(name, InputUtil.Type.KEYSYM, key, CATEGORY));
     }
 
+    /** Jetpack: while jump is held, push upwards (movement is yours to decide, so this runs on the client). */
+    private static void jetpack(MinecraftClient client) {
+        var player = client.player;
+        if (player == null || !CheatState.isOn(Feature.JETPACK) || !isSingleplayer(client) || client.currentScreen != null
+                || !client.options.jumpKey.isPressed() || player.getAbilities().flying) {
+            return;
+        }
+        var velocity = player.getVelocity();
+        player.setVelocity(velocity.x, Math.min(0.5, velocity.y + 0.15), velocity.z);
+        player.fallDistance = 0;
+        if (client.world != null) {
+            client.world.addParticle(net.minecraft.particle.ParticleTypes.FLAME, player.getX(), player.getY(), player.getZ(),
+                    (client.world.random.nextDouble() - 0.5) * 0.05, -0.15, (client.world.random.nextDouble() - 0.5) * 0.05);
+        }
+    }
+
     private static void onClientTick(MinecraftClient client) {
+        jetpack(client);
         while (openMenuKey.wasPressed()) {
             if (openMenuOverride != null) {
                 openMenuOverride.run();

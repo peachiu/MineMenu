@@ -2,6 +2,11 @@ package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
 import com.mineboost.Culling;
+import com.mineboost.EntityBudget;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.entity.decoration.painting.PaintingEntity;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
@@ -20,6 +25,23 @@ public class EntityRenderDispatcherMixin {
     private <E extends Entity> void mineboost$limitDistance(E entity, Frustum frustum, double x, double y, double z,
                                                          CallbackInfoReturnable<Boolean> cir) {
         BoostConfig config = BoostConfig.get();
+        // Hide Decorations: armor stands, item frames and paintings.
+        if (config.hideDecorations && (entity instanceof ArmorStandEntity || entity instanceof ItemFrameEntity
+                || entity instanceof PaintingEntity)) {
+            cir.setReturnValue(false);
+            return;
+        }
+        // Dropped Items Distance: farms and explosions leave lots of items around.
+        if (config.itemDistance > 0 && entity instanceof ItemEntity
+                && entity.squaredDistanceTo(x, y, z) > (double) config.itemDistance * config.itemDistance) {
+            cir.setReturnValue(false);
+            return;
+        }
+        // Max Entities: only the closest ones.
+        if (config.maxEntities > 0 && !EntityBudget.isAllowed(entity)) {
+            cir.setReturnValue(false);
+            return;
+        }
         double max = config.entityDistanceBlocks();
         // Always draw players and bosses: you want to see those.
         if (max >= 0 && !(entity instanceof PlayerEntity || entity instanceof EnderDragonEntity || entity instanceof WitherEntity)

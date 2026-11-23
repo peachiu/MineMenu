@@ -26,4 +26,12 @@ public class WorldRendererMixin {
             ci.cancel();
         }
     }
+
+    /** Hide Sky: no sky, sun, moon or stars; the background is just the fog colour. */
+    @Inject(method = "renderSky", at = @At("HEAD"), cancellable = true)
+    private void mineboost$hideSky(CallbackInfo ci) {
+        if (BoostConfig.get().hideSky) {
+            ci.cancel();
+        }
+    }
 }

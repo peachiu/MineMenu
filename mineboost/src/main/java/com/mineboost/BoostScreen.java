@@ -210,7 +210,22 @@ public class BoostScreen extends GameOptionsScreen {
         private BoostOptions() {
         }
 
-        /** The two biggest new boosts, shown first. */
+        /** A slider over a fixed list of values (-1 shows as "All"/"Unlimited"). */
+        private static SimpleOption<Integer> listSlider(String key, String tooltip, int[] values, int current,
+                                                        java.util.function.IntFunction<String> label,
+                                                        java.util.function.IntConsumer setter) {
+            return new SimpleOption<>(key, SimpleOption.constantTooltip(Text.literal(tooltip)),
+                    (prefix, index) -> GameOptions.getGenericValueText(prefix, Text.literal(label.apply(values[index]))),
+                    new SimpleOption.ValidatingIntSliderCallbacks(0, values.length - 1),
+                    Math.max(0, BoostConfig.indexOf(values, current)),
+                    index -> setter.accept(values[index]));
+        }
+
+        private static SimpleOption<Boolean> toggle(String key, String tooltip, boolean current, java.util.function.Consumer<Boolean> setter) {
+            return SimpleOption.ofBoolean(key, SimpleOption.constantTooltip(Text.literal(tooltip)), current, setter);
+        }
+
+        /** The biggest boosts, shown first. */
         static SimpleOption<?>[] smart(GameOptions gameOptions) {
             BoostConfig c = BoostConfig.get();
             return new SimpleOption<?>[]{
@@ -242,6 +257,16 @@ public class BoostScreen extends GameOptionsScreen {
                             new SimpleOption.ValidatingIntSliderCallbacks(0, BoostConfig.PARTICLE_LIMITS.length - 1),
                             Math.max(0, BoostConfig.indexOf(BoostConfig.PARTICLE_LIMITS, c.particleLimit)),
                             index -> c.particleLimit = BoostConfig.PARTICLE_LIMITS[index]),
+                    listSlider("mineboost.option.max_entities",
+                            "Draw only this many of the closest mobs, animals and items. Huge help at farms and mob "
+                                    + "grinders. Players, bosses and glowing mobs are always drawn.",
+                            BoostConfig.MAX_ENTITIES, c.maxEntities, v -> v < 0 ? "All" : String.valueOf(v),
+                            v -> c.maxEntities = v),
+                    listSlider("mineboost.option.particle_range",
+                            "Particles farther away than this aren't created at all. Rain splashes, far-away "
+                                    + "explosions and farms make lots you can barely see.",
+                            BoostConfig.DISTANCES, c.particleRange, v -> v < 0 ? "Any" : v + " blocks",
+                            v -> c.particleRange = v),
             };
         }
 
@@ -268,6 +293,14 @@ public class BoostScreen extends GameOptionsScreen {
                             new SimpleOption.ValidatingIntSliderCallbacks(1, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA),
                             c.blockEntityDistance,
                             value -> c.blockEntityDistance = value),
+                    listSlider("mineboost.option.item_distance",
+                            "Dropped items farther than this aren't drawn. Farms and explosions leave lots of them around.",
+                            BoostConfig.DISTANCES, c.itemDistance, v -> v < 0 ? "All" : v + " blocks",
+                            v -> c.itemDistance = v),
+                    toggle("mineboost.option.simple_items",
+                            "Draw a stack of dropped items as one item instead of a pile of up to five. "
+                                    + "Up to 5x less to draw for every dropped stack.",
+                            c.simpleItems, v -> c.simpleItems = v),
                     SimpleOption.ofBoolean("mineboost.option.disable_particles",
                             SimpleOption.constantTooltip(Text.literal(
                                     "No particles at all: no explosions, smoke, block breaking or potion swirls. "
@@ -307,6 +340,26 @@ public class BoostScreen extends GameOptionsScreen {
                                             + "never hide anything, and things close to you are always drawn.")),
                             c.smartCulling,
                             value -> c.smartCulling = value),
+                    listSlider("mineboost.option.menu_fps",
+                            "FPS limit while an inventory, chest or the pause menu is open. Nothing there needs full "
+                                    + "speed, so your PC runs cooler and quieter. (Chat isn't limited.)",
+                            BoostConfig.MENU_FPS, c.menuFps, v -> v == 0 ? "Off" : v + " FPS",
+                            v -> c.menuFps = v),
+                    toggle("mineboost.option.hide_sky",
+                            "Don't draw the sky, sun, moon and stars. The background is just the fog colour.",
+                            c.hideSky, v -> c.hideSky = v),
+                    toggle("mineboost.option.hide_beacon_beams",
+                            "Don't draw beacon beams (the beacon still works).",
+                            c.hideBeaconBeams, v -> c.hideBeaconBeams = v),
+                    toggle("mineboost.option.hide_decorations",
+                            "Don't draw armor stands, item frames and paintings. Helps in decorated bases and villages.",
+                            c.hideDecorations, v -> c.hideDecorations = v),
+                    toggle("mineboost.option.hide_name_tags",
+                            "Don't draw names above players and named mobs.",
+                            c.hideNameTags, v -> c.hideNameTags = v),
+                    toggle("mineboost.option.hide_vignette",
+                            "Don't draw the dark shading around the edges of the screen. A small saving, and a clearer view.",
+                            c.hideVignette, v -> c.hideVignette = v),
                     SimpleOption.ofBoolean("mineboost.option.fps_overlay",
                             SimpleOption.constantTooltip(Text.literal(
                                     "Show FPS, average FPS and 1% low in the top-right corner. "

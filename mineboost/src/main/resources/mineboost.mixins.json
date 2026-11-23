@@ -6,7 +6,11 @@
   "client": [
     "BlockEntityRenderDispatcherMixin",
     "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "InGameHudMixin",
+    "ItemEntityRendererMixin",
     "MinecraftClientMixin",
+    "ParticleAccessor",
     "ParticleManagerMixin",
     "SpriteAtlasTextureMixin",
     "WorldRendererMixin"

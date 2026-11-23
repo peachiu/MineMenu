@@ -35,6 +35,16 @@ public class ParticleManagerMixin {
             ci.cancel();
             return;
         }
+        // Particle Range: particles far away are barely visible; don't create them at all.
+        if (config.particleRange > 0) {
+            var camera = net.minecraft.client.MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+            ParticleAccessor p = (ParticleAccessor) particle;
+            double dx = p.mineboost$getX() - camera.x, dy = p.mineboost$getY() - camera.y, dz = p.mineboost$getZ() - camera.z;
+            if (dx * dx + dy * dy + dz * dz > (double) config.particleRange * config.particleRange) {
+                ci.cancel();
+                return;
+            }
+        }
         // Particle Limit: a TNT chain or a big farm can spawn thousands at once.
         if (config.particleLimit > 0) {
             int count = newParticles.size();

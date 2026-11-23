@@ -26,6 +26,13 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "getFramerateLimit", at = @At("RETURN"), cancellable = true)
     private void mineboost$backgroundFps(CallbackInfoReturnable<Integer> cir) {
+        // Menu FPS: while an inventory or the pause menu is open there's nothing moving that needs full speed.
+        int menuCap = BoostConfig.get().menuFps;
+        MinecraftClient self = (MinecraftClient) (Object) this;
+        if (menuCap > 0 && self.world != null && self.currentScreen != null
+                && !(self.currentScreen instanceof net.minecraft.client.gui.screen.ChatScreen)) {
+            cir.setReturnValue(Math.min(cir.getReturnValueI(), menuCap));
+        }
         int cap = BoostConfig.get().backgroundFps;
         if (cap <= 0) {
             return;

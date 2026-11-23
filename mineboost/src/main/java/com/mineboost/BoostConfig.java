@@ -46,6 +46,27 @@ public final class BoostConfig {
     /** Most particles allowed at once (one of {@link #PARTICLE_LIMITS}); -1 = no limit. */
     public int particleLimit = -1;
 
+    // --- MineBoost 2.2 ---
+    /** Draw only this many of the closest entities (one of {@link #MAX_ENTITIES}); -1 = all. */
+    public int maxEntities = -1;
+    /** Dropped items farther than this many blocks aren't drawn (one of {@link #DISTANCES}); -1 = no limit. */
+    public int itemDistance = -1;
+    /** Draw a stack of dropped items as one item instead of up to five. */
+    public boolean simpleItems = false;
+    /** Particles farther than this many blocks aren't created (one of {@link #DISTANCES}); -1 = no limit. */
+    public int particleRange = -1;
+    public boolean hideDecorations = false;
+    public boolean hideBeaconBeams = false;
+    public boolean hideSky = false;
+    public boolean hideNameTags = false;
+    public boolean hideVignette = false;
+    /** FPS cap while a menu (inventory, pause menu...) is open in a world; 0 = off. */
+    public int menuFps = 0;
+
+    public static final int[] MAX_ENTITIES = {25, 50, 100, 200, 400, -1};
+    public static final int[] DISTANCES = {8, 16, 24, 32, 48, 64, -1};
+    public static final int[] MENU_FPS = {0, 30, 60};
+
     public static final int[] FPS_TARGETS = {0, 30, 45, 60, 75, 90, 120, 144};
     public static final int[] PARTICLE_LIMITS = {250, 500, 1000, 2000, 4000, -1};
 
@@ -87,6 +108,18 @@ public final class BoostConfig {
             particleLimit = -1;
         }
         autoRenderMax = Math.max(2, Math.min(32, autoRenderMax));
+        if (indexOf(MAX_ENTITIES, maxEntities) < 0) {
+            maxEntities = -1;
+        }
+        if (indexOf(DISTANCES, itemDistance) < 0) {
+            itemDistance = -1;
+        }
+        if (indexOf(DISTANCES, particleRange) < 0) {
+            particleRange = -1;
+        }
+        if (indexOf(MENU_FPS, menuFps) < 0) {
+            menuFps = 0;
+        }
     }
 
     public static int indexOf(int[] values, int value) {

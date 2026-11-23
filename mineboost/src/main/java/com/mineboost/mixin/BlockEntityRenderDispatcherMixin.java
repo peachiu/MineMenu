@@ -2,6 +2,7 @@ package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
 import com.mineboost.Culling;
+import net.minecraft.block.entity.BeaconBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -26,6 +27,11 @@ public class BlockEntityRenderDispatcherMixin {
                                                               VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         BoostConfig config = BoostConfig.get();
         if (camera == null) {
+            return;
+        }
+        // Hide Beacon Beams: the beacon block stays, only its beam isn't drawn.
+        if (config.hideBeaconBeams && blockEntity instanceof BeaconBlockEntity) {
+            ci.cancel();
             return;
         }
         if (config.blockEntityDistance < BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA) {
