@@ -17,27 +17,33 @@ public enum Preset {
     TOASTER("Toaster", Formatting.DARK_RED,
             "The absolute minimum: 2 chunk view distance, nothing extra drawn. For PCs that can barely run Minecraft.",
             GraphicsMode.FAST, 2, 5, false, CloudRenderMode.OFF, ParticlesMode.MINIMAL, false, 0, 0, 0.5, 0,
-            2, 1, true, true, false, 5, true, 50, 4, true, 16),
+            2, 1, true, true, false, 5, true, 50, 4, true, 16, 12),
     POTATO("Potato", Formatting.RED,
             "Maximum FPS for very weak PCs. Looks rough: short view distance, no particles, no rain.",
             GraphicsMode.FAST, 4, 5, false, CloudRenderMode.OFF, ParticlesMode.MINIMAL, false, 0, 0, 0.5, 0,
-            4, 2, true, true, false, 5, true, 100, 6, true, 24),
+            4, 2, true, true, false, 5, true, 100, 6, true, 24, 16),
     LOW("Low", Formatting.GOLD,
             "Big FPS boost that still looks like Minecraft.",
             GraphicsMode.FAST, 6, 6, false, CloudRenderMode.OFF, ParticlesMode.DECREASED, false, 1, 1, 0.75, 0,
-            6, 4, false, true, true, 10, true, 200, 8, true, 32),
+            6, 4, false, true, true, 10, true, 200, 8, true, 32, 24),
+    INTEL_IGPU("Intel iGPU", Formatting.BLUE,
+            "Made for laptops with Intel UHD / Iris graphics (like an i3 or i5 with UHD). Turns off what costs "
+                    + "integrated graphics the most (menu blur, clouds, Fancy leaves, shadows), keeps smooth lighting "
+                    + "and 8 chunks so it still looks good.",
+            GraphicsMode.FAST, 8, 6, true, CloudRenderMode.OFF, ParticlesMode.DECREASED, false, 1, 2, 0.75, 0,
+            6, 5, false, false, true, 10, true, 100, 8, true, 32, 24),
     BALANCED("Balanced", Formatting.YELLOW,
             "Good looks and smooth FPS on most PCs.",
             GraphicsMode.FANCY, 10, 8, true, CloudRenderMode.FAST, ParticlesMode.DECREASED, true, 2, 2, 1.0, 3,
-            10, 6, false, false, true, 15, true, -1, 12, false, -1),
+            10, 6, false, false, true, 15, true, -1, 12, false, -1, 32),
     HIGH("High", Formatting.GREEN,
             "Close to Minecraft's defaults, a bit farther. For decent PCs.",
             GraphicsMode.FANCY, 16, 12, true, CloudRenderMode.FANCY, ParticlesMode.ALL, true, 3, 4, 1.0, 5,
-            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, true, -1, -1, false, -1),
+            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, true, -1, -1, false, -1, -1),
     ULTRA("Ultra", Formatting.AQUA,
             "Everything turned up, long view distance. For strong PCs.",
             GraphicsMode.FANCY, 24, 16, true, CloudRenderMode.FANCY, ParticlesMode.ALL, true, 5, 4, 1.5, 5,
-            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, false, -1, -1, false, -1);
+            BoostConfig.ENTITY_DISTANCE_UNLIMITED, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA, false, false, true, 30, false, -1, -1, false, -1, -1);
 
     private final String displayName;
     private final Formatting color;
@@ -66,6 +72,7 @@ public enum Preset {
     private final int itemDistance;
     private final boolean simpleItems;
     private final int particleRange;
+    private final int farMobDetail;
 
     Preset(String displayName, Formatting color, String description,
            GraphicsMode graphics, int renderDistance, int simulationDistance, boolean smoothLighting,
@@ -73,7 +80,8 @@ public enum Preset {
            double entityDistanceScaling, int menuBlur,
            int entityDistance, int blockEntityDistance, boolean disableParticles, boolean hideWeather,
            boolean animatedTextures, int backgroundFps, boolean smartCulling,
-           int maxEntities, int itemDistance, boolean simpleItems, int particleRange) {
+           int maxEntities, int itemDistance, boolean simpleItems, int particleRange,
+           int farMobDetail) {
         this.displayName = displayName;
         this.color = color;
         this.description = description;
@@ -99,6 +107,7 @@ public enum Preset {
         this.itemDistance = itemDistance;
         this.simpleItems = simpleItems;
         this.particleRange = particleRange;
+        this.farMobDetail = farMobDetail;
     }
 
     public String displayName() {
@@ -142,6 +151,7 @@ public enum Preset {
         c.itemDistance = itemDistance;
         c.simpleItems = simpleItems;
         c.particleRange = particleRange;
+        c.farMobDetail = farMobDetail;
         // Smart Render Distance (if on) now works below this preset's distance.
         SmartRenderDistance.restartFrom(clampedRenderDistance(o));
         BoostConfig.save();
@@ -176,7 +186,8 @@ public enum Preset {
                 && c.maxEntities == maxEntities
                 && c.itemDistance == itemDistance
                 && c.simpleItems == simpleItems
-                && c.particleRange == particleRange;
+                && c.particleRange == particleRange
+                && c.farMobDetail == farMobDetail;
     }
 
     /** Same rule as vanilla: under 1 GB of memory caps render distance at 16. */

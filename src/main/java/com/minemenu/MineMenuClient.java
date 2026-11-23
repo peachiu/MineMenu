@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -38,6 +39,8 @@ public class MineMenuClient implements ClientModInitializer {
     private static KeyBinding toggleGodKey;
     private static KeyBinding killHostileKey;
     private static KeyBinding spawnMobKey;
+    /** Hold to zoom (when the Zoom hack is on). */
+    public static KeyBinding zoomKey;
 
     @Override
     public void onInitializeClient() {
@@ -47,6 +50,7 @@ public class MineMenuClient implements ClientModInitializer {
         toggleGodKey = register("key.minemenu.toggle_god", GLFW.GLFW_KEY_UNKNOWN);
         killHostileKey = register("key.minemenu.kill_hostile", GLFW.GLFW_KEY_UNKNOWN);
         spawnMobKey = register("key.minemenu.spawn_mob", GLFW.GLFW_KEY_UNKNOWN);
+        zoomKey = register("key.minemenu.zoom", GLFW.GLFW_KEY_Z);
 
         ClientTickEvents.END_CLIENT_TICK.register(MineMenuClient::onClientTick);
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
@@ -56,6 +60,11 @@ public class MineMenuClient implements ClientModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(Revenge::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(ExtraCheats::onServerStarted);
         ServerLifecycleEvents.SERVER_STARTED.register(MoreCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(SurvivalCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(Pets::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(WorldCheats::onServerStarted);
+        ServerLifecycleEvents.SERVER_STARTED.register(Waypoints::onServerStarted);
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> Pets.onUse(player, world, hand, entity));
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
                 MoreCheats.afterBlockBreak(world, player, pos, state));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> DeleteMode.reset());
@@ -63,8 +72,10 @@ public class MineMenuClient implements ClientModInitializer {
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) ->
                 ExtraCheats.afterBlockBreak(world, player, pos, state));
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            SurvivalCheats.onAttack(player, world, entity); // Always Crit: before the hit is worked out
             ExtraCheats.onAttack(player, world, entity);
             MoreCheats.onAttack(player, world, entity);
+            Pets.onAttack(player, world, entity);
             return ActionResult.PASS;
         });
         ServerLivingEntityEvents.AFTER_DEATH.register(Revenge::onDeath);
@@ -100,6 +111,7 @@ public class MineMenuClient implements ClientModInitializer {
 
     private static void onClientTick(MinecraftClient client) {
         jetpack(client);
+        ClientCheats.tick(client);
         while (openMenuKey.wasPressed()) {
             if (openMenuOverride != null) {
                 openMenuOverride.run();
@@ -178,8 +190,20 @@ public class MineMenuClient implements ClientModInitializer {
             y += 12;
         }
 
-        if (!CheatState.hudVisible() || !isSingleplayer(client)) {
+        if (!isSingleplayer(client)) {
             return;
+        }
+        // Waypoints and the Structure Finder target: always shown (each waypoint has its own HUD switch).
+        List<Text> waypointLines = Waypoints.hudLines(client);
+        for (Text line : waypointLines) {
+            context.drawTextWithShadow(font, line, x, y, 0xFFFFFF);
+            y += 10;
+        }
+        if (!CheatState.hudVisible()) {
+            return;
+        }
+        if (!waypointLines.isEmpty()) {
+            y += 3;
         }
         List<Feature> enabled = CheatState.enabled();
         CheatState.Size size = CheatState.size();

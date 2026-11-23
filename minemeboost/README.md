@@ -8,8 +8,8 @@ Press **Right Shift** and the menu has two tabs at the top:
 |---|---|
 | ![The MineMenu tab](docs/minemenu-tab.png) | ![The MineBoost tab](docs/mineboost-tab.png) |
 
-- **MineMenu:** singleplayer hacks on four pages (Player, Combat, World, Items), with an **Enable All / Disable All** button: fly, god mode, Ore Vision, Vein Miner, Water Walk, Spider Climb, No Fall Damage, Jetpack, Feather Fall, Ride Mob, Set/Go Home, Stun Hits, Mob Rain, Resize Mob, Auto Replant, Peace Mode, Grow Plants, Thor Mode, Explosive Arrows, Auto Smelt, Wolf Army, Item Magnet, Mob Glow, Mega Knockback, Infinite Items, Keep Inventory, Always Day, fireballs, arrow rain, Give Item (any item, to your inventory or the ground, with category search like "comida" or "armadura"), Super Enchant, Netherite Kit, Clear Junk (with Undo), Delete Items (right-click items in your inventory to delete them), spawn any mob, give XP, Revenge Mode and more.
-- **MineBoost:** FPS boost: Toaster/Potato/Low/Balanced/High/Ultra presets, Auto Preset (picks the best one for your PC), Smart Culling (skips things hidden behind walls), Max Entities, Particle Range, Item Distance, Simple Items, Menu FPS, Hide Sky / Beacon Beams / Decorations / Name Tags / Vignette, Smart Render Distance (holds an FPS target by itself), Max Particles, a 10-second benchmark, the graphics settings that matter, extra boosts and an FPS overlay.
+- **MineMenu:** singleplayer hacks on four pages (Player, Combat, World, Items), with an **Enable All / Disable All** button. New in 3.3: Noclip, Zoom (hold Z), Step-Up, Fast Swim, Elytra Boost, Auto-Eat, Auto-Tool, Auto-Totem, Tame Anything, Always Crit, Chest ESP, Growth Aura, Fast Breed, Infinite Durability, Auto-Fish, Instant Build, 5 named **Waypoints** with a direction/distance HUD, **Time & Weather** (exact time, day speed, sun/rain/thunder) and **Find Structure**. Also: fly, god mode, Ore Vision, Vein Miner, Water Walk, Spider Climb, No Fall Damage, Jetpack, Feather Fall, Ride Mob, Set/Go Home, Stun Hits, Mob Rain, Resize Mob, Auto Replant, Peace Mode, Grow Plants, Thor Mode, Explosive Arrows, Auto Smelt, Wolf Army, Item Magnet, Mob Glow, Mega Knockback, Infinite Items, Keep Inventory, Always Day, fireballs, arrow rain, Give Item (any item, to your inventory or the ground, with category search like "comida" or "armadura"), Super Enchant, Netherite Kit, Clear Junk (with Undo), Delete Items (right-click items in your inventory to delete them), spawn any mob, give XP, Revenge Mode and more.
+- **MineBoost:** FPS boost. New in 3.3: an **Intel iGPU** preset, **Simple Far Mobs** (+31% FPS with armored mobs in view), **Idle Mode**, nearest-first particle limit, a **Benchmark that compares with your last run**, an **Impact:** line in every tooltip with the measured gain, and detection of Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling. Also: Toaster/Potato/Low/Balanced/High/Ultra presets, Auto Preset (picks the best one for your PC), Smart Culling (skips things hidden behind walls), Max Entities, Particle Range, Item Distance, Simple Items, Menu FPS, Hide Sky / Beacon Beams / Decorations / Name Tags / Vignette, Smart Render Distance (holds an FPS target by itself), Max Particles, a 10-second benchmark, the graphics settings that matter, extra boosts and an FPS overlay.
 
 | Ore Vision | Benchmark result |
 |---|---|
@@ -31,7 +31,7 @@ MineMenu only works in your own singleplayer worlds. On a server, Right Shift op
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemeboost-3.2.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemeboost-3.3.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoost already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over.
@@ -49,7 +49,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/minemeboost-3.2.0.jar`.
+The jar ends up in `minemeboost/build/libs/minemeboost-3.3.0.jar`.
 
 ### Making a release
 

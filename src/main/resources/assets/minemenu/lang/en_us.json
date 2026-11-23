@@ -4,5 +4,6 @@
   "key.minemenu.toggle_fly": "Toggle Fly",
   "key.minemenu.toggle_god": "Toggle God Mode",
   "key.minemenu.kill_hostile": "Kill Hostile Mobs",
-  "key.minemenu.spawn_mob": "Spawn Selected Mob"
+  "key.minemenu.spawn_mob": "Spawn Selected Mob",
+  "key.minemenu.zoom": "Zoom (hold)"
 }

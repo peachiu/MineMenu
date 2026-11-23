@@ -24,15 +24,12 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -40,8 +37,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +45,7 @@ import java.util.UUID;
 
 /**
  * The MineMenu 3.2 hacks: Jetpack (server side), Feather Fall, Stun Hits, Auto Replant, Peace Mode,
- * Mob Rain, Resize Mob, Ride Mob, Set/Go Home and Grow Plants. Server thread only, host only.
+ * Mob Rain, Resize Mob, Ride Mob and Grow Plants (Set/Go Home moved to Waypoints in 3.3). Server thread only, host only.
  */
 public final class MoreCheats {
     private static final int STUN_TICKS = 200;
@@ -295,53 +290,10 @@ public final class MoreCheats {
     }
 
     /** Plants only: not grass blocks, moss and nylium, which would cover the area in weeds. */
-    private static boolean isGrowable(BlockState state) {
+    static boolean isGrowable(BlockState state) {
         var block = state.getBlock();
         return block instanceof CropBlock || block instanceof SaplingBlock || block instanceof StemBlock
                 || block instanceof SweetBerryBushBlock || block instanceof CocoaBlock || block instanceof AzaleaBlock
                 || block instanceof MushroomPlantBlock || block instanceof BambooBlock || block instanceof BambooShootBlock;
-    }
-
-    // ------------------------------------------------------------------
-    // Home: saved in the world folder, so each world has its own
-    // ------------------------------------------------------------------
-
-    private static Path homeFile(MinecraftServer server) {
-        return server.getSavePath(WorldSavePath.ROOT).resolve("minemenu_home.txt");
-    }
-
-    public static void setHome(ServerPlayerEntity player) {
-        MinecraftServer server = player.getServer();
-        String line = player.getServerWorld().getRegistryKey().getValue() + " " + player.getX() + " " + player.getY() + " "
-                + player.getZ() + " " + player.getYaw() + " " + player.getPitch();
-        try {
-            Files.writeString(homeFile(server), line);
-            player.sendMessage(Text.literal("Home set here").formatted(Formatting.GREEN), true);
-        } catch (Exception e) {
-            player.sendMessage(Text.literal("Couldn't save your home").formatted(Formatting.RED), true);
-        }
-    }
-
-    public static void goHome(ServerPlayerEntity player) {
-        MinecraftServer server = player.getServer();
-        try {
-            Path file = homeFile(server);
-            if (!Files.exists(file)) {
-                player.sendMessage(Text.literal("No home yet: use Set Home first").formatted(Formatting.YELLOW), true);
-                return;
-            }
-            String[] parts = Files.readString(file).trim().split(" ");
-            RegistryKey<World> dimension = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(parts[0]));
-            ServerWorld world = server.getWorld(dimension);
-            if (world == null) {
-                return;
-            }
-            player.teleport(world, Double.parseDouble(parts[1]), Double.parseDouble(parts[2]), Double.parseDouble(parts[3]),
-                    Float.parseFloat(parts[4]), Float.parseFloat(parts[5]));
-            player.fallDistance = 0;
-            player.sendMessage(Text.literal("Welcome home!").formatted(Formatting.GREEN), true);
-        } catch (Exception e) {
-            player.sendMessage(Text.literal("Couldn't read your home").formatted(Formatting.RED), true);
-        }
     }
 }

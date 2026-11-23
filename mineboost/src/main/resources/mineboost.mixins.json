@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.mineboost.mixin",
+  "plugin": "com.mineboost.MineBoostMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BlockEntityRenderDispatcherMixin",
@@ -9,8 +10,10 @@
     "EntityRendererMixin",
     "InGameHudMixin",
     "ItemEntityRendererMixin",
+    "KeyboardMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
+    "MouseMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
     "SpriteAtlasTextureMixin",

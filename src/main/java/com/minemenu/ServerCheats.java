@@ -168,6 +168,9 @@ public final class ServerCheats {
         }
         ExtraCheats.tick(player, applied, tickCounter);
         MoreCheats.tick(player, applied, tickCounter);
+        SurvivalCheats.tick(player, applied, tickCounter);
+        Pets.tick(player, applied, tickCounter);
+        WorldCheats.tick(player, applied, tickCounter);
     }
 
     private static void enable(MinecraftServer server, ServerPlayerEntity player, Feature feature) {
@@ -189,6 +192,13 @@ public final class ServerCheats {
             }
             case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.enable(server, player, feature);
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
+            case NOCLIP, STEP_UP, FAST_SWIM -> SurvivalCheats.enable(server, player, feature);
+            case ZOOM, ELYTRA_BOOST, AUTO_TOOL, AUTO_FISH, INSTANT_BUILD -> {
+                // client side (ClientCheats)
+            }
+            case AUTO_EAT, AUTO_TOTEM, ALWAYS_CRIT, TAME_ANYTHING, CHEST_ESP, GROWTH_AURA, FAST_BREED, INFINITE_DURABILITY -> {
+                // run in tick() or react to events (SurvivalCheats, Pets, WorldCheats)
+            }
             default -> applyAttributes(player, feature);
         }
     }
@@ -215,6 +225,12 @@ public final class ServerCheats {
             }
             case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.disable(server, player, feature);
             case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
+            case NOCLIP, STEP_UP, FAST_SWIM -> SurvivalCheats.disable(server, player, feature);
+            case CHEST_ESP -> WorldCheats.disable(server, player, feature);
+            case ZOOM, ELYTRA_BOOST, AUTO_TOOL, AUTO_FISH, INSTANT_BUILD, AUTO_EAT, AUTO_TOTEM, ALWAYS_CRIT, TAME_ANYTHING,
+                 GROWTH_AURA, FAST_BREED, INFINITE_DURABILITY -> {
+                // nothing to undo
+            }
             default -> removeAttributes(player, feature);
         }
     }
@@ -298,9 +314,11 @@ public final class ServerCheats {
             } else {
                 ExtraCheats.disable(server, null, feature); // restores game rules, removes Ore Vision markers
                 MoreCheats.disable(server, null, feature);  // Peace Mode's game rule, stunned mobs
+                WorldCheats.disable(server, null, feature); // Chest ESP markers
             }
         }
         applied.clear();
+        WorldCheats.revert(server); // day speed back to normal (and the daylight cycle rule)
         if (player != null && appliedSize != CheatState.Size.NORMAL) {
             removeModifier(player, EntityAttributes.GENERIC_SCALE, SCALE_ID);
         }
@@ -360,8 +378,8 @@ public final class ServerCheats {
         LAUNCH(Category.PLAYER, "Launch Me", "Shoot yourself into the sky."),
         HEAL(Category.PLAYER, "Heal & Feed", "Restore full health and hunger."),
         RIDE_MOB(Category.PLAYER, "Ride Mob", "Ride the mob you're looking at (up to 32 blocks away). Sneak to get off."),
-        SET_HOME(Category.PLAYER, "Set Home", "Remember where you're standing. Saved with the world."),
-        GO_HOME(Category.PLAYER, "Go Home", "Teleport back to your home, even from another dimension."),
+        SET_HOME(Category.PLAYER, "Set Home", "Remember where you're standing as the waypoint \"Home\". Saved with the world."),
+        GO_HOME(Category.PLAYER, "Go Home", "Teleport back to your Home waypoint, even from another dimension."),
         // Combat
         KILL_HOSTILE(Category.COMBAT, "Kill Hostile Mobs", "Kill every hostile mob within 64 blocks."),
         KILL_ALL(Category.COMBAT, "Kill ALL Mobs", "Kill every mob within 64 blocks (not you, pets or armor stands)."),
@@ -468,8 +486,8 @@ public final class ServerCheats {
             case MOB_RAIN -> MoreCheats.mobRain(player);
             case RESIZE_MOB -> MoreCheats.resizeMob(player);
             case RIDE_MOB -> MoreCheats.rideMob(player);
-            case SET_HOME -> MoreCheats.setHome(player);
-            case GO_HOME -> MoreCheats.goHome(player);
+            case SET_HOME -> Waypoints.setHome(player);
+            case GO_HOME -> Waypoints.goHome(player);
             case GROW_PLANTS -> MoreCheats.growPlants(player);
             case CLEAR_GROUND_ITEMS -> ExtraCheats.clearGroundItems(player);
             case ARROW_RAIN -> ExtraCheats.arrowRain(player);

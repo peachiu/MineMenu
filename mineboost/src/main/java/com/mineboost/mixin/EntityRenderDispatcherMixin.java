@@ -1,6 +1,7 @@
 package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
+import com.mineboost.Compat;
 import com.mineboost.Culling;
 import com.mineboost.EntityBudget;
 import net.minecraft.entity.ItemEntity;
@@ -51,7 +52,7 @@ public class EntityRenderDispatcherMixin {
         }
         // Smart Culling: hidden behind solid blocks? Then don't draw it. Only worth checking for things
         // in view; vanilla already skips the rest.
-        if (config.smartCulling && frustum.isVisible(entity.getVisibilityBoundingBox())
+        if (Compat.smartCulling() && frustum.isVisible(entity.getVisibilityBoundingBox())
                 && !Culling.isEntityVisible(entity, x, y, z)) {
             cir.setReturnValue(false);
         }

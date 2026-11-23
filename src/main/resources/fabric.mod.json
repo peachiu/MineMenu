@@ -3,7 +3,7 @@
   "id": "minemenu",
   "version": "${version}",
   "name": "MineMenu",
-  "description": "A singleplayer-only fun menu: fly, god mode, one-hit kills, mob wipes, lightning and more. Press Right Shift in a singleplayer world.",
+  "description": "A singleplayer-only fun menu with 60+ hacks: fly, noclip, god mode, zoom, tame any mob, chest ESP, auto-fish, waypoints, time and weather control, structure finder and more. Press Right Shift in a singleplayer world.",
   "authors": ["peachiu"],
   "contact": {},
   "license": "MIT",

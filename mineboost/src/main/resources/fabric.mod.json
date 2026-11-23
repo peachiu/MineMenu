@@ -3,7 +3,7 @@
   "id": "mineboost",
   "version": "${version}",
   "name": "MineBoost",
-  "description": "An FPS boost menu. Press . (period) in game for one-click presets, the graphics settings that matter, and extra boosts vanilla doesn't have.",
+  "description": "An FPS boost menu. Press . (period) in game for one-click presets (including one for Intel integrated graphics), the graphics settings that matter, measured extra boosts vanilla doesn't have, Idle Mode and a benchmark that compares runs. Works alongside Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling.",
   "authors": ["peachiu"],
   "contact": {},
   "license": "MIT",

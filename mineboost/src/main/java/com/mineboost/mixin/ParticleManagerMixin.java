@@ -7,11 +7,15 @@ import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -46,14 +50,66 @@ public class ParticleManagerMixin {
             }
         }
         // Particle Limit: a TNT chain or a big farm can spawn thousands at once.
+        // At the limit, particles close to you still get in (up to 25% over); the end-of-tick trim
+        // below then removes the farthest ones. So the ones you can actually see win.
         if (config.particleLimit > 0) {
-            int count = newParticles.size();
-            for (Queue<Particle> queue : particles.values()) {
-                count += queue.size();
-            }
+            int count = mineboost$count();
             if (count >= config.particleLimit) {
-                ci.cancel();
+                if (count >= config.particleLimit + config.particleLimit / 4 || mineboost$distanceSq(particle) > NEAR_SQ) {
+                    ci.cancel();
+                }
             }
+        }
+    }
+
+    @Unique
+    private static final double NEAR_SQ = 16 * 16;
+
+    @Unique
+    private int mineboost$count() {
+        int count = newParticles.size();
+        for (Queue<Particle> queue : particles.values()) {
+            count += queue.size();
+        }
+        return count;
+    }
+
+    @Unique
+    private static double mineboost$distanceSq(Particle particle) {
+        var camera = net.minecraft.client.MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+        ParticleAccessor p = (ParticleAccessor) particle;
+        double dx = p.mineboost$getX() - camera.x, dy = p.mineboost$getY() - camera.y, dz = p.mineboost$getZ() - camera.z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    /** Over the Particle Limit? Remove the farthest particles first. */
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void mineboost$trimFarthest(CallbackInfo ci) {
+        int limit = BoostConfig.get().particleLimit;
+        if (limit <= 0) {
+            return;
+        }
+        int over = mineboost$count() - limit;
+        if (over <= 0) {
+            return;
+        }
+        List<Particle> all = new ArrayList<>(limit + over);
+        for (Queue<Particle> queue : particles.values()) {
+            for (Particle particle : queue) {
+                if (particle.isAlive()) {
+                    all.add(particle);
+                }
+            }
+        }
+        double[] distance = new double[all.size()];
+        Integer[] order = new Integer[all.size()];
+        for (int i = 0; i < order.length; i++) {
+            order[i] = i;
+            distance[i] = mineboost$distanceSq(all.get(i));
+        }
+        Arrays.sort(order, (a, b) -> Double.compare(distance[b], distance[a]));
+        for (int i = 0; i < over && i < order.length; i++) {
+            all.get(order[i]).markDead();
         }
     }
 

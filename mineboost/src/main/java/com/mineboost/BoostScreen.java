@@ -58,7 +58,8 @@ public class BoostScreen extends GameOptionsScreen {
     @Override
     protected void initHeader() {
         List<ButtonWidget> tabButtons = tabs != null ? tabs.apply(this) : List.of();
-        layout.setHeaderHeight(tabButtons.isEmpty() ? 58 : 82);
+        String detected = Compat.detected();
+        layout.setHeaderHeight((tabButtons.isEmpty() ? 58 : 82) + (detected.isEmpty() ? 0 : 12));
         DirectionalLayoutWidget header = DirectionalLayoutWidget.vertical().spacing(4);
         header.getMainPositioner().alignHorizontalCenter();
 
@@ -81,12 +82,27 @@ public class BoostScreen extends GameOptionsScreen {
                 label = Text.literal("✔ ").formatted(Formatting.WHITE).append(label);
             }
             presets.add(ButtonWidget.builder(label, b -> applyPreset(preset))
-                    .width(60)
+                    .width(Math.max(40, this.textRenderer.getWidth(label) + 10))
                     .tooltip(Tooltip.of(Text.literal(preset.description()
                             + (active ? "\n\nThis preset is active." : "\n\nClick to apply."))))
                     .build());
         }
         header.add(presets);
+        if (!detected.isEmpty()) {
+            // Other performance mods found: say which, and what MineBoost turned off so it doesn't do the same work twice.
+            List<String> off = Compat.turnedOff();
+            String offText = off.isEmpty() ? "" : " (" + off.size() + " MineBoost option" + (off.size() > 1 ? "s" : "") + " off, hover)";
+            String line = "Works with: " + detected + offText;
+            if (this.textRenderer.getWidth(line) > this.width - 20) {
+                // Too long for this window: the names go in the tooltip instead.
+                line = "Works with " + detected.split(", ").length + " other FPS mods" + offText;
+            }
+            TextWidget compat = new TextWidget(Text.literal(line).formatted(Formatting.GRAY), this.textRenderer);
+            compat.setTooltip(Tooltip.of(Text.literal("Found: " + detected + "\n\n" + (off.isEmpty()
+                    ? "No conflicts: these mods and MineBoost speed up different things."
+                    : "Turned off because the other mod already does it:\n- " + String.join("\n- ", off)))));
+            header.add(compat);
+        }
         layout.addHeader(header);
     }
 
@@ -97,17 +113,24 @@ public class BoostScreen extends GameOptionsScreen {
         SimpleOption<?>[] extras = BoostOptions.all();
         this.body.addAll(extras);
         lockFpsOverlayIfNeeded(extras[extras.length - 1]);
+        if (Compat.ENTITYCULLING) {
+            lock(BoostOptions.smartCullingOption, "Off: EntityCulling is installed and already hides things behind walls.");
+        }
 
         // Then the vanilla settings that matter most for FPS, biggest impact first.
         GameOptions o = this.gameOptions;
-        this.body.addAll(
+        List<SimpleOption<?>> vanilla = new java.util.ArrayList<>(List.of(
                 o.getViewDistance(), o.getSimulationDistance(),
                 o.getGraphicsMode(), o.getMaxFps(),
                 o.getEnableVsync(), o.getChunkBuilderMode(),
                 o.getAo(), o.getCloudRenderMode(),
                 o.getParticles(), o.getEntityShadows(),
                 o.getEntityDistanceScaling(), o.getBiomeBlendRadius(),
-                o.getMipmapLevels(), o.getMenuBackgroundBlurriness());
+                o.getMipmapLevels(), o.getMenuBackgroundBlurriness()));
+        if (Compat.SODIUM) {
+            vanilla.remove(o.getChunkBuilderMode()); // Sodium ignores it
+        }
+        this.body.addAll(vanilla.toArray(new SimpleOption<?>[0]));
     }
 
     @Override
@@ -148,6 +171,15 @@ public class BoostScreen extends GameOptionsScreen {
     public void applyPendingValues() {
         if (this.body != null) {
             this.body.applyAllPendingValues();
+        }
+    }
+
+    /** Greys out an option another mod already handles. */
+    private void lock(SimpleOption<?> option, String reason) {
+        ClickableWidget widget = option != null ? this.body.getWidgetFor(option) : null;
+        if (widget != null) {
+            widget.active = false;
+            widget.setTooltip(Tooltip.of(Text.literal(reason)));
         }
     }
 
@@ -207,14 +239,54 @@ public class BoostScreen extends GameOptionsScreen {
 
     /** MineBoost's own settings as vanilla-style options, so they look and work like the rest. */
     static final class BoostOptions {
+        static SimpleOption<Boolean> smartCullingOption;
+
         private BoostOptions() {
         }
+
+        /**
+         * The "Impact" line under each tooltip: the typical FPS gain and where it shows. Measured with the
+         * production jar in one busy scene (98 armored zombies 26-44 blocks away, 40 chests, 150 dropped
+         * stacks), each option on/off 3 times. See docs/fps-measurements.md. Options that don't change FPS
+         * while you play say so honestly.
+         */
+        private static final java.util.Map<String, String> IMPACT = java.util.Map.ofEntries(
+                java.util.Map.entry("mineboost.option.fps_target", "High when you're below the target: render distance is the biggest FPS cost in Minecraft."),
+                java.util.Map.entry("mineboost.option.particle_limit", "None normally. Big during TNT, potion clouds and particle farms (stops the FPS crash)."),
+                java.util.Map.entry("mineboost.option.max_entities", "High in crowds: +37% FPS at 50 (measured with 250 mobs and items in view)."),
+                java.util.Map.entry("mineboost.option.particle_range", "Small normally. Helps when far-away explosions, rain or farms make lots of particles."),
+                java.util.Map.entry("mineboost.option.far_mob_detail", "High with armored mobs: +31% FPS and +48% 1% low at 16 blocks (measured with 98 mobs in armor)."),
+                java.util.Map.entry("mineboost.option.entity_distance", "High in crowds: +30% FPS at 24 blocks (measured with 98 mobs 26-44 blocks away)."),
+                java.util.Map.entry("mineboost.option.block_entity_distance", "Small: +2% with 40 chests in view. Worth it only in big storage rooms."),
+                java.util.Map.entry("mineboost.option.item_distance", "Medium near lots of drops: +10% FPS at 6 blocks (measured with 150 stacks on the ground)."),
+                java.util.Map.entry("mineboost.option.simple_items", "Small: +4% with 150 stacks on the ground."),
+                java.util.Map.entry("mineboost.option.disable_particles", "None normally. Big during explosions and in particle-heavy places."),
+                java.util.Map.entry("mineboost.option.hide_weather", "Medium while it rains or snows (none in clear weather)."),
+                java.util.Map.entry("mineboost.option.animated_textures", "Small (water, lava and fire animations)."),
+                java.util.Map.entry("mineboost.option.background_fps", "None while you play. Frees your PC while Minecraft is in the background."),
+                java.util.Map.entry("mineboost.option.smart_culling", "High in caves, villages and bases where walls hide mobs and chests; none in open fields."),
+                java.util.Map.entry("mineboost.option.idle_fps", "None while you play. Saves power and heat when you're away, so a laptop doesn't slow down from heat later."),
+                java.util.Map.entry("mineboost.option.menu_fps", "None while you play. Your PC runs cooler while a menu is open."),
+                java.util.Map.entry("mineboost.option.hide_sky", "Small."),
+                java.util.Map.entry("mineboost.option.hide_beacon_beams", "Small, only near beacons."),
+                java.util.Map.entry("mineboost.option.hide_decorations", "Medium in bases full of armor stands and item frames."),
+                java.util.Map.entry("mineboost.option.hide_name_tags", "Small, only with many named mobs or players."),
+                java.util.Map.entry("mineboost.option.hide_vignette", "Tiny (about one full-screen layer less per frame)."),
+                java.util.Map.entry("mineboost.option.fps_overlay", "None (it only shows the numbers).")
+        );
+
+        /** The tooltip text plus its "Impact:" line, if there is one. */
+        static Text withImpact(String key, String tooltip) {
+            String impact = IMPACT.get(key);
+            return Text.literal(tooltip + (impact == null ? "" : "\n\nImpact: " + impact));
+        }
+
 
         /** A slider over a fixed list of values (-1 shows as "All"/"Unlimited"). */
         private static SimpleOption<Integer> listSlider(String key, String tooltip, int[] values, int current,
                                                         java.util.function.IntFunction<String> label,
                                                         java.util.function.IntConsumer setter) {
-            return new SimpleOption<>(key, SimpleOption.constantTooltip(Text.literal(tooltip)),
+            return new SimpleOption<>(key, SimpleOption.constantTooltip(withImpact(key, tooltip)),
                     (prefix, index) -> GameOptions.getGenericValueText(prefix, Text.literal(label.apply(values[index]))),
                     new SimpleOption.ValidatingIntSliderCallbacks(0, values.length - 1),
                     Math.max(0, BoostConfig.indexOf(values, current)),
@@ -222,7 +294,7 @@ public class BoostScreen extends GameOptionsScreen {
         }
 
         private static SimpleOption<Boolean> toggle(String key, String tooltip, boolean current, java.util.function.Consumer<Boolean> setter) {
-            return SimpleOption.ofBoolean(key, SimpleOption.constantTooltip(Text.literal(tooltip)), current, setter);
+            return SimpleOption.ofBoolean(key, SimpleOption.constantTooltip(withImpact(key, tooltip)), current, setter);
         }
 
         /** The biggest boosts, shown first. */
@@ -230,7 +302,7 @@ public class BoostScreen extends GameOptionsScreen {
             BoostConfig c = BoostConfig.get();
             return new SimpleOption<?>[]{
                     new SimpleOption<>("mineboost.option.fps_target",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.fps_target", 
                                     "Smart Render Distance. Pick the FPS you want: when the game drops below it, "
                                             + "MineBoost lowers the render distance, and raises it again (up to the "
                                             + "distance you chose) when there's FPS to spare.")),
@@ -248,7 +320,7 @@ public class BoostScreen extends GameOptionsScreen {
                                 }
                             }),
                     new SimpleOption<>("mineboost.option.particle_limit",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.particle_limit", 
                                     "Most particles on screen at once. Stops TNT, big farms and potion clouds "
                                             + "from tanking your FPS, while normal particles still show.")),
                             (prefix, index) -> GameOptions.getGenericValueText(prefix,
@@ -273,8 +345,14 @@ public class BoostScreen extends GameOptionsScreen {
         static SimpleOption<?>[] all() {
             BoostConfig c = BoostConfig.get();
             return new SimpleOption<?>[]{
+                    listSlider("mineboost.option.far_mob_detail",
+                            "Simple Far Mobs: mobs farther than this are drawn without armor, held items, saddles, "
+                                    + "heads and other extra layers (each one draws the mob again). Sheep wool, glowing "
+                                    + "eyes and charged creepers are kept, and players always look normal.",
+                            BoostConfig.FAR_MOB_DETAIL, c.farMobDetail, v -> v < 0 ? "Off" : v + " blocks",
+                            v -> c.farMobDetail = v),
                     new SimpleOption<>("mineboost.option.entity_distance",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.entity_distance", 
                                     "Mobs, animals, items and item frames farther than this aren't drawn. "
                                             + "One of the biggest boosts near farms and mob grinders.")),
                             (prefix, value) -> GameOptions.getGenericValueText(prefix,
@@ -284,7 +362,7 @@ public class BoostScreen extends GameOptionsScreen {
                             c.entityDistance,
                             value -> c.entityDistance = value),
                     new SimpleOption<>("mineboost.option.block_entity_distance",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.block_entity_distance", 
                                     "Chests, signs, banners, heads and beds farther than this aren't drawn. "
                                             + "Great for big bases and storage rooms.")),
                             (prefix, value) -> GameOptions.getGenericValueText(prefix,
@@ -303,7 +381,7 @@ public class BoostScreen extends GameOptionsScreen {
                                     + "Up to 5x less to draw for every dropped stack.",
                             c.simpleItems, v -> c.simpleItems = v),
                     SimpleOption.ofBoolean("mineboost.option.disable_particles",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.disable_particles", 
                                     "No particles at all: no explosions, smoke, block breaking or potion swirls. "
                                             + "Stronger than vanilla's Particles: Minimal.")),
                             c.disableParticles,
@@ -314,18 +392,18 @@ public class BoostScreen extends GameOptionsScreen {
                                 }
                             }),
                     SimpleOption.ofBoolean("mineboost.option.hide_weather",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.hide_weather", 
                                     "Don't draw rain and snow. It still rains (crops grow, fire goes out); "
                                             + "you just don't see it.")),
                             c.hideWeather,
                             value -> c.hideWeather = value),
                     SimpleOption.ofBoolean("mineboost.option.animated_textures",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.animated_textures", 
                                     "Turn off to freeze water, lava, fire and portal animations. Small boost.")),
                             c.animatedTextures,
                             value -> c.animatedTextures = value),
                     new SimpleOption<>("mineboost.option.background_fps",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.background_fps", 
                                     "FPS limit when Minecraft isn't the window you're using (alt-tab). "
                                             + "Minimized always drops to 1 FPS. Frees your PC for OBS, Discord or "
                                             + "your browser.")),
@@ -334,13 +412,23 @@ public class BoostScreen extends GameOptionsScreen {
                             new SimpleOption.ValidatingIntSliderCallbacks(0, 60),
                             c.backgroundFps,
                             value -> c.backgroundFps = value),
-                    SimpleOption.ofBoolean("mineboost.option.smart_culling",
-                            SimpleOption.constantTooltip(Text.literal(
+                    smartCullingOption = SimpleOption.ofBoolean("mineboost.option.smart_culling",
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.smart_culling", 
                                     "Don't draw mobs, items, chests and signs that are completely hidden behind "
                                             + "solid blocks. Big boost in caves, villages and bases. Glass and leaves "
                                             + "never hide anything, and things close to you are always drawn.")),
                             c.smartCulling,
                             value -> c.smartCulling = value),
+                    listSlider("mineboost.option.idle_fps",
+                            "Idle Mode: when you haven't touched the keyboard or mouse for a while (see Idle After), "
+                                    + "limit the FPS to this. Anything you press brings full FPS back instantly. "
+                                    + "Your laptop stays cooler, so it doesn't slow down from heat later.",
+                            BoostConfig.IDLE_FPS, c.idleFps, v -> v == 0 ? "Off" : v + " FPS",
+                            v -> c.idleFps = v),
+                    listSlider("mineboost.option.idle_seconds",
+                            "How long without input before Idle Mode starts.",
+                            BoostConfig.IDLE_SECONDS, c.idleSeconds, v -> v < 60 ? v + "s" : v / 60 + " min",
+                            v -> c.idleSeconds = v),
                     listSlider("mineboost.option.menu_fps",
                             "FPS limit while an inventory, chest or the pause menu is open. Nothing there needs full "
                                     + "speed, so your PC runs cooler and quieter. (Chat isn't limited.)",
@@ -362,7 +450,7 @@ public class BoostScreen extends GameOptionsScreen {
                             "Don't draw the dark shading around the edges of the screen. A small saving, and a clearer view.",
                             c.hideVignette, v -> c.hideVignette = v),
                     SimpleOption.ofBoolean("mineboost.option.fps_overlay",
-                            SimpleOption.constantTooltip(Text.literal(
+                            SimpleOption.constantTooltip(withImpact("mineboost.option.fps_overlay", 
                                     "Show FPS, average FPS and 1% low in the top-right corner. "
                                             + "The 1% low tells you how bad the stutters are.")),
                             c.fpsOverlay,

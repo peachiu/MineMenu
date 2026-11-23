@@ -1,6 +1,7 @@
 package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
+import com.mineboost.Idle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import org.lwjgl.glfw.GLFW;
@@ -32,6 +33,11 @@ public abstract class MinecraftClientMixin {
         if (menuCap > 0 && self.world != null && self.currentScreen != null
                 && !(self.currentScreen instanceof net.minecraft.client.gui.screen.ChatScreen)) {
             cir.setReturnValue(Math.min(cir.getReturnValueI(), menuCap));
+        }
+        // Idle Mode: nobody has touched the keyboard or mouse for a while.
+        int idleCap = Idle.cap(self);
+        if (idleCap > 0) {
+            cir.setReturnValue(Math.min(cir.getReturnValueI(), idleCap));
         }
         int cap = BoostConfig.get().backgroundFps;
         if (cap <= 0) {

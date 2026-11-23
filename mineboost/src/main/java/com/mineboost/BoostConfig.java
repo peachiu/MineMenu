@@ -66,6 +66,19 @@ public final class BoostConfig {
     /** FPS cap while a menu (inventory, pause menu...) is open in a world; 0 = off. */
     public int menuFps = 0;
 
+    // --- MineBoost 2.3 (new fields have defaults, so older mineboost.json files still load) ---
+    /** Simple Far Mobs: armor, held items and other extra layers aren't drawn on mobs farther than this; -1 = off. */
+    public int farMobDetail = -1;
+    /** Idle Mode: FPS cap after {@link #idleSeconds} without any input (keys, mouse); 0 = off. */
+    public int idleFps = 0;
+    public int idleSeconds = 30;
+    /** The last benchmark, so the next one can show what changed. */
+    public Benchmark.Result lastBenchmark = null;
+
+    public static final int[] FAR_MOB_DETAIL = {12, 16, 24, 32, 48, -1};
+    public static final int[] IDLE_FPS = {0, 5, 10, 15, 30};
+    public static final int[] IDLE_SECONDS = {15, 30, 60, 120, 300};
+
     public static final int[] MAX_ENTITIES = {25, 50, 100, 200, 400, -1};
     public static final int[] DISTANCES = {8, 16, 24, 32, 48, 64, -1};
     public static final int[] ITEM_DISTANCES = {4, 6, 8, 12, -1};
@@ -123,6 +136,15 @@ public final class BoostConfig {
         }
         if (indexOf(MENU_FPS, menuFps) < 0) {
             menuFps = 0;
+        }
+        if (indexOf(FAR_MOB_DETAIL, farMobDetail) < 0) {
+            farMobDetail = -1;
+        }
+        if (indexOf(IDLE_FPS, idleFps) < 0) {
+            idleFps = 0;
+        }
+        if (indexOf(IDLE_SECONDS, idleSeconds) < 0) {
+            idleSeconds = 30;
         }
     }
 

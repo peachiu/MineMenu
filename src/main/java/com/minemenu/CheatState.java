@@ -67,14 +67,23 @@ public final class CheatState {
 
     /** True when every on/off hack is on. */
     public static synchronized boolean allOn() {
-        return ENABLED.size() == Feature.values().length;
+        for (Feature feature : Feature.values()) {
+            if (feature.inEnableAll() && !ENABLED.contains(feature)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    /** Turns every on/off hack on or off at once. */
+    /** Turns every on/off hack on or off at once (except the ones that would get in the way, like Noclip). */
     public static synchronized void setAll(boolean on) {
         ENABLED.clear();
         if (on) {
-            ENABLED.addAll(EnumSet.allOf(Feature.class));
+            for (Feature feature : Feature.values()) {
+                if (feature.inEnableAll()) {
+                    ENABLED.add(feature);
+                }
+            }
         }
     }
 

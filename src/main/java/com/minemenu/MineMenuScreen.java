@@ -35,7 +35,7 @@ public class MineMenuScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private static final int GAP = 2;
 
-    private final int headerHeight = 12;
+    private int headerHeight = 12;
     private boolean hasTabs;
 
     /** One button in a grid: a label that can change, what clicking does, and a tooltip. */
@@ -74,7 +74,18 @@ public class MineMenuScreen extends Screen {
 
     private List<Spec> actionSpecs(Category category) {
         List<Spec> specs = new ArrayList<>();
+        if (category == Category.PLAYER) {
+            specs.add(new Spec(() -> Text.literal("Waypoints...").formatted(Formatting.AQUA),
+                    b -> this.client.setScreen(new WaypointScreen(this)),
+                    "Up to 5 named waypoints for this world: save, teleport, and see their direction and distance on screen."));
+        }
         if (category == Category.WORLD) {
+            specs.add(new Spec(() -> Text.literal("Time & Weather...").formatted(Formatting.AQUA),
+                    b -> this.client.setScreen(new TimeWeatherScreen(this)),
+                    "Set the exact time, how fast days go by (or stop time), and sun, rain or thunder."));
+            specs.add(new Spec(() -> Text.literal("Find Structure...").formatted(Formatting.AQUA),
+                    b -> this.client.setScreen(new StructureScreen(this)),
+                    "Find the nearest village, stronghold, ancient city, temple... Its direction and distance show on screen."));
             specs.add(new Spec(() -> Text.literal("Spawn Mob...").formatted(Formatting.AQUA),
                     b -> this.client.setScreen(new MobSpawnScreen(this)),
                     "Pick any mob and spawn it where you're looking. Last picked: "
@@ -137,6 +148,9 @@ public class MineMenuScreen extends Screen {
         List<Spec> actions = actionSpecs(currentCategory);
         togglesHeaderY = -1;
         actionsHeaderY = -1;
+        // Small window (or a full page): drop the "Toggles"/"Actions" titles so nothing reaches the bottom row.
+        int gridsHeight = (rows(toggles.size(), columns) + rows(actions.size(), columns)) * (BUTTON_HEIGHT + GAP) + 2;
+        headerHeight = y + 24 + gridsHeight <= this.height - BUTTON_HEIGHT - 6 ? 12 : 0;
         if (!toggles.isEmpty()) {
             togglesHeaderY = y;
             y = addGrid(toggles, left, y + headerHeight, columns) + 2;
@@ -158,7 +172,7 @@ public class MineMenuScreen extends Screen {
                     clearAndInit(); // refresh every ON/OFF label on the page
                 })
                 .dimensions(rowLeft + (w + 4), bottom, w, BUTTON_HEIGHT)
-                .tooltip(Tooltip.of(Text.literal("Turn every ON/OFF hack on at once (on all four pages). "
+                .tooltip(Tooltip.of(Text.literal("Turn every ON/OFF hack on at once (on all four pages; not Noclip). "
                         + "Click again to turn them all off. Show HUD, Show FPS and Size aren't changed.")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
@@ -244,11 +258,11 @@ public class MineMenuScreen extends Screen {
                     Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                     this.width / 2, titleY, 0xFFFFFF);
         }
-        if (togglesHeaderY >= 0) {
+        if (togglesHeaderY >= 0 && headerHeight > 0) {
             context.drawCenteredTextWithShadow(this.textRenderer,
                     Text.literal("Toggles").formatted(Formatting.YELLOW), this.width / 2, togglesHeaderY + 1, 0xFFFFFF);
         }
-        if (actionsHeaderY >= 0) {
+        if (actionsHeaderY >= 0 && headerHeight > 0) {
             context.drawCenteredTextWithShadow(this.textRenderer,
                     Text.literal("Actions").formatted(Formatting.YELLOW), this.width / 2, actionsHeaderY + 1, 0xFFFFFF);
         }

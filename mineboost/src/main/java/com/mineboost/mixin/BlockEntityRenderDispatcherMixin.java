@@ -1,6 +1,7 @@
 package com.mineboost.mixin;
 
 import com.mineboost.BoostConfig;
+import com.mineboost.Compat;
 import com.mineboost.Culling;
 import net.minecraft.block.entity.BeaconBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -42,7 +43,7 @@ public class BlockEntityRenderDispatcherMixin {
             }
         }
         // Smart Culling: a chest or sign behind solid blocks isn't drawn.
-        if (config.smartCulling && !Culling.isBlockEntityVisible(blockEntity.getPos(), camera.getPos())) {
+        if (Compat.smartCulling() && !Culling.isBlockEntityVisible(blockEntity.getPos(), camera.getPos())) {
             ci.cancel();
         }
     }

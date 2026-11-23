@@ -6,12 +6,17 @@
   "mixins": [
     "FluidBlockMixin",
     "LivingEntityMixin",
+    "MobEntityAccessor",
     "PlayerEntityMixin",
     "ProjectileEntityMixin"
   ],
   "client": [
+    "FishingBobberEntityAccessor",
+    "GameRendererMixin",
     "HandledScreenAccessor",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "MinecraftClientAccessor",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

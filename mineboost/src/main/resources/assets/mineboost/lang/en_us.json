@@ -20,5 +20,8 @@
   "mineboost.option.hide_beacon_beams": "Hide Beacon Beams",
   "mineboost.option.hide_decorations": "Hide Decorations",
   "mineboost.option.hide_name_tags": "Hide Name Tags",
-  "mineboost.option.hide_vignette": "Hide Vignette"
+  "mineboost.option.hide_vignette": "Hide Vignette",
+  "mineboost.option.far_mob_detail": "Simple Far Mobs",
+  "mineboost.option.idle_fps": "Idle Mode",
+  "mineboost.option.idle_seconds": "Idle After"
 }
