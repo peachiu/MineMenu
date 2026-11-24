@@ -31,6 +31,11 @@ public final class ServerTasks {
         tasks.add(new Task(name, now, body));
     }
 
+    /** Jobs waiting to run (shown nowhere; used by tests). */
+    public static int size() {
+        return tasks.size();
+    }
+
     public static void clear() {
         tasks.clear();
     }

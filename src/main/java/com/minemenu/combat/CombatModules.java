@@ -162,20 +162,26 @@ public final class CombatModules {
         }
     }
 
-    /** Mob War: every hostile mob within 48 blocks attacks a random other one; they keep fighting. */
+    private static void fight(HostileEntity mob, HostileEntity enemy) {
+        mob.setTarget(enemy);
+        mob.setAttacker(enemy); // makes it keep fighting instead of going back to you
+    }
+
+    /** Mob War: the hostile mobs within 48 blocks pair up at random and fight each other. */
     public static void mobWar(ServerPlayerEntity player) {
-        List<HostileEntity> mobs = player.getServerWorld().getEntitiesByClass(HostileEntity.class, player.getBoundingBox().expand(48), Entity::isAlive);
+        List<HostileEntity> mobs = new java.util.ArrayList<>(player.getServerWorld().getEntitiesByClass(HostileEntity.class, player.getBoundingBox().expand(48), e -> e.isAlive() && !e.isAiDisabled()));
         if (mobs.size() < 2) {
             player.sendMessage(Text.literal("Need at least 2 hostile mobs nearby").formatted(Formatting.YELLOW), true);
             return;
         }
-        for (HostileEntity mob : mobs) {
-            HostileEntity enemy = mobs.get(player.getRandom().nextInt(mobs.size()));
-            if (enemy == mob) {
-                enemy = mobs.get((mobs.indexOf(mob) + 1) % mobs.size());
-            }
-            mob.setTarget(enemy);
-            mob.setAttacker(enemy); // makes it fight back, and keep fighting
+        // Pairs that fight each other (a mob only hits back at its own target), the odd one out joins a pair.
+        java.util.Collections.shuffle(mobs, new java.util.Random(player.getRandom().nextLong()));
+        for (int i = 0; i + 1 < mobs.size(); i += 2) {
+            fight(mobs.get(i), mobs.get(i + 1));
+            fight(mobs.get(i + 1), mobs.get(i));
+        }
+        if (mobs.size() % 2 == 1) {
+            fight(mobs.get(mobs.size() - 1), mobs.get(0));
         }
         player.sendMessage(Text.literal("Mob War! " + mobs.size() + " mobs are fighting each other").formatted(Formatting.RED), true);
     }

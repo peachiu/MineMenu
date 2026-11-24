@@ -1,10 +1,10 @@
 # MineMenu
 
-A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, noclip, god mode, zoom, tame any mob, Chest ESP, waypoints, time and weather control, a structure finder, X-ray style Ore Vision, Vein Miner, Water Walk, Spider Climb, Thor Mode, explosive arrows, auto smelt, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
+A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). New in 3.4: freecam, morph into mobs, copy/paste and schematics, instant structures, a minimap, Chaos Mode, Lucky Blocks, a Command Palette (Ctrl+K) and Safe Mode. Also: fly, noclip, god mode, zoom, tame any mob, Chest ESP, waypoints, time and weather control, a structure finder, X-ray style Ore Vision, Vein Miner, Water Walk, Spider Climb, Thor Mode, explosive arrows, auto smelt, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
 
 ![The MineMenu menu](docs/menu.png)
 
-> MineMenu only works in your own singleplayer worlds. It refuses to work on multiplayer servers, and it switches itself off if you open your world to LAN.
+> MineMenu's hacks only work in your own worlds: singleplayer, or a world you opened to LAN (only for you, the host). On a multiplayer server they stay off and nothing is sent to the server; only the Minimap (without mobs), Info HUD and Chunk Borders work there.
 
 > **Also in this repo:**
 > - **[MineBoost](mineboost/README.md)**: an FPS boost menu (press `.` in game) with one-click presets and extra boosts.
@@ -16,15 +16,71 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). Fly, no
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.3.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.4.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
 ## What's in the menu
 
-The menu has four pages: **Player**, **Combat**, **World** and **Items**. Click a page at the top. The bottom row is always there: **Show HUD**, **Enable All**, **Done** and **Show FPS**.
+The menu has a **★ Favorites** page and seven pages: **Player**, **Combat**, **World**, **Items**, **Build**, **Fun** and **Utility** *(3.4)*. Click a page at the top. The bottom row is always there: **Show HUD**, **Enable All**, **Done** and **Show FPS**.
 
-**Enable All** turns every ON/OFF hack on at once, on all four pages, and then changes to **Disable All**, which turns them all off again. Show HUD, Show FPS and Size aren't changed, and neither is Noclip (spectator mode would make every other hack useless). Hover any button in the game to see what it does.
+**Enable All** turns the ON/OFF hacks on at once and then changes to **Disable All**. Show HUD, Show FPS and Size aren't changed, and neither are Noclip, Freecam, Morph, Nuker, Scaffold, the build tools and the challenges (they would get in the way of everything else). Hover any button in the game to see what it does.
+
+New in 3.4:
+
+- **Search** box at the top: type part of a name and every page is searched.
+- **Right-click any button** for its settings (sliders and options, like the number of Double Jumps or the Lifesteal %), to give it a key, or to add it to Favorites.
+- **Command Palette**: press **Ctrl+K** anywhere in a world, type, press Enter. Runs any hack, action or screen.
+- **⚙ Settings**: theme (Dark, Light, Glass), accent colour, animations, **profiles** (save which hacks are on, and share them as a code), and **Reset everything** (makes a backup first).
+- **Safe Mode**: if a hack throws an error, only that hack is switched off, with a message in the corner, instead of crashing the game. If the game fails to start twice in a row, the next start keeps every hack off.
+- Your hacks, favorites, keys and settings are saved in `config/minemeboost/cheats.json` and come back the next time you play (except Freecam, Morph and Noclip).
+
+### New in 3.4
+
+| Page | | What it does |
+|---|---|---|
+| Player | **Freecam** | Fly the camera around (WASD, space, sneak) while your body stays where it is. |
+| Player | **Full Bright** | Everything fully lit, without the Night Vision effect. |
+| Player | **Auto-Sprint** | Always sprint when walking forward. |
+| Player | **Double Jump** | Jump again in mid-air, 1 to 3 times (right-click to change). Up to about 1.7 blocks with one extra jump. |
+| Player | **Dash** | Press **V** for a quick burst where you're going (about 4.5 blocks), short cooldown. |
+| Player | **Scaffold** | Places blocks from your hotbar under your feet when you walk off an edge. |
+| Player | **Lava Swim** | Swim in lava like in water: no burning, fast, clear view. |
+| Player | **Gravity Control** | Your own gravity from 0.1× (moon) to 3×. |
+| Player | **Morph** | Look like any mob (right-click to pick) and get its power with **R**: blaze fireballs, ghast fireballs, enderman teleport, creeper explosion; spiders climb walls, flying mobs fly. **U** turns you back; dying, leaving or changing dimension does too. |
+| Player | **Phase** | Walk through doors, trapdoors, fence gates, glass, panes and iron bars. |
+| Player | **Remote Chest** *(actions)* | Ender Chest, Crafting Table, Anvil and Enchanting from anywhere; **Mark Chest** then **Open Marked Chest** from anywhere in the dimension. |
+| Combat | **Bow Aimbot** | Your arrows curve towards the hostile mob closest to where you aimed. |
+| Combat | **Lifesteal** | Heal a part of the damage you deal (25% by default). |
+| Combat | **Force Field** | Hostile mobs are pushed out of a bubble around you. |
+| Combat | **Thorns Aura** | Mobs that hit you take twice that damage back (also with God Mode). |
+| Combat | **Mind Control** | Look at a mob and press **N**: for 60 s it fights the other hostile mobs. |
+| Combat | **Trident Storm** | A thrown trident calls lightning and a rain of tridents. |
+| Combat | **Mob War** *(action)* | The hostile mobs around you pair up and fight each other. |
+| Combat | **Boss Arena...** | A Wither, Ender Dragon, Warden or Elder Guardian with 0.5× to 5× health, in a glass arena (Undo removes the arena). |
+| Combat | **Armor Loadouts...** | Save up to 5 armor sets and switch with one click. |
+| World | **Nuker** | Breaks every block around you except the floor. Sneak to pause. |
+| World | **Mob Creator...** | A mob with a name, health, equipment and a rider (spider jockeys and so on). |
+| Items | **Item Creator...** / **Potion Creator...** | Any item with a name, lore and enchantments at any level; any potion (drink, splash, lingering) with your own effects. |
+| Items | **Inventory Snapshots...** | Save your whole inventory and put it back later. |
+| Items | **Duplicate**, **Auto-Sort**, **Loot Refill** *(actions)* | Copy the stack in your hand; sort your inventory; refill loot chests you already opened. |
+| Items | **Magnet Filter** | Item Magnet only pulls the items on your list (or everything but them). |
+| Items | **Death Chest** | When you die, your items go into a chest at that spot, with a waypoint. |
+| Build | **Selection Wand**, Corner 1/2, **Copy**, **Paste** (with a preview), **Rotate**, **Mirror**, **Fill**, **Clear**, **Undo/Redo** (10 steps) | Big jobs are built a few thousand blocks per tick: filling 64×64×64 keeps the game running (worst frame 71 ms in our test). |
+| Build | **Schematics...** | Save a copy as `.nbt` in `config/minemeboost/schematics` and load it back. |
+| Build | **Structures...** | Instant house, tower, castle, bridge, farm or Nether portal, plus vanilla structures (villages, temples, outpost, igloo, witch hut, shipwreck...). Undo removes the built-in ones; vanilla ones can't be undone. |
+| Build | **Terrain Brush**, **Brush...** | Flatten, raise, lower, smooth, paint, replace or drain (water and lava) with a golden shovel. |
+| Build | **Biome Painter...** | Change the biome around you. |
+| Build | **Gravity Gun** | Sneak + right-click with an empty hand to grab a mob or block, again to throw it. |
+| Fun | **Chaos Mode** | Something random every few minutes (meteors, TNT, babies, low gravity, diamonds, an invasion, darkness...). **Chaos Events...** picks which. |
+| Fun | **Lucky Blocks** | Break a sponge for a random surprise. |
+| Fun | **Floor is Lava**, **Random Drops**, **Mob Swap** | Challenges. |
+| Fun | **Meteor Strike**, **Tornado** *(actions)* | A meteor that leaves a crater with ores; a tornado that throws mobs around for 20 s without breaking blocks. |
+| Utility | **Minimap** | A map in the corner with your waypoints and nearby mobs; **M** opens the big map. |
+| Utility | **Info HUD** | Coordinates, direction, biome, time, day, speed, chunk, light level (choose the lines). |
+| Utility | **Light Level Overlay**, **Chunk Borders**, **Slime Chunks**, **Mob Health Bars** | What the names say. |
+| Utility | **Macros...** | Several steps on one key (hacks, actions, commands, waits); record them by using the menu. |
+| Player | **Waypoints...** | Now 10 waypoints (5 per page) and **Last Death**, saved automatically when you die. |
 
 ### Player
 
@@ -214,11 +270,18 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 | Kill Hostile Mobs | not bound |
 | Spawn Selected Mob | not bound |
 | Zoom (hold, with the Zoom hack on) | Z |
+| Dash *(3.4)* | V |
+| Morph power / Unmorph *(3.4)* | R / U |
+| Mind Control *(3.4)* | N |
+| Big map *(3.4, with the Minimap on)* | M |
+| Command Palette *(3.4)* | Ctrl+K |
+
+Any hack or action can get its own key: right-click its button in the menu. MineMenu warns you if the key is already used.
 
 ## Notes
 
 - The menu doesn't pause the game, so you can watch things happen behind it.
-- Toggles stay on when you switch worlds. Everything is undone before the world saves, so nothing sticks to your save file (no permanent flying or giant size if you remove the mod).
+- Toggles stay on when you switch worlds and when you restart the game *(3.4)*. Everything is undone before the world saves, so nothing sticks to your save file (no permanent flying or giant size if you remove the mod).
 - Explosions and TNT break blocks. Make a backup or use a test world if you care about your build.
 - **Keep Inventory**, **Always Day** and **Peace Mode** change your world's game rules while they're on. Turning them off, or leaving the world, puts the old values back. If the game crashes while one is on, the rule stays changed; turn the toggle on and off again to reset it, or use `/gamerule`.
 
@@ -233,7 +296,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.3.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.4.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 
@@ -247,7 +310,7 @@ GitHub Actions builds the mod, creates the tag if needed, and publishes the rele
 
 ## How it works (for the curious)
 
-MineMenu is a client mod. When you play singleplayer, Minecraft runs a small server inside your game, and MineMenu makes its changes there, on your player only. That is also how it knows when you're *not* in singleplayer: there is no local server, or the server has been opened to LAN, so it does nothing.
+MineMenu is a client mod. When you play singleplayer, Minecraft runs a small server inside your game, and MineMenu makes its changes there, on your player only. That is also how it knows when you're *not* in singleplayer: there is no local server, so it does nothing (and sends nothing). When you open your world to LAN, the hacks keep working for you, the host, and never for the other players.
 
 - `MineMenuClient`: keybinds, the HUD, and hooks into the local server.
 - `MineMenuScreen`: the menu.
