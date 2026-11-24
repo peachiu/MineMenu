@@ -8,16 +8,24 @@
     "BlockEntityRenderDispatcherMixin",
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
+    "FarEntityTickMixin",
     "InGameHudMixin",
     "ItemEntityRendererMixin",
     "KeyboardMixin",
     "LivingEntityRendererMixin",
+    "MinecraftClientFramebufferAccessor",
     "MinecraftClientMixin",
     "MouseMixin",
     "ParticleAccessor",
     "ParticleManagerMixin",
+    "ProfilerResultAccessor",
+    "RenderScaleMixin",
+    "SectionCullingMixin",
+    "SmoothFogMixin",
+    "SoundLimitMixin",
     "SpriteAtlasTextureMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "WorldRendererOutlineAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

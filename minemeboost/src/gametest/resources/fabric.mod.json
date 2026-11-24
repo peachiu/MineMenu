@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "minemeboost-gametest",
+  "version": "1.0.0",
+  "name": "MineMeBoost GameTests",
+  "description": "Automatic tests of MineMeBoost's server-side hacks. Only used by ./gradlew runGametest, never shipped.",
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": ["com.minemeboost.test.MineMeBoostGameTests"]
+  },
+  "mixins": ["minemenu.mixins.json"],
+  "depends": {
+    "fabric-gametest-api-v1": "*"
+  }
+}

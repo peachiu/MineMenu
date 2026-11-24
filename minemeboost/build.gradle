@@ -28,7 +28,14 @@ sourceSets {
             srcDirs = ['src/main/java', '../src/main/java', '../mineboost/src/main/java']
         }
     }
+    // A compile-only copy of Mod Menu's API: lets the optional Mod Menu button compile without downloading
+    // Mod Menu. Not packaged; at runtime the real Mod Menu (if installed) provides these classes.
+    modmenuStub {
+        compileClasspath += configurations.compileClasspath
+    }
 }
+
+sourceSets.main.compileClasspath += sourceSets.modmenuStub.output
 
 processResources {
     // Assets (lang files, icons) and MineBoost's mixin config, without the two mods' own fabric.mod.json.
@@ -67,5 +74,27 @@ java {
 jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+
+// GameTests: ./gradlew runGametest starts a test server and runs src/gametest (not part of the mod jar).
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+loom {
+    runs {
+        gametest {
+            server()
+            name = "Game Test"
+            vmArg "-Dfabric-api.gametest"
+            vmArg "-Dfabric-api.gametest.report-file=${project.layout.buildDirectory.get().asFile}/gametest-report.xml"
+            runDir = "build/gametest"
+            source sourceSets.gametest
+        }
     }
 }

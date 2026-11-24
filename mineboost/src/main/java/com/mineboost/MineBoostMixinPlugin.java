@@ -18,6 +18,8 @@ import java.util.Set;
 public class MineBoostMixinPlugin implements IMixinConfigPlugin {
     /** {mixin, mod}: don't load that MineBoost mixin when that mod is installed. */
     private static final String[][] SKIP = {
+            {"RenderScaleMixin", "iris"},        // shaders replace the world rendering path
+            {"SectionCullingMixin", "sodium"},   // Sodium doesn't fill vanilla's visible-section list
     };
 
     @Override

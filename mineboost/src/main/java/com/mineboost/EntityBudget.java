@@ -18,7 +18,8 @@ import java.util.Set;
  * The list of closest entities is worked out twice a second, so it costs almost nothing per frame.
  */
 public final class EntityBudget {
-    private static Set<Integer> allowed = Set.of();
+    /** Entity ids, as a primitive set: checked for every entity every frame, so no Integer boxing. */
+    private static it.unimi.dsi.fastutil.ints.IntSet allowed = it.unimi.dsi.fastutil.ints.IntSets.EMPTY_SET;
     private static int ticks;
 
     private EntityBudget() {
@@ -33,6 +34,10 @@ public final class EntityBudget {
     public static boolean isAllowed(Entity entity) {
         MinecraftClient client = MinecraftClient.getInstance();
         return alwaysDrawn(client, entity) || allowed.contains(entity.getId());
+    }
+
+    public static void clear() {
+        allowed = it.unimi.dsi.fastutil.ints.IntSets.EMPTY_SET;
     }
 
     /** Called every client tick. */
@@ -52,7 +57,7 @@ public final class EntityBudget {
             }
         }
         candidates.sort(Comparator.comparingDouble(e -> e.squaredDistanceTo(camera)));
-        Set<Integer> next = new HashSet<>();
+        it.unimi.dsi.fastutil.ints.IntOpenHashSet next = new it.unimi.dsi.fastutil.ints.IntOpenHashSet(limit * 2);
         for (int i = 0; i < Math.min(limit, candidates.size()); i++) {
             next.add(candidates.get(i).getId());
         }

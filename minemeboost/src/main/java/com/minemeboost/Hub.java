@@ -23,13 +23,13 @@ public final class Hub {
     private Hub() {
     }
 
-    /** Right Shift: open the last tab. MineMenu only works in singleplayer, so elsewhere you get MineBoost. */
+    /** Right Shift: open the last tab (on servers MineMenu only offers the fair Utility hacks). */
     public static void openLastTab() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.currentScreen != null) {
             return;
         }
-        if (lastTab == Tab.MINEMENU && MineMenuClient.isSingleplayer(client)) {
+        if (lastTab == Tab.MINEMENU) {
             open(Tab.MINEMENU);
         } else {
             open(Tab.MINEBOOST);
@@ -38,9 +38,6 @@ public final class Hub {
 
     public static void open(Tab tab) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (tab == Tab.MINEMENU && !MineMenuClient.isSingleplayer(client)) {
-            return;
-        }
         // Leaving MineBoost: apply sliders still being dragged, like its Done button does.
         if (client.currentScreen instanceof BoostScreen boostScreen) {
             boostScreen.applyPendingValues();
@@ -60,9 +57,9 @@ public final class Hub {
                 .width(TAB_WIDTH)
                 .tooltip(Tooltip.of(Text.literal(singleplayer
                         ? "Fun cheats: fly, god mode, spawn mobs, XP, revenge mode..."
-                        : "MineMenu only works in singleplayer worlds.")))
+                        : "Cheats only work in singleplayer. On servers: Info HUD, Minimap and Chunk Borders.")))
                 .build();
-        menuTab.active = current != Tab.MINEMENU && singleplayer;
+        menuTab.active = current != Tab.MINEMENU;
 
         ButtonWidget boostTab = ButtonWidget.builder(
                         Text.literal("MineBoost").formatted(Formatting.GREEN, Formatting.BOLD),

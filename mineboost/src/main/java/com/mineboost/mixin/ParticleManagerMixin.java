@@ -52,10 +52,11 @@ public class ParticleManagerMixin {
         // Particle Limit: a TNT chain or a big farm can spawn thousands at once.
         // At the limit, particles close to you still get in (up to 25% over); the end-of-tick trim
         // below then removes the farthest ones. So the ones you can actually see win.
-        if (config.particleLimit > 0) {
+        int limit = config.effectiveParticleLimit();
+        if (limit > 0) {
             int count = mineboost$count();
-            if (count >= config.particleLimit) {
-                if (count >= config.particleLimit + config.particleLimit / 4 || mineboost$distanceSq(particle) > NEAR_SQ) {
+            if (count >= limit) {
+                if (count >= limit + limit / 4 || mineboost$distanceSq(particle) > NEAR_SQ) {
                     ci.cancel();
                 }
             }
@@ -85,7 +86,7 @@ public class ParticleManagerMixin {
     /** Over the Particle Limit? Remove the farthest particles first. */
     @Inject(method = "tick", at = @At("TAIL"))
     private void mineboost$trimFarthest(CallbackInfo ci) {
-        int limit = BoostConfig.get().particleLimit;
+        int limit = BoostConfig.get().effectiveParticleLimit();
         if (limit <= 0) {
             return;
         }
@@ -93,6 +94,7 @@ public class ParticleManagerMixin {
         if (over <= 0) {
             return;
         }
+        // Distances only (no boxing): the cut-off distance is the over-th largest; remove everything beyond it.
         List<Particle> all = new ArrayList<>(limit + over);
         for (Queue<Particle> queue : particles.values()) {
             for (Particle particle : queue) {
@@ -102,14 +104,18 @@ public class ParticleManagerMixin {
             }
         }
         double[] distance = new double[all.size()];
-        Integer[] order = new Integer[all.size()];
-        for (int i = 0; i < order.length; i++) {
-            order[i] = i;
+        for (int i = 0; i < distance.length; i++) {
             distance[i] = mineboost$distanceSq(all.get(i));
         }
-        Arrays.sort(order, (a, b) -> Double.compare(distance[b], distance[a]));
-        for (int i = 0; i < over && i < order.length; i++) {
-            all.get(order[i]).markDead();
+        double[] sorted = distance.clone();
+        Arrays.sort(sorted);
+        double cutoff = sorted[Math.max(0, sorted.length - over)];
+        int removed = 0;
+        for (int i = 0; i < distance.length && removed < over; i++) {
+            if (distance[i] >= cutoff) {
+                all.get(i).markDead();
+                removed++;
+            }
         }
     }
 

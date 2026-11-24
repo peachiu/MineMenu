@@ -63,6 +63,24 @@ public final class FpsOverlay {
         int y = 4 + effectRowsHeight(client);
         context.fill(x - 3, y - 3, x + width + 3, y + 11, 0x90000000);
         context.drawTextWithShadow(client.textRenderer, line, x, y, 0xFFFFFF);
+        if (BoostConfig.get().frameGraph) {
+            drawGraph(context, context.getScaledWindowWidth() - 4, y + 13);
+        }
+    }
+
+    /** Frame-time graph: the last 100 frames, one bar each (green under 16.7 ms, yellow under 33 ms, red above). */
+    private static void drawGraph(DrawContext context, int right, int top) {
+        int bars = Math.min(100, count);
+        int height = 24;
+        context.fill(right - 100, top, right, top + height, 0x90000000);
+        for (int i = 0; i < bars; i++) {
+            int idx = Math.floorMod(next - 1 - i, SAMPLES);
+            double ms = frameTimes[idx] / 1e6;
+            int h = (int) Math.min(height, Math.max(1, ms * height / 50.0));
+            int color = ms <= 16.7 ? 0xFF55FF55 : ms <= 33.4 ? 0xFFFFFF55 : 0xFFFF5555;
+            int x = right - 1 - i;
+            context.fill(x, top + height - h, x + 1, top + height, color);
+        }
     }
 
     /** Average FPS over the last {@code windowNanos}, or 0 if there aren't enough frames yet. */

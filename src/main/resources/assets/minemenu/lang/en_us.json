@@ -5,5 +5,10 @@
   "key.minemenu.toggle_god": "Toggle God Mode",
   "key.minemenu.kill_hostile": "Kill Hostile Mobs",
   "key.minemenu.spawn_mob": "Spawn Selected Mob",
-  "key.minemenu.zoom": "Zoom (hold)"
+  "key.minemenu.zoom": "Zoom (hold)",
+  "key.minemenu.dash": "Dash",
+  "key.minemenu.morph_power": "Morph: use power",
+  "key.minemenu.unmorph": "Morph: turn back",
+  "key.minemenu.mind_control": "Mind Control",
+  "key.minemenu.big_map": "Big Map"
 }

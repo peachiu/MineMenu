@@ -27,12 +27,16 @@ public final class Culling {
     /** Always draw anything this close, so nothing next to you ever flickers. */
     private static final double ALWAYS_VISIBLE_DISTANCE_SQ = 6 * 6;
 
-    private record Answer(boolean visible, long checkedAt) {
-    }
-
-    private static final Map<Integer, Answer> entities = new HashMap<>();
-    private static final Map<Long, Answer> blockEntities = new HashMap<>();
+    /**
+     * Answers packed in a long: bit 0 = visible, the rest = when it expires (nanoTime >> 1). Primitive maps, no
+     * objects per check. Each answer expires 100-200 ms after it was made (a bit of random spread), and old ones
+     * are dropped a few at a time; before 3.4 everything was cleared at once every 3 s, so every entity was
+     * re-checked in the same frame (a stutter every 3 s with many mobs around).
+     */
+    private static final it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap entities = new it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap();
+    private static final it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap blockEntities = new it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap();
     private static long lastCleanup;
+    private static int spread;
 
     private Culling() {
     }
@@ -57,15 +61,15 @@ public final class Culling {
         }
         long now = System.nanoTime();
         cleanup(now);
-        Answer answer = entities.get(entity.getId());
-        if (answer != null && now - answer.checkedAt() < RECHECK_NANOS) {
-            return answer.visible();
+        long answer = entities.get(entity.getId());
+        if (answer != 0 && (answer >>> 1) > (now >>> 1)) {
+            return (answer & 1) == 1;
         }
         // Visible if the top, middle or bottom of it can be seen.
         boolean visible = canSee(world, camera, new Vec3d(center.x, box.maxY - 0.05, center.z))
                 || canSee(world, camera, center)
                 || canSee(world, camera, new Vec3d(center.x, box.minY + 0.05, center.z));
-        entities.put(entity.getId(), new Answer(visible, now));
+        entities.put(entity.getId(), pack(visible, now));
         return visible;
     }
 
@@ -81,21 +85,34 @@ public final class Culling {
         long now = System.nanoTime();
         cleanup(now);
         long key = pos.asLong();
-        Answer answer = blockEntities.get(key);
-        if (answer != null && now - answer.checkedAt() < RECHECK_NANOS) {
-            return answer.visible();
+        long answer = blockEntities.get(key);
+        if (answer != 0 && (answer >>> 1) > (now >>> 1)) {
+            return (answer & 1) == 1;
         }
         boolean visible = canSee(world, camera, center) || canSee(world, camera, center.add(0, 0.45, 0));
-        blockEntities.put(key, new Answer(visible, now));
+        blockEntities.put(key, pack(visible, now));
         return visible;
     }
 
+    private static long pack(boolean visible, long now) {
+        spread = (spread + 37) % 100;
+        long expires = now + RECHECK_NANOS + spread * 1_000_000L;
+        return ((expires >>> 1) << 1) | (visible ? 1 : 0);
+    }
+
+    /** Drops expired answers (they'd be re-checked anyway), so the maps don't grow while you travel. */
     private static void cleanup(long now) {
         if (now - lastCleanup > CLEANUP_NANOS) {
-            entities.clear();
-            blockEntities.clear();
+            long limit = now >>> 1;
+            entities.values().removeIf(v -> (v >>> 1) < limit);
+            blockEntities.values().removeIf(v -> (v >>> 1) < limit);
             lastCleanup = now;
         }
+    }
+
+    public static void clear() {
+        entities.clear();
+        blockEntities.clear();
     }
 
     /**

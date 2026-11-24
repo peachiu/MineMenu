@@ -57,8 +57,8 @@ public final class ServerCheats {
     private static final float DEFAULT_FLY_SPEED = 0.05f;
     private static final float FAST_FLY_SPEED = 0.15f;
     private static final double MOB_AURA_RADIUS = 8.0;
-    private static final double KILL_RADIUS = 64.0;
-    private static final double CROSSHAIR_RANGE = 160.0;
+    static final double KILL_RADIUS = 64.0;
+    static final double CROSSHAIR_RANGE = 160.0;
     /** High enough for anything fun; the XP bar stops working properly far above this. */
     public static final int MAX_XP_LEVELS = 100_000;
 
@@ -78,9 +78,12 @@ public final class ServerCheats {
     // Singleplayer guard
     // ------------------------------------------------------------------
 
-    /** True only for a local singleplayer world that has not been opened to LAN. */
+    /**
+     * True for your own world: singleplayer, or opened to LAN (since 3.4). Hacks only ever affect the host;
+     * friends who join over LAN are left alone. Never true on a dedicated (multiplayer) server.
+     */
     public static boolean isPrivateSingleplayer(MinecraftServer server) {
-        return server instanceof IntegratedServer && !server.isRemote();
+        return server instanceof IntegratedServer;
     }
 
     /** The singleplayer host, or null if this isn't a private singleplayer world. */
@@ -111,16 +114,14 @@ public final class ServerCheats {
         // A fresh world: nothing from the previous world is applied here yet.
         applied.clear();
         appliedSize = CheatState.Size.NORMAL;
+        com.minemenu.core.DayCycle.reset();
+        com.minemenu.core.Modules.resetAll();
     }
 
     public static void tick(MinecraftServer server) {
         ServerPlayerEntity player = host(server);
         if (player == null) {
-            // Opened to LAN (or no host yet): switch everything off.
-            if (server instanceof IntegratedServer && server.isRemote()) {
-                revertAll(server);
-            }
-            return;
+            return; // no host yet (still joining)
         }
         tickCounter++;
 
@@ -129,11 +130,13 @@ public final class ServerCheats {
             boolean want = CheatState.isOn(feature);
             boolean has = applied.contains(feature);
             if (want && !has) {
-                enable(server, player, feature);
                 applied.add(feature);
+                if (!com.minemenu.core.Guard.run(feature, () -> enable(server, player, feature))) {
+                    applied.remove(feature); // Safe Mode turned it off
+                }
             } else if (!want && has) {
-                disable(server, player, feature);
                 applied.remove(feature);
+                com.minemenu.core.Guard.run(feature, () -> disable(server, player, feature));
             }
         }
 
@@ -166,11 +169,13 @@ public final class ServerCheats {
         if (tickCounter % 20 == 0) {
             reapplyAttributes(player);
         }
-        ExtraCheats.tick(player, applied, tickCounter);
-        MoreCheats.tick(player, applied, tickCounter);
-        SurvivalCheats.tick(player, applied, tickCounter);
-        Pets.tick(player, applied, tickCounter);
-        WorldCheats.tick(player, applied, tickCounter);
+        int t = tickCounter;
+        com.minemenu.core.Guard.run("3.0 hacks", () -> ExtraCheats.tick(player, applied, t));
+        com.minemenu.core.Guard.run("3.2 hacks", () -> MoreCheats.tick(player, applied, t));
+        com.minemenu.core.Guard.run("3.3 survival hacks", () -> SurvivalCheats.tick(player, applied, t));
+        com.minemenu.core.Guard.run("Tame Anything", () -> Pets.tick(player, applied, t));
+        com.minemenu.core.Guard.run("3.3 world hacks", () -> WorldCheats.tick(player, applied, t));
+        com.minemenu.core.Modules.serverTick(player, applied, t);
     }
 
     private static void enable(MinecraftServer server, ServerPlayerEntity player, Feature feature) {
@@ -183,7 +188,7 @@ public final class ServerCheats {
             case NIGHT_VISION -> addNightVision(player);
             case FREEZE_WORLD -> server.getTickManager().setFrozen(true);
             case SPEED -> {
-                player.getAbilities().setFlySpeed(FAST_FLY_SPEED);
+                player.getAbilities().setFlySpeed(fastFlySpeed());
                 player.sendAbilitiesUpdate();
                 applyAttributes(player, feature);
             }
@@ -191,15 +196,19 @@ public final class ServerCheats {
                 // Mob Aura runs in tick(); the rest react to events and mixins (Revenge, ExtraCheats, MoreCheats, mixin package)
             }
             case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.enable(server, player, feature);
-            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
+            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.enable(server, player, feature);
             case NOCLIP, STEP_UP, FAST_SWIM -> SurvivalCheats.enable(server, player, feature);
             case ZOOM, ELYTRA_BOOST, AUTO_TOOL, AUTO_FISH, INSTANT_BUILD -> {
                 // client side (ClientCheats)
             }
-            case AUTO_EAT, AUTO_TOTEM, ALWAYS_CRIT, TAME_ANYTHING, CHEST_ESP, GROWTH_AURA, FAST_BREED, INFINITE_DURABILITY -> {
+            case AUTO_EAT, AUTO_TOTEM, ALWAYS_CRIT, TAME_ANYTHING, GROWTH_AURA, FAST_BREED, INFINITE_DURABILITY -> {
                 // run in tick() or react to events (SurvivalCheats, Pets, WorldCheats)
             }
-            default -> applyAttributes(player, feature);
+            default -> {
+                if (!com.minemenu.core.Modules.enable(server, player, feature)) {
+                    applyAttributes(player, feature);
+                }
+            }
         }
     }
 
@@ -224,25 +233,35 @@ public final class ServerCheats {
                 // nothing to undo
             }
             case FEATHER_FALL, STUN_HITS, PEACE_MODE -> MoreCheats.disable(server, player, feature);
-            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, ORE_VISION, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
+            case ITEM_MAGNET, INFINITE_ITEMS, KEEP_INVENTORY, ALWAYS_DAY, MOB_GLOW, VEIN_MINER, MEGA_KNOCKBACK -> ExtraCheats.disable(server, player, feature);
             case NOCLIP, STEP_UP, FAST_SWIM -> SurvivalCheats.disable(server, player, feature);
-            case CHEST_ESP -> WorldCheats.disable(server, player, feature);
             case ZOOM, ELYTRA_BOOST, AUTO_TOOL, AUTO_FISH, INSTANT_BUILD, AUTO_EAT, AUTO_TOTEM, ALWAYS_CRIT, TAME_ANYTHING,
                  GROWTH_AURA, FAST_BREED, INFINITE_DURABILITY -> {
                 // nothing to undo
             }
-            default -> removeAttributes(player, feature);
+            default -> {
+                if (!com.minemenu.core.Modules.disable(server, player, feature)) {
+                    removeAttributes(player, feature);
+                }
+            }
         }
+    }
+
+    /** Fly speed with Speed on: vanilla 0.05 times the Speed slider (3x by default = 0.15, as before). */
+    private static float fastFlySpeed() {
+        return (float) Math.min(0.5, DEFAULT_FLY_SPEED * com.minemenu.core.FeatureSettings.get(Feature.SPEED, "multiplier"));
     }
 
     private static void applyAttributes(ServerPlayerEntity player, Feature feature) {
         switch (feature) {
-            case SPEED -> setModifier(player, EntityAttributes.GENERIC_MOVEMENT_SPEED, SPEED_ID, 2.0,
+            case SPEED -> setModifier(player, EntityAttributes.GENERIC_MOVEMENT_SPEED, SPEED_ID,
+                    com.minemenu.core.FeatureSettings.get(Feature.SPEED, "multiplier") - 1.0,
                     EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             case ONE_HIT_KILL -> setModifier(player, EntityAttributes.GENERIC_ATTACK_DAMAGE, DAMAGE_ID, 1000.0,
                     EntityAttributeModifier.Operation.ADD_VALUE);
             case SUPER_JUMP -> {
-                setModifier(player, EntityAttributes.GENERIC_JUMP_STRENGTH, JUMP_ID, 1.1,
+                setModifier(player, EntityAttributes.GENERIC_JUMP_STRENGTH, JUMP_ID,
+                        com.minemenu.core.FeatureSettings.get(Feature.SUPER_JUMP, "strength"),
                         EntityAttributeModifier.Operation.ADD_VALUE);
                 setModifier(player, EntityAttributes.GENERIC_FALL_DAMAGE_MULTIPLIER, FALL_ID, -1.0,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -282,8 +301,8 @@ public final class ServerCheats {
     }
 
     private static void reapplyAttributes(ServerPlayerEntity player) {
-        if (applied.contains(Feature.SPEED) && player.getAbilities().getFlySpeed() != FAST_FLY_SPEED) {
-            player.getAbilities().setFlySpeed(FAST_FLY_SPEED);
+        if (applied.contains(Feature.SPEED) && player.getAbilities().getFlySpeed() != fastFlySpeed()) {
+            player.getAbilities().setFlySpeed(fastFlySpeed());
             player.sendAbilitiesUpdate();
         }
         for (Feature feature : applied) {
@@ -315,6 +334,7 @@ public final class ServerCheats {
                 ExtraCheats.disable(server, null, feature); // restores game rules, removes Ore Vision markers
                 MoreCheats.disable(server, null, feature);  // Peace Mode's game rule, stunned mobs
                 WorldCheats.disable(server, null, feature); // Chest ESP markers
+                com.minemenu.core.Modules.disable(server, null, feature);
             }
         }
         applied.clear();
@@ -349,7 +369,8 @@ public final class ServerCheats {
         }
     }
 
-    private static void keepAlive(ServerPlayerEntity player) {
+    /** God Mode's effect for one tick (also called by the GameTests). */
+    public static void keepAlive(ServerPlayerEntity player) {
         if (player.isDead()) {
             return;
         }
@@ -379,6 +400,12 @@ public final class ServerCheats {
         HEAL(Category.PLAYER, "Heal & Feed", "Restore full health and hunger."),
         RIDE_MOB(Category.PLAYER, "Ride Mob", "Ride the mob you're looking at (up to 32 blocks away). Sneak to get off."),
         SET_HOME(Category.PLAYER, "Set Home", "Remember where you're standing as the waypoint \"Home\". Saved with the world."),
+        OPEN_ENDER_CHEST(Category.PLAYER, "Ender Chest", "Open your ender chest from anywhere (Remote Chest)."),
+        OPEN_CRAFTING(Category.PLAYER, "Crafting Table", "Open a crafting table anywhere (Remote Chest)."),
+        OPEN_ANVIL(Category.PLAYER, "Anvil", "Open an anvil anywhere (Remote Chest)."),
+        OPEN_ENCHANTING(Category.PLAYER, "Enchanting", "Open an enchanting table anywhere. No bookshelves around, so the best is level 8 (Remote Chest)."),
+        MARK_CHEST(Category.PLAYER, "Mark Chest", "Look at a chest (or barrel) and mark it, to open it later from anywhere."),
+        OPEN_MARKED_CHEST(Category.PLAYER, "Open Marked Chest", "Open the chest you marked, from anywhere in the same dimension (its chunk must be loaded)."),
         GO_HOME(Category.PLAYER, "Go Home", "Teleport back to your Home waypoint, even from another dimension."),
         // Combat
         KILL_HOSTILE(Category.COMBAT, "Kill Hostile Mobs", "Kill every hostile mob within 64 blocks."),
@@ -388,6 +415,7 @@ public final class ServerCheats {
         ARROW_RAIN(Category.COMBAT, "Arrow Rain", "50 arrows fall from the sky where you're looking."),
         WOLF_ARMY(Category.COMBAT, "Wolf Army", "5 tamed wolves appear around you and fight for you."),
         MOB_RAIN(Category.COMBAT, "Mob Rain", "20 random mobs fall from the sky around you. Chaos!"),
+        MOB_WAR(Category.COMBAT, "Mob War", "Every hostile mob within 48 blocks starts attacking the others."),
         RESIZE_MOB(Category.COMBAT, "Resize Mob", "The mob you're looking at becomes giant, then tiny, then normal again. It stays that size."),
         // World
         EXPLODE(Category.WORLD, "Explode", "Cause an explosion where you're looking. Turn on God Mode first!"),
@@ -405,7 +433,25 @@ public final class ServerCheats {
                 + "dirt, gravel, granite, diorite, andesite, tuff, cobbled deepslate and netherrack. "
                 + "Armor and items you renamed are never touched. Undo Clear brings it all back."),
         UNDO_CLEAR(Category.ITEMS, "Undo Clear", "Get back everything the last Clear Junk removed."),
-        NETHERITE_KIT(Category.ITEMS, "Netherite Kit", "Get a full set of super-enchanted netherite armor and tools.");
+        NETHERITE_KIT(Category.ITEMS, "Netherite Kit", "Get a full set of super-enchanted netherite armor and tools."),
+        DUPLICATE(Category.ITEMS, "Duplicate", "Get a copy of the stack in your hand."),
+        AUTO_SORT(Category.ITEMS, "Auto-Sort", "Sort your inventory (not the hotbar): stacks merged and ordered by item."),
+        LOOT_REFILL(Category.ITEMS, "Loot Refill", "Loot chests within 48 blocks that you already opened get new loot (open them again)."),
+        // Build (3.4)
+        SET_CORNER_1(Category.BUILD, "Corner 1", "The block you look at becomes corner 1 of the selection."),
+        SET_CORNER_2(Category.BUILD, "Corner 2", "The block you look at becomes corner 2 of the selection."),
+        COPY(Category.BUILD, "Copy", "Copy the blocks in the selection (with chests' contents)."),
+        PASTE_PREVIEW(Category.BUILD, "Paste (preview)", "Show where the copy would go: on the block you look at. Look around, then Confirm Paste."),
+        PASTE_CONFIRM(Category.BUILD, "Confirm Paste", "Place the copy where the preview is. Big copies are built over a few ticks."),
+        ROTATE(Category.BUILD, "Rotate 90°", "Turn the copy a quarter turn clockwise."),
+        MIRROR(Category.BUILD, "Mirror", "Flip the copy left-right."),
+        FILL_SELECTION(Category.BUILD, "Fill", "Fill the selection with the block in your main hand."),
+        CLEAR_SELECTION(Category.BUILD, "Clear", "Empty the selection (set it to air)."),
+        UNDO(Category.BUILD, "Undo", "Undo the last paste, fill, clear, brush or structure (up to 10)."),
+        REDO(Category.BUILD, "Redo", "Redo what Undo took back."),
+        // Fun (3.4)
+        METEOR_STRIKE(Category.FUN, "Meteor Strike", "A meteor falls where you're looking, leaves a crater and ores. Turn on God Mode first!"),
+        TORNADO(Category.FUN, "Tornado", "A tornado appears where you look and pulls mobs and items around for 20 seconds (no blocks broken).");
 
         private final Category category;
         private final String displayName;
@@ -430,193 +476,29 @@ public final class ServerCheats {
         }
     }
 
+    /** Runs a one-shot action (button). Kept here so older callers keep working; the code is in {@link Actions}. */
     public static void run(MinecraftServer server, Action action) {
         ServerPlayerEntity player = host(server);
-        if (player == null) {
-            return;
-        }
-        ServerWorld world = player.getServerWorld();
-        switch (action) {
-            case KILL_HOSTILE -> report(player, killAround(player, KILL_RADIUS, e -> e instanceof Monster), "hostile mob");
-            case KILL_ALL -> report(player, killAround(player, KILL_RADIUS, e -> true), "mob");
-            case SMITE -> {
-                LightningEntity bolt = EntityType.LIGHTNING_BOLT.create(world);
-                if (bolt != null) {
-                    bolt.refreshPositionAfterTeleport(crosshairTarget(player));
-                    bolt.setChanneler(player);
-                    world.spawnEntity(bolt);
-                }
-            }
-            case EXPLODE -> {
-                Vec3d pos = crosshairTarget(player);
-                world.createExplosion(player, pos.x, pos.y, pos.z, 4.0f, World.ExplosionSourceType.TNT);
-            }
-            case TNT_RAIN -> {
-                int count = 12;
-                for (int i = 0; i < count; i++) {
-                    double angle = (Math.PI * 2 * i) / count;
-                    double radius = 4 + world.random.nextDouble() * 6;
-                    TntEntity tnt = new TntEntity(world,
-                            player.getX() + Math.cos(angle) * radius,
-                            player.getY() + 12 + world.random.nextDouble() * 6,
-                            player.getZ() + Math.sin(angle) * radius,
-                            player);
-                    tnt.setFuse(60 + world.random.nextInt(30));
-                    world.spawnEntity(tnt);
-                }
-            }
-            case TELEPORT -> teleportToCrosshair(player);
-            case LAUNCH -> {
-                player.setVelocity(player.getVelocity().x, 3.0, player.getVelocity().z);
-                player.velocityModified = true;
-                if (!CheatState.isOn(Feature.GOD_MODE) && !CheatState.isOn(Feature.SUPER_JUMP)) {
-                    player.sendMessage(Text.literal("Tip: turn on God Mode, Fly or Super Jump before you land!")
-                            .formatted(Formatting.YELLOW), true);
-                }
-            }
-            case HEAL -> {
-                player.setHealth(player.getMaxHealth());
-                player.getHungerManager().setFoodLevel(20);
-                player.getHungerManager().setSaturationLevel(20.0f);
-                player.extinguish();
-                player.setAir(player.getMaxAir());
-            }
-            case FIREBALL -> ExtraCheats.fireball(player);
-            case WOLF_ARMY -> ExtraCheats.wolfArmy(player);
-            case MOB_RAIN -> MoreCheats.mobRain(player);
-            case RESIZE_MOB -> MoreCheats.resizeMob(player);
-            case RIDE_MOB -> MoreCheats.rideMob(player);
-            case SET_HOME -> Waypoints.setHome(player);
-            case GO_HOME -> Waypoints.goHome(player);
-            case GROW_PLANTS -> MoreCheats.growPlants(player);
-            case CLEAR_GROUND_ITEMS -> ExtraCheats.clearGroundItems(player);
-            case ARROW_RAIN -> ExtraCheats.arrowRain(player);
-            case SUPER_ENCHANT -> ExtraCheats.superEnchantHeld(player);
-            case REPAIR_ALL -> ExtraCheats.repairAll(player);
-            case CLEAR_JUNK -> ExtraCheats.clearJunk(player);
-            case UNDO_CLEAR -> ExtraCheats.undoClearJunk(player);
-            case NETHERITE_KIT -> ExtraCheats.netheriteKit(player);
-            case DAY -> world.setTimeOfDay(1000);
-            case NIGHT -> world.setTimeOfDay(13000);
-            case CLEAR_WEATHER -> world.setWeather(12000, 0, false, false);
-            case THUNDER -> world.setWeather(0, 6000, true, true);
+        if (player != null) {
+            com.minemenu.core.Guard.run("action " + action.displayName(), () -> Actions.run(server, player, action));
         }
     }
 
-    /** Spawns {@code amount} of the given mob on the block the player is looking at. */
     public static void spawnMob(MinecraftServer server, Identifier typeId, int amount) {
         ServerPlayerEntity player = host(server);
-        if (player == null) {
-            return;
+        if (player != null) {
+            com.minemenu.core.Guard.run("Spawn Mob", () -> Actions.spawnMob(player, typeId, amount));
         }
-        EntityType<?> type = Registries.ENTITY_TYPE.getOrEmpty(typeId).orElse(null);
-        if (type == null || !MobList.isSpawnable(type)) {
-            return;
-        }
-        HitResult hit = player.raycast(CROSSHAIR_RANGE, 1.0f, false);
-        if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            player.sendMessage(Text.literal("Look at a block to spawn a mob there").formatted(Formatting.YELLOW), true);
-            return;
-        }
-        ServerWorld world = player.getServerWorld();
-        BlockPos pos = blockHit.getBlockPos().offset(blockHit.getSide());
-
-        int spawned = 0;
-        for (int i = 0; i < amount; i++) {
-            Entity entity = type.spawn(world, pos, SpawnReason.COMMAND);
-            if (entity == null) {
-                continue;
-            }
-            spawned++;
-            if (i > 0) {
-                // Spread a group out a little so they don't all stack in one spot.
-                entity.refreshPositionAndAngles(
-                        entity.getX() + (world.random.nextDouble() - 0.5) * 3,
-                        entity.getY(),
-                        entity.getZ() + (world.random.nextDouble() - 0.5) * 3,
-                        entity.getYaw(), entity.getPitch());
-            }
-            // Face the player.
-            float yaw = player.getYaw() + 180.0f;
-            entity.setYaw(yaw);
-            entity.setHeadYaw(yaw);
-            entity.setBodyYaw(yaw);
-        }
-
-        String name = type.getName().getString();
-        if (spawned == 0) {
-            player.sendMessage(Text.literal("Couldn't spawn " + name + " there").formatted(Formatting.RED), true);
-            return;
-        }
-        Text message = Text.literal("Spawned " + (spawned == 1 ? name : spawned + "x " + name)).formatted(Formatting.GREEN);
-        if (type.getSpawnGroup() == SpawnGroup.MONSTER && world.getDifficulty() == Difficulty.PEACEFUL) {
-            message = Text.literal(name + " disappears right away on Peaceful. Change the difficulty to see it.")
-                    .formatted(Formatting.YELLOW);
-        } else if (type.getSpawnGroup() == SpawnGroup.MONSTER && CheatState.isOn(Feature.MOB_AURA)) {
-            message = Text.literal("Spawned " + name + ", but Mob Aura is on, so it won't last long!")
-                    .formatted(Formatting.YELLOW);
-        }
-        player.sendMessage(message, true);
     }
 
-    /** Sets the player's XP level to {@code levels}, or adds that many when {@code set} is false. */
     public static void giveXp(MinecraftServer server, int levels, boolean set) {
         ServerPlayerEntity player = host(server);
-        if (player == null || levels < 0) {
-            return;
+        if (player != null) {
+            Actions.giveXp(player, levels, set);
         }
-        if (set) {
-            player.setExperienceLevel(levels);
-            player.setExperiencePoints(0); // start of the level, not part-way through
-        } else {
-            long total = (long) player.experienceLevel + levels;
-            player.setExperienceLevel((int) Math.min(total, MAX_XP_LEVELS));
-        }
-        player.sendMessage(Text.literal("You now have " + player.experienceLevel + " levels").formatted(Formatting.GREEN), true);
     }
 
-    private static int killAround(ServerPlayerEntity player, double radius, Predicate<LivingEntity> filter) {
-        List<LivingEntity> targets = player.getServerWorld().getEntitiesByClass(LivingEntity.class,
-                player.getBoundingBox().expand(radius),
-                e -> e.isAlive()
-                        && !(e instanceof PlayerEntity)
-                        && !(e instanceof ArmorStandEntity)
-                        && !(e instanceof TameableEntity tame && tame.isTamed())
-                        && filter.test(e));
-        for (LivingEntity target : targets) {
-            target.damage(player.getDamageSources().playerAttack(player), Float.MAX_VALUE);
-            if (target.isAlive()) {
-                target.kill();
-            }
-        }
-        return targets.size();
-    }
-
-    private static void report(ServerPlayerEntity player, int count, String noun) {
-        String text = count == 0 ? "No " + noun + "s nearby" : "Killed " + count + " " + noun + (count == 1 ? "" : "s");
-        player.sendMessage(Text.literal(text).formatted(Formatting.RED), true);
-    }
-
-    /** The point the player is looking at, up to {@link #CROSSHAIR_RANGE} blocks away. */
-    private static Vec3d crosshairTarget(ServerPlayerEntity player) {
-        HitResult hit = player.raycast(CROSSHAIR_RANGE, 1.0f, false);
-        return hit.getPos();
-    }
-
-    private static void teleportToCrosshair(ServerPlayerEntity player) {
-        HitResult hit = player.raycast(CROSSHAIR_RANGE, 1.0f, false);
-        if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            player.sendMessage(Text.literal("Look at a block to teleport to it").formatted(Formatting.YELLOW), true);
-            return;
-        }
-        BlockPos target = blockHit.getBlockPos().offset(blockHit.getSide());
-        // Step up until there is room for the player to stand.
-        ServerWorld world = player.getServerWorld();
-        for (int i = 0; i < 8 && !(world.isAir(target) && world.isAir(target.up())); i++) {
-            target = target.up();
-        }
-        player.fallDistance = 0;
-        player.networkHandler.requestTeleport(target.getX() + 0.5, target.getY(), target.getZ() + 0.5,
-                player.getYaw(), player.getPitch());
+    static int killAround(ServerPlayerEntity player, double radius, Predicate<LivingEntity> filter) {
+        return Actions.killAround(player, radius, filter);
     }
 }

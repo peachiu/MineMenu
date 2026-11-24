@@ -7,15 +7,23 @@
     "FluidBlockMixin",
     "LivingEntityMixin",
     "MobEntityAccessor",
+    "PhaseMixin",
     "PlayerEntityMixin",
-    "ProjectileEntityMixin"
+    "ProjectileAccessor",
+    "ProjectileEntityMixin",
+    "StructureTemplateAccessor"
   ],
   "client": [
+    "ClientBlockUpdateMixin",
     "FishingBobberEntityAccessor",
+    "FullBrightMixin",
     "GameRendererMixin",
     "HandledScreenAccessor",
     "HandledScreenMixin",
+    "HealthBarMixin",
+    "LavaFogMixin",
     "MinecraftClientAccessor",
+    "MorphRenderMixin",
     "MouseMixin"
   ],
   "injectors": {

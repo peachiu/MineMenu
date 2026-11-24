@@ -164,7 +164,7 @@ public class ItemGiveScreen extends Screen {
         server.execute(() -> {
             var player = ServerCheats.host(server);
             if (player != null) {
-                ExtraCheats.giveItem(player, id, amount, ground);
+                ItemCheats.giveItem(player, id, amount, ground);
             }
         });
         status = Text.literal((ground ? "Dropped " : "Gave ") + effectiveAmount() + "x " + entry.data.name())

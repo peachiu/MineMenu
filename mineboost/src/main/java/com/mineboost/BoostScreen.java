@@ -116,6 +116,14 @@ public class BoostScreen extends GameOptionsScreen {
         if (Compat.ENTITYCULLING) {
             lock(BoostOptions.smartCullingOption, "Off: EntityCulling is installed and already hides things behind walls.");
         }
+        String scaleReason = com.mineboost.renderscale.RenderScale.unavailableReason(this.client);
+        if (scaleReason != null) {
+            lock(BoostOptions.renderScaleOption, scaleReason);
+        }
+        if (Compat.SODIUM || Compat.ENTITYCULLING) {
+            lock(BoostOptions.sectionCullingOption, Compat.SODIUM ? "Off: Sodium already skips entities in hidden sections."
+                    : "Off: EntityCulling already hides entities you can't see.");
+        }
 
         // Then the vanilla settings that matter most for FPS, biggest impact first.
         GameOptions o = this.gameOptions;
@@ -154,6 +162,14 @@ public class BoostScreen extends GameOptionsScreen {
                 .width(100)
                 .tooltip(Tooltip.of(Text.literal("Closes the menu and measures your FPS for 10 seconds. "
                         + "Keep playing normally; the result shows up in chat. Try it with different presets!")))
+                .build());
+        footer.add(ButtonWidget.builder(Text.literal("Tools...").formatted(Formatting.YELLOW), b -> {
+                    applyPendingValues();
+                    this.client.setScreen(new com.mineboost.tools.BoostToolsScreen(this));
+                })
+                .width(100)
+                .tooltip(Tooltip.of(Text.literal("Lag Doctor, A/B test of every boost, memory and JVM advice, context rules, "
+                        + "FPS profiles and Battery Saver.")))
                 .build());
         footer.add(ButtonWidget.builder(ScreenTexts.DONE, b -> close()).width(100).build());
         layout.addFooter(footer);
@@ -250,6 +266,10 @@ public class BoostScreen extends GameOptionsScreen {
          * stacks), each option on/off 3 times. See docs/fps-measurements.md. Options that don't change FPS
          * while you play say so honestly.
          */
+        static final String IMPACT_RENDER_SCALE = "Very high when the graphics card is the limit (integrated graphics): see the A/B test.";
+        static final String IMPACT_SECTION_CULLING = "High when mobs are hidden in caves or behind hills; none in the open.";
+        static final String IMPACT_FAR_TICKS = "Small; experimental.";
+
         private static final java.util.Map<String, String> IMPACT = java.util.Map.ofEntries(
                 java.util.Map.entry("mineboost.option.fps_target", "High when you're below the target: render distance is the biggest FPS cost in Minecraft."),
                 java.util.Map.entry("mineboost.option.particle_limit", "None normally. Big during TNT, potion clouds and particle farms (stops the FPS crash)."),
@@ -272,7 +292,15 @@ public class BoostScreen extends GameOptionsScreen {
                 java.util.Map.entry("mineboost.option.hide_decorations", "Medium in bases full of armor stands and item frames."),
                 java.util.Map.entry("mineboost.option.hide_name_tags", "Small, only with many named mobs or players."),
                 java.util.Map.entry("mineboost.option.hide_vignette", "Tiny (about one full-screen layer less per frame)."),
-                java.util.Map.entry("mineboost.option.fps_overlay", "None (it only shows the numbers).")
+                java.util.Map.entry("mineboost.option.fps_overlay", "None (it only shows the numbers)."),
+                java.util.Map.entry("mineboost.option.render_scale", IMPACT_RENDER_SCALE),
+                java.util.Map.entry("mineboost.option.dynamic_render_scale", "Holds your FPS target by trading sharpness for FPS only when needed."),
+                java.util.Map.entry("mineboost.option.section_culling", IMPACT_SECTION_CULLING),
+                java.util.Map.entry("mineboost.option.far_entity_ticks", IMPACT_FAR_TICKS),
+                java.util.Map.entry("mineboost.option.smooth_fog", "None (looks smoother, costs nothing)."),
+                java.util.Map.entry("mineboost.option.max_sounds", "Only with very many sounds at once; couldn't be measured on the test PC (no audio)."),
+                java.util.Map.entry("mineboost.option.frame_graph", "Tiny (a few small rectangles per frame)."),
+                java.util.Map.entry("mineboost.option.spike_log", "None (one comparison per frame).")
         );
 
         /** The tooltip text plus its "Impact:" line, if there is one. */
@@ -298,9 +326,21 @@ public class BoostScreen extends GameOptionsScreen {
         }
 
         /** The biggest boosts, shown first. */
+        static SimpleOption<Integer> renderScaleOption;
+        static SimpleOption<Boolean> sectionCullingOption;
+
         static SimpleOption<?>[] smart(GameOptions gameOptions) {
             BoostConfig c = BoostConfig.get();
             return new SimpleOption<?>[]{
+                    renderScaleOption = listSlider("mineboost.option.render_scale",
+                            "Render Scale: draw the world at a lower resolution and stretch it to the window. The HUD, text "
+                                    + "and menus stay sharp. 75% means about half the pixels to fill, which is what slows "
+                                    + "down integrated graphics the most.",
+                            BoostConfig.RENDER_SCALES, c.renderScale, v -> v >= 100 ? "Off (100%)" : v + "%", v -> c.renderScale = v),
+                    toggle("mineboost.option.dynamic_render_scale",
+                            "Dynamic Render Scale: lowers the scale by itself when you're below your FPS Target (60 if off) "
+                                    + "and raises it back (up to Render Scale) when there's FPS to spare. Changes at most once a second.",
+                            c.dynamicRenderScale, v -> c.dynamicRenderScale = v),
                     new SimpleOption<>("mineboost.option.fps_target",
                             SimpleOption.constantTooltip(withImpact("mineboost.option.fps_target", 
                                     "Smart Render Distance. Pick the FPS you want: when the game drops below it, "
@@ -434,6 +474,34 @@ public class BoostScreen extends GameOptionsScreen {
                                     + "speed, so your PC runs cooler and quieter. (Chat isn't limited.)",
                             BoostConfig.MENU_FPS, c.menuFps, v -> v == 0 ? "Off" : v + " FPS",
                             v -> c.menuFps = v),
+                    toggle("mineboost.option.render_scale_filter",
+                            "How Render Scale stretches the picture: ON = Nearest (sharp pixels, a bit faster), OFF = Linear (smooth).",
+                            c.renderScaleNearest, v -> c.renderScaleNearest = v),
+                    listSlider("mineboost.option.render_scale_min",
+                            "The lowest scale Dynamic Render Scale may go down to.",
+                            BoostConfig.RENDER_SCALES, c.renderScaleMin, v -> v + "%", v -> c.renderScaleMin = v),
+                    sectionCullingOption = toggle("mineboost.option.section_culling",
+                            "Section Culling: the game already knows which chunk sections you can't see (caves under you, "
+                                    + "behind hills) but still draws the mobs in them. This skips those mobs.",
+                            c.sectionCulling, v -> c.sectionCulling = v),
+                    toggle("mineboost.option.far_entity_ticks",
+                            "Experimental: mobs more than 48 blocks away and behind you are animated only every 4th tick on "
+                                    + "your side. The world still runs them normally.",
+                            c.farEntityTicks, v -> c.farEntityTicks = v),
+                    toggle("mineboost.option.smooth_fog",
+                            "Smooth Fog Edge: fog starts earlier so chunks at the edge of your render distance fade in instead "
+                                    + "of popping. Good with Smart Render Distance.",
+                            c.smoothFog, v -> c.smoothFog = v),
+                    listSlider("mineboost.option.max_sounds",
+                            "Most sounds playing at once. Huge farms and explosions can play hundreds.",
+                            BoostConfig.MAX_SOUNDS, c.maxSounds, v -> v == 0 ? "No limit" : String.valueOf(v), v -> c.maxSounds = v),
+                    toggle("mineboost.option.frame_graph",
+                            "A small graph of the last 100 frame times under the FPS Overlay. Tall red bars are stutters.",
+                            c.frameGraph, v -> c.frameGraph = v),
+                    toggle("mineboost.option.spike_log",
+                            "Note every frame slower than 50 ms, with what was going on (see Tools > Last report & spikes, "
+                                    + "and config/minemeboost/spikes.log).",
+                            c.spikeLog, v -> c.spikeLog = v),
                     toggle("mineboost.option.hide_sky",
                             "Don't draw the sky, sun, moon and stars. The background is just the fog colour.",
                             c.hideSky, v -> c.hideSky = v),

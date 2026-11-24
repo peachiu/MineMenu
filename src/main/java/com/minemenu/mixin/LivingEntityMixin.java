@@ -17,7 +17,7 @@ public abstract class LivingEntityMixin {
     private void minemenu$spiderClimb(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (!cir.getReturnValueZ() && self instanceof PlayerEntity && self.horizontalCollision
-                && CheatState.isOn(Feature.SPIDER_CLIMB) && LocalHost.is(self)) {
+                && (CheatState.isOn(Feature.SPIDER_CLIMB) || com.minemenu.player.Morph.climbs()) && LocalHost.is(self)) {
             cir.setReturnValue(true);
         }
     }

@@ -16,6 +16,9 @@ public final class Compat {
     public static final boolean FERRITECORE = loaded("ferritecore");
     public static final boolean IMMEDIATELYFAST = loaded("immediatelyfast");
     public static final boolean ENTITYCULLING = loaded("entityculling");
+    public static final boolean IRIS = loaded("iris");
+    public static final boolean MORECULLING = loaded("moreculling");
+    public static final boolean C2ME = loaded("c2me");
 
     private Compat() {
     }
@@ -37,6 +40,9 @@ public final class Compat {
         if (FERRITECORE) names.add("FerriteCore");
         if (IMMEDIATELYFAST) names.add("ImmediatelyFast");
         if (ENTITYCULLING) names.add("EntityCulling");
+        if (IRIS) names.add("Iris");
+        if (MORECULLING) names.add("MoreCulling");
+        if (C2ME) names.add("C2ME");
         return String.join(", ", names);
     }
 
@@ -48,6 +54,13 @@ public final class Compat {
         }
         if (SODIUM) {
             lines.add("Chunk Builder (vanilla setting): Sodium has its own chunk renderer and ignores it.");
+            lines.add("Section Culling: Sodium already skips entities in hidden sections.");
+        }
+        if (ENTITYCULLING && !SODIUM) {
+            lines.add("Section Culling: EntityCulling already hides entities you can't see.");
+        }
+        if (IRIS) {
+            lines.add("Render Scale: Iris draws the world itself (shaders have their own resolution settings).");
         }
         return lines;
     }

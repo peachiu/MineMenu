@@ -19,6 +19,18 @@ public class MouseMixin {
         }
     }
 
+    /** Freecam: the mouse turns the free camera instead of your body. */
+    @com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation(method = "updateMouse",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;changeLookDirection(DD)V"))
+    private void minemenu$freecamLook(net.minecraft.client.network.ClientPlayerEntity player, double dx, double dy,
+                                      com.llamalad7.mixinextras.injector.wrapoperation.Operation<Void> original) {
+        if (com.minemenu.player.Freecam.active()) {
+            com.minemenu.player.Freecam.camera().changeLookDirection(dx, dy);
+        } else {
+            original.call(player, dx, dy);
+        }
+    }
+
     @ModifyExpressionValue(method = "updateMouse",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingSpyglass()Z"))
     private boolean minemenu$slowWhileZooming(boolean usingSpyglass) {

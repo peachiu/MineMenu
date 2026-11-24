@@ -23,14 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Up to 5 named waypoints per world, saved in the world folder (minemenu_waypoints.json), with a
+ * Up to 10 named waypoints per world (5 before 3.4), plus "Last Death",, saved in the world folder (minemenu_waypoints.json), with a
  * direction-and-distance line in the HUD. Replaces the single Home of MineMenu 3.2: an old Home is
  * moved into the first slot, and Set Home / Go Home use the waypoint called "Home".
  *
  * <p>Changed on the server thread; the HUD and the Waypoints screen read a copy on the client.
  */
 public final class Waypoints {
-    public static final int MAX = 5;
+    public static final int MAX = 10;
     private static final Logger LOGGER = LoggerFactory.getLogger("MineMenu");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String HOME = "Home";
@@ -45,6 +45,25 @@ public final class Waypoints {
         public float yaw;
         public float pitch;
         public boolean hud = true;
+
+        Waypoint copy() {
+            Waypoint w = new Waypoint();
+            w.name = name;
+            w.dimension = dimension;
+            w.x = x;
+            w.y = y;
+            w.z = z;
+            w.yaw = yaw;
+            w.pitch = pitch;
+            w.hud = hud;
+            return w;
+        }
+    }
+
+    /** Saved file layout since 3.4 (the 3.3 file was just the array of slots). */
+    private static final class SaveFile {
+        Waypoint[] slots;
+        Waypoint lastDeath;
     }
 
     /** A Structure Finder result, shown in the HUD like a waypoint until you search again. */
@@ -52,6 +71,8 @@ public final class Waypoints {
     }
 
     private static volatile Waypoint[] slots = new Waypoint[MAX];
+    /** Where you died last (set automatically, shown in the HUD until you get there or delete it). */
+    private static volatile Waypoint lastDeath;
     private static volatile Found found;
     private static volatile int version;
     private static Path file;
@@ -68,11 +89,20 @@ public final class Waypoints {
         Path root = server.getSavePath(WorldSavePath.ROOT);
         file = root.resolve("minemenu_waypoints.json");
         Waypoint[] loaded = new Waypoint[MAX];
+        Waypoint death = null;
         try {
             if (Files.exists(file)) {
-                Waypoint[] read = GSON.fromJson(Files.readString(file), Waypoint[].class);
+                String json = Files.readString(file).trim();
+                Waypoint[] read;
+                if (json.startsWith("[")) {
+                    read = GSON.fromJson(json, Waypoint[].class); // 3.3 format
+                } else {
+                    SaveFile saved = GSON.fromJson(json, SaveFile.class);
+                    read = saved != null ? saved.slots : null;
+                    death = saved != null && valid(saved.lastDeath) ? saved.lastDeath : null;
+                }
                 for (int i = 0; read != null && i < Math.min(MAX, read.length); i++) {
-                    loaded[i] = read[i] != null && read[i].dimension != null ? read[i] : null;
+                    loaded[i] = valid(read[i]) ? read[i] : null;
                 }
             } else {
                 // MineMenu 3.2 had one Home in minemenu_home.txt: "dimension x y z yaw pitch".
@@ -94,6 +124,7 @@ public final class Waypoints {
             LOGGER.warn("Couldn't read the MineMenu waypoints of this world", e);
         }
         slots = loaded;
+        lastDeath = death;
         version++;
         if (Files.exists(root.resolve("minemenu_home.txt")) && !Files.exists(file)) {
             save(); // finish the move to the new file
@@ -105,7 +136,10 @@ public final class Waypoints {
             return;
         }
         try {
-            Files.writeString(file, GSON.toJson(slots));
+            SaveFile saved = new SaveFile();
+            saved.slots = slots;
+            saved.lastDeath = lastDeath;
+            Files.writeString(file, GSON.toJson(saved));
             // Keep the 3.2 Home file up to date too, so an older MineMenu still finds your Home.
             int homeSlot = indexOf(HOME);
             Waypoint home = homeSlot >= 0 ? slots[homeSlot] : null;
@@ -158,12 +192,16 @@ public final class Waypoints {
 
     public static void go(ServerPlayerEntity player, int slot) {
         Waypoint w = slots[slot];
-        if (w == null) {
-            return;
+        if (w != null) {
+            teleport(player, w);
         }
+    }
+
+    private static void teleport(ServerPlayerEntity player, Waypoint w) {
+        Identifier id = Identifier.tryParse(w.dimension);
         MinecraftServer server = player.getServer();
-        ServerWorld world = server == null ? null
-                : server.getWorld(RegistryKey.of(RegistryKeys.WORLD, Identifier.of(w.dimension)));
+        ServerWorld world = server == null || id == null ? null
+                : server.getWorld(RegistryKey.of(RegistryKeys.WORLD, id));
         if (world == null) {
             player.sendMessage(Text.literal("That dimension doesn't exist any more").formatted(Formatting.RED), true);
             return;
@@ -174,20 +212,69 @@ public final class Waypoints {
                 .formatted(Formatting.GREEN), true);
     }
 
+    // Changes replace the waypoint with a changed copy: the HUD (client thread) may be reading the old one.
+
     public static void rename(int slot, String name) {
         Waypoint w = slots[slot];
         if (w != null && name != null && !name.isBlank() && !name.trim().equals(w.name)) {
-            w.name = name.trim();
-            changed();
+            Waypoint changedCopy = w.copy();
+            changedCopy.name = name.trim();
+            replace(slot, changedCopy);
         }
     }
 
     public static void toggleHud(int slot) {
         Waypoint w = slots[slot];
         if (w != null) {
-            w.hud = !w.hud;
-            changed();
+            Waypoint changedCopy = w.copy();
+            changedCopy.hud = !w.hud;
+            replace(slot, changedCopy);
         }
+    }
+
+    private static void replace(int slot, Waypoint w) {
+        Waypoint[] copy = slots.clone();
+        copy[slot] = w;
+        slots = copy;
+        changed();
+    }
+
+    /** A waypoint with a dimension id Minecraft accepts (hand-edited files can have anything). */
+    private static boolean valid(Waypoint w) {
+        return w != null && w.dimension != null && Identifier.tryParse(w.dimension) != null
+                && Double.isFinite(w.x) && Double.isFinite(w.y) && Double.isFinite(w.z);
+    }
+
+    /** The host died: remember where (for Last Death, and Death Chest's waypoint). */
+    public static void setLastDeath(ServerPlayerEntity player, String name) {
+        Waypoint w = new Waypoint();
+        w.name = name;
+        w.dimension = player.getServerWorld().getRegistryKey().getValue().toString();
+        w.x = player.getX();
+        w.y = player.getY();
+        w.z = player.getZ();
+        w.yaw = player.getYaw();
+        w.pitch = player.getPitch();
+        lastDeath = w;
+        changed();
+    }
+
+    public static Waypoint lastDeath() {
+        return lastDeath;
+    }
+
+    public static void goLastDeath(ServerPlayerEntity player) {
+        Waypoint w = lastDeath;
+        if (w == null) {
+            player.sendMessage(Text.literal("You haven't died in this world yet").formatted(Formatting.YELLOW), true);
+            return;
+        }
+        teleport(player, w);
+    }
+
+    public static void deleteLastDeath() {
+        lastDeath = null;
+        changed();
     }
 
     public static void delete(int slot) {
@@ -204,7 +291,7 @@ public final class Waypoints {
             slot = firstFree();
         }
         if (slot < 0) {
-            player.sendMessage(Text.literal("All 5 waypoints are used: delete one in Waypoints... first").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.literal("All 10 waypoints are used: delete one in Waypoints... first").formatted(Formatting.YELLOW), true);
             return;
         }
         setHere(player, slot, HOME);
@@ -258,6 +345,10 @@ public final class Waypoints {
             if (w != null && w.hud && dimension.equals(w.dimension)) {
                 lines.add(line(client, w.name, w.x, w.y, w.z, Formatting.AQUA));
             }
+        }
+        Waypoint death = lastDeath;
+        if (death != null && dimension.equals(death.dimension)) {
+            lines.add(line(client, death.name, death.x, death.y, death.z, Formatting.RED));
         }
         Found f = found;
         if (f != null && dimension.equals(f.dimension())) {

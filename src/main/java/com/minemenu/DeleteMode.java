@@ -114,7 +114,7 @@ public final class DeleteMode {
         server.execute(() -> {
             var player = ServerCheats.host(server);
             if (player != null) {
-                ExtraCheats.deleteInventorySlot(player, inventoryIndex);
+                ItemCheats.deleteInventorySlot(player, inventoryIndex);
             }
         });
     }
@@ -128,7 +128,7 @@ public final class DeleteMode {
         server.execute(() -> {
             var player = ServerCheats.host(server);
             if (player != null) {
-                ExtraCheats.undoDelete(player);
+                ItemCheats.undoDelete(player);
             }
         });
         if (undoButton != null) {

@@ -23,5 +23,16 @@
   "mineboost.option.hide_vignette": "Hide Vignette",
   "mineboost.option.far_mob_detail": "Simple Far Mobs",
   "mineboost.option.idle_fps": "Idle Mode",
-  "mineboost.option.idle_seconds": "Idle After"
+  "mineboost.option.idle_seconds": "Idle After",
+  "key.mineboost.battery_saver": "Battery Saver (toggle)",
+  "mineboost.option.render_scale": "Render Scale",
+  "mineboost.option.render_scale_filter": "Upscale Filter",
+  "mineboost.option.dynamic_render_scale": "Dynamic Render Scale",
+  "mineboost.option.render_scale_min": "Dynamic Scale Minimum",
+  "mineboost.option.section_culling": "Section Culling",
+  "mineboost.option.far_entity_ticks": "Far Entity Ticks (beta)",
+  "mineboost.option.smooth_fog": "Smooth Fog Edge",
+  "mineboost.option.max_sounds": "Max Sounds",
+  "mineboost.option.frame_graph": "Frame-time Graph",
+  "mineboost.option.spike_log": "Spike Log"
 }

@@ -3,16 +3,22 @@
   "id": "mineboost",
   "version": "${version}",
   "name": "MineBoost",
-  "description": "An FPS boost menu. Press . (period) in game for one-click presets (including one for Intel integrated graphics), the graphics settings that matter, measured extra boosts vanilla doesn't have, Idle Mode and a benchmark that compares runs. Works alongside Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling.",
-  "authors": ["peachiu"],
+  "description": "An FPS boost menu. Press . (period) for presets (including Intel iGPU), Render Scale (sharp HUD, lower world resolution), Lag Doctor (finds what costs you FPS), measured extra boosts, Idle Mode, Battery Saver, memory/JVM advice and an A/B test of every boost. Works alongside Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling.",
+  "authors": [
+    "peachiu"
+  ],
   "contact": {},
   "license": "MIT",
   "icon": "assets/mineboost/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["com.mineboost.MineBoostClient"]
+    "client": [
+      "com.mineboost.MineBoostClient"
+    ]
   },
-  "mixins": ["mineboost.mixins.json"],
+  "mixins": [
+    "mineboost.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "minecraft": "~${minecraft_version}",

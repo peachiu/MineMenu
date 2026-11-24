@@ -3,16 +3,26 @@
   "id": "minemeboost",
   "version": "${version}",
   "name": "MineMeBoost",
-  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with two tabs: MineMenu (60+ singleplayer cheats: noclip, zoom, tame anything, chest ESP, waypoints, time and weather...) and MineBoost (FPS boost with an Intel iGPU preset, Idle Mode and benchmark compare; works alongside Sodium and friends). The . key still opens MineBoost directly.",
-  "authors": ["peachiu"],
+  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with MineMenu (80+ singleplayer cheats on 7 pages: build tools, fun events, utility HUD, creators, morph...) and MineBoost (FPS boost: Render Scale, Lag Doctor, Intel iGPU preset, Idle Mode, A/B test; works alongside Sodium and friends). Ctrl+K opens the Command Palette, . opens MineBoost directly.",
+  "authors": [
+    "peachiu"
+  ],
   "contact": {},
   "license": "MIT",
   "icon": "assets/minemeboost/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["com.minemeboost.MineMeBoostClient"]
+    "client": [
+      "com.minemeboost.MineMeBoostClient"
+    ],
+    "modmenu": [
+      "com.minemeboost.ModMenuIntegration"
+    ]
   },
-  "mixins": ["mineboost.mixins.json", "minemenu.mixins.json"],
+  "mixins": [
+    "mineboost.mixins.json",
+    "minemenu.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "minecraft": "~${minecraft_version}",

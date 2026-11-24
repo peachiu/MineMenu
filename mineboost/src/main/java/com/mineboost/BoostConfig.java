@@ -75,6 +75,37 @@ public final class BoostConfig {
     /** The last benchmark, so the next one can show what changed. */
     public Benchmark.Result lastBenchmark = null;
 
+    // --- MineBoost 2.4 (MineMeBoost 3.4) ---
+    /** File format version: 0 = 2.3 or older (no field), 1 = 2.4. See {@link #migrate()}. */
+    public int configVersion = 0;
+    /** Render Scale: the world is drawn at this % of the window's resolution (HUD stays sharp). 100 = off. */
+    public int renderScale = 100;
+    /** Upscale filter: true = Nearest (pixelated, fastest), false = Linear (smooth). */
+    public boolean renderScaleNearest = false;
+    /** Dynamic Render Scale: moves between {@link #renderScaleMin} and {@link #renderScale} to hold the FPS target. */
+    public boolean dynamicRenderScale = false;
+    public int renderScaleMin = 50;
+    /** Section Culling: entities in chunk sections the game already knows are hidden (caves...) aren't drawn. */
+    public boolean sectionCulling = false;
+    /** Experimental: far, off-screen mobs are ticked (animated) every 4th tick only. */
+    public boolean farEntityTicks = false;
+    /** Smooth Fog Edge: fog starts earlier so chunks appearing at the edge fade in. */
+    public boolean smoothFog = false;
+    /** Battery Saver: 30 FPS, Render Scale at most 70%, at most 500 particles. */
+    public boolean batterySaver = false;
+    /** Most sounds playing at once; 0 = no limit. */
+    public int maxSounds = 0;
+    /** Small frame-time graph under the FPS Overlay. */
+    public boolean frameGraph = false;
+    /** Log frames slower than 50 ms to config/minemeboost/spikes.log. */
+    public boolean spikeLog = true;
+    /** Context rules: situation (NETHER, END, CAVE, CROWD, ELYTRA) -> preset name; missing = leave as is. */
+    public java.util.Map<String, String> contextPresets = new java.util.HashMap<>();
+    public boolean contextRules = false;
+
+    public static final int[] RENDER_SCALES = {50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100};
+    public static final int[] MAX_SOUNDS = {0, 16, 32, 64};
+
     public static final int[] FAR_MOB_DETAIL = {12, 16, 24, 32, 48, -1};
     public static final int[] IDLE_FPS = {0, 5, 10, 15, 30};
     public static final int[] IDLE_SECONDS = {15, 30, 60, 120, 300};
@@ -102,7 +133,55 @@ public final class BoostConfig {
                 LOGGER.warn("Couldn't read {}, using defaults", FILE, e);
             }
         }
+        instance.migrate();
         instance.clamp();
+    }
+
+    /** Brings files from older versions up to date without losing any value. */
+    private void migrate() {
+        if (configVersion < 1) {
+            // 2.3 and older: the new fields already have their defaults; nothing to convert.
+            configVersion = 1;
+        }
+        if (contextPresets == null) {
+            contextPresets = new java.util.HashMap<>();
+        }
+    }
+
+    /** Render Scale actually used now (Battery Saver caps it at 70%). */
+    public int effectiveRenderScale() {
+        return batterySaver ? Math.min(renderScale, 70) : renderScale;
+    }
+
+    /** Max Particles actually used now (Battery Saver caps it at 500). */
+    public int effectiveParticleLimit() {
+        if (!batterySaver) {
+            return particleLimit;
+        }
+        return particleLimit > 0 ? Math.min(particleLimit, 500) : 500;
+    }
+
+    public static String toJson(BoostConfig config) {
+        return GSON.toJson(config);
+    }
+
+    public static BoostConfig fromJson(String json) {
+        BoostConfig loaded = GSON.fromJson(json, BoostConfig.class);
+        if (loaded == null) {
+            loaded = new BoostConfig();
+        }
+        loaded.migrate();
+        loaded.clamp();
+        return loaded;
+    }
+
+    /** Swaps in other settings (a profile, a restored state), but keeps things that aren't settings. */
+    public static void replaceKeepingHistory(BoostConfig other) {
+        other.lastBenchmark = instance.lastBenchmark;
+        other.contextPresets = instance.contextPresets;
+        other.contextRules = instance.contextRules;
+        instance = other;
+        save();
     }
 
     public static void save() {
@@ -145,6 +224,11 @@ public final class BoostConfig {
         }
         if (indexOf(IDLE_SECONDS, idleSeconds) < 0) {
             idleSeconds = 30;
+        }
+        renderScale = Math.max(50, Math.min(100, renderScale / 5 * 5));
+        renderScaleMin = Math.max(50, Math.min(renderScale, renderScaleMin / 5 * 5));
+        if (indexOf(MAX_SOUNDS, maxSounds) < 0) {
+            maxSounds = 0;
         }
     }
 

@@ -53,6 +53,7 @@ public class MineMenuClient implements ClientModInitializer {
         zoomKey = register("key.minemenu.zoom", GLFW.GLFW_KEY_Z);
 
         ClientTickEvents.END_CLIENT_TICK.register(MineMenuClient::onClientTick);
+        com.minemenu.core.Bootstrap.init();
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
 
         // These fire for the integrated (singleplayer) server, which runs inside the client.
@@ -82,11 +83,13 @@ public class MineMenuClient implements ClientModInitializer {
         ServerPlayerEvents.AFTER_RESPAWN.register(Revenge::onRespawn);
         ServerLifecycleEvents.SERVER_STOPPING.register(ServerCheats::revertAll);
         ServerTickEvents.END_SERVER_TICK.register(ServerCheats::tick);
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
-                // God mode blocks everything except the void and /kill, so you can't get stuck.
-                !ServerCheats.isProtectedHost(entity)
-                        || source.isOf(DamageTypes.OUT_OF_WORLD)
-                        || source.isOf(DamageTypes.GENERIC_KILL));
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            com.minemenu.combat.CombatModules.beforeHostDamage(entity, source, amount); // Thorns Aura, even with God Mode
+            // God mode blocks everything except the void and /kill, so you can't get stuck.
+            return !ServerCheats.isProtectedHost(entity)
+                    || source.isOf(DamageTypes.OUT_OF_WORLD)
+                    || source.isOf(DamageTypes.GENERIC_KILL);
+        });
     }
 
     private static KeyBinding register(String name, int key) {
@@ -110,13 +113,14 @@ public class MineMenuClient implements ClientModInitializer {
     }
 
     private static void onClientTick(MinecraftClient client) {
-        jetpack(client);
-        ClientCheats.tick(client);
+        com.minemenu.core.Guard.run("Jetpack", () -> jetpack(client));
+        com.minemenu.core.Guard.run("3.3 client hacks", () -> ClientCheats.tick(client));
+        com.minemenu.core.Bootstrap.clientTick(client);
         while (openMenuKey.wasPressed()) {
             if (openMenuOverride != null) {
                 openMenuOverride.run();
-            } else if (requireSingleplayer(client)) {
-                client.setScreen(new MineMenuScreen());
+            } else if (client.player != null) {
+                client.setScreen(new MineMenuScreen()); // on servers it only offers the fair Utility hacks
             }
         }
         while (toggleFlyKey.wasPressed()) {
@@ -147,7 +151,7 @@ public class MineMenuClient implements ClientModInitializer {
             return true;
         }
         if (client.player != null) {
-            client.player.sendMessage(Text.literal("MineMenu only works in singleplayer worlds (not multiplayer or LAN).")
+            client.player.sendMessage(Text.literal("Cheats only work in singleplayer (and your own LAN world).")
                     .formatted(Formatting.RED), true);
         }
         return false;
@@ -155,7 +159,8 @@ public class MineMenuClient implements ClientModInitializer {
 
     public static boolean isSingleplayer(MinecraftClient client) {
         IntegratedServer server = client.getServer();
-        return client.player != null && client.isIntegratedServerRunning() && server != null && !server.isRemote();
+        // Since 3.4 also when your world is opened to LAN (hacks still only affect you, the host).
+        return client.player != null && client.isIntegratedServerRunning() && server != null;
     }
 
     public static void toggleWithMessage(MinecraftClient client, Feature feature) {

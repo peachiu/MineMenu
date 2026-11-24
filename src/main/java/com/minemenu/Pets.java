@@ -60,6 +60,9 @@ public final class Pets {
                 || !LocalHost.is(player)) {
             return ActionResult.PASS;
         }
+        if (CheatState.isOn(Feature.GRAVITY_GUN) && player.isSneaking()) {
+            return ActionResult.PASS; // sneak + right-click belongs to the Gravity Gun
+        }
         boolean pet = isPet(mob);
         if (pet && !player.isSneaking()) {
             return ActionResult.PASS; // a normal right-click on your pet (ride your horse, trade...)

@@ -50,6 +50,8 @@ public final class SurvivalCheats {
             case NOCLIP -> {
                 if (!player.isSpectator()) {
                     beforeNoclip = player.interactionManager.getGameMode();
+                    // Written to the world folder first: if the game crashes now, the next join puts it back.
+                    writeNoclipFile(server, beforeNoclip);
                     player.changeGameMode(GameMode.SPECTATOR);
                 }
             }
@@ -69,11 +71,13 @@ public final class SurvivalCheats {
         }
         switch (feature) {
             case NOCLIP -> {
+                GameMode back = beforeNoclip != null ? beforeNoclip : readNoclipFile(server);
                 if (player.isSpectator()) {
-                    player.changeGameMode(beforeNoclip != null ? beforeNoclip : server.getDefaultGameMode());
+                    player.changeGameMode(back != null ? back : server.getDefaultGameMode());
                     player.fallDistance = 0;
                 }
                 beforeNoclip = null;
+                deleteNoclipFile(server);
             }
             case STEP_UP -> setModifier(player, false, STEP_ID);
             case FAST_SWIM -> {
@@ -83,6 +87,52 @@ public final class SurvivalCheats {
             default -> {
             }
         }
+    }
+
+    // ------------------------------------------------------------------
+    // Noclip safety: the game mode from before Noclip is kept in the world folder
+    // ------------------------------------------------------------------
+
+    private static java.nio.file.Path noclipFile(MinecraftServer server) {
+        return server.getSavePath(net.minecraft.util.WorldSavePath.ROOT).resolve("minemenu_noclip.txt");
+    }
+
+    private static void writeNoclipFile(MinecraftServer server, GameMode mode) {
+        try {
+            java.nio.file.Files.writeString(noclipFile(server), mode.asString());
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static GameMode readNoclipFile(MinecraftServer server) {
+        try {
+            java.nio.file.Path file = noclipFile(server);
+            return java.nio.file.Files.exists(file) ? GameMode.byName(java.nio.file.Files.readString(file).trim(), null) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static void deleteNoclipFile(MinecraftServer server) {
+        try {
+            java.nio.file.Files.deleteIfExists(noclipFile(server));
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * The host joined: if the last session ended (crash, killed game) while Noclip was on, they'd still be a
+     * spectator. Put the old game mode back, unless Noclip is meant to be on now.
+     */
+    public static void onHostJoin(MinecraftServer server, ServerPlayerEntity player) {
+        GameMode saved = readNoclipFile(server);
+        if (saved == null || CheatState.isOn(Feature.NOCLIP)) {
+            return;
+        }
+        if (player.isSpectator()) {
+            player.changeGameMode(saved);
+        }
+        deleteNoclipFile(server);
     }
 
     public static void tick(ServerPlayerEntity player, Set<Feature> applied, int tickCounter) {

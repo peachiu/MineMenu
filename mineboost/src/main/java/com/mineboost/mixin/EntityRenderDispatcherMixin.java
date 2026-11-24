@@ -50,6 +50,12 @@ public class EntityRenderDispatcherMixin {
             cir.setReturnValue(false);
             return;
         }
+        // Section Culling: in a chunk section the game knows can't be seen (caves, behind hills)?
+        if (com.mineboost.SectionCulling.enabled() && !(entity instanceof PlayerEntity) && !entity.isGlowing()
+                && !com.mineboost.SectionCulling.isVisible(entity)) {
+            cir.setReturnValue(false);
+            return;
+        }
         // Smart Culling: hidden behind solid blocks? Then don't draw it. Only worth checking for things
         // in view; vanilla already skips the rest.
         if (Compat.smartCulling() && frustum.isVisible(entity.getVisibilityBoundingBox())
