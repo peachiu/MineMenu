@@ -1,6 +1,7 @@
-# gradle
+# gradle (build output only; src/**/build/ is source code, e.g. com.minemenu.build)
 .gradle/
 build/
+!src/**/build/
 out/
 classes/
 
