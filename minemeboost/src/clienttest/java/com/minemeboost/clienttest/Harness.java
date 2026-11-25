@@ -243,6 +243,10 @@ public abstract class Harness {
         if (wait > 0) { wait--; return; }
         try {
             if (stepIndex == -2) {
+                if (client.currentScreen instanceof net.minecraft.client.gui.screen.AccessibilityOnboardingScreen onboarding) {
+                    onboarding.close(); // first start on a fresh machine (CI)
+                    return;
+                }
                 if (client.currentScreen instanceof com.minemenu.ui.WhatsNewScreen) {
                     client.setScreen(null);
                 }
