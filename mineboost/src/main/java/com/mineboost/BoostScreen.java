@@ -266,7 +266,7 @@ public class BoostScreen extends GameOptionsScreen {
          * stacks), each option on/off 3 times. See docs/fps-measurements.md. Options that don't change FPS
          * while you play say so honestly.
          */
-        static final String IMPACT_RENDER_SCALE = "High when the graphics card is the limit (integrated graphics): +15% at 50% and +17% at 75% on our test PC. Run the A/B test to see yours.";
+        static final String IMPACT_RENDER_SCALE = "High when the graphics card is the limit (integrated graphics): +28% at 75% (with Sharpen) and +15% at 50% on our test PC. Run the A/B test to see yours.";
         static final String IMPACT_SECTION_CULLING = "None measured (−7%, within noise): Smart Culling already hides the same mobs. Off by default.";
         static final String IMPACT_FAR_TICKS = "None measured (−2%) with 300 mobs behind you; experimental. Off by default.";
 
@@ -294,8 +294,8 @@ public class BoostScreen extends GameOptionsScreen {
                 java.util.Map.entry("mineboost.option.hide_vignette", "Tiny (about one full-screen layer less per frame)."),
                 java.util.Map.entry("mineboost.option.fps_overlay", "None (it only shows the numbers)."),
                 java.util.Map.entry("mineboost.option.render_scale", IMPACT_RENDER_SCALE),
-                java.util.Map.entry("mineboost.option.impostors", "Measured below."),
-                java.util.Map.entry("mineboost.option.render_scale_sharpen", "None by itself; costs about 9 texture reads per pixel while Render Scale is on (measured below)."),
+                java.util.Map.entry("mineboost.option.impostors", "High with many far mobs: +11% FPS and +53% 1% low with 150 armored mobs at 28-44 blocks (Impostors 24). Off by default: far mobs stop animating."),
+                java.util.Map.entry("mineboost.option.render_scale_sharpen", "Costs FPS on our CPU-rendered test PC (-18% at 100 FPS); on a graphics card it is a fraction of a millisecond. Render Scale 75% with Sharpen 50% still gave +28%. Set Off for maximum FPS."),
                 java.util.Map.entry("mineboost.option.dynamic_render_scale", "Holds your FPS target by trading sharpness for FPS only when needed."),
                 java.util.Map.entry("mineboost.option.section_culling", IMPACT_SECTION_CULLING),
                 java.util.Map.entry("mineboost.option.far_entity_ticks", IMPACT_FAR_TICKS),

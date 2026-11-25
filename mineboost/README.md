@@ -4,8 +4,8 @@ An **FPS boost menu** for **Minecraft Java 1.21.1** (Fabric). Press **`.`** (per
 
 ![The MineBoost menu](docs/menu.png)
 
-- **Sharpen (CAS)** *(2.5)*: Render Scale now stretches the picture with AMD's Contrast Adaptive Sharpening, in the same pass, so 75% looks close to 100%. Strength 0-100% (50% by default).
-- **Impostors** *(2.5)*: mobs farther than 16-64 blocks are drawn as one flat picture of themselves (photographed from 8 sides) instead of the full model with armor and items. Off by default; see the measurements.
+- **Sharpen (CAS)** *(2.5)*: Render Scale now stretches the picture with AMD's Contrast Adaptive Sharpening, in the same pass, so 75% looks close to 100%; Render Scale 75% with Sharpen gave **+28% FPS** in our A/B test. Strength 0-100% (50% by default; Off for maximum FPS).
+- **Impostors** *(2.5)*: mobs farther than 16-64 blocks are drawn as one flat picture of themselves (photographed from 8 sides) instead of the full model with armor and items. **+11% FPS, +53% 1% low** with 150 armored mobs in view. Off by default (far mobs don't animate).
 - **Presets that use your A/B results** *(2.5)*: after you run the A/B test, Toaster, Potato and Intel iGPU pick the Render Scale that really gave FPS on your PC (Toaster 50% or 75%, the others 75% or 100%); the preset's tooltip says why.
 - **Render Scale** *(2.4)*: draws the world at 50-99% of your screen's resolution and scales it up, while the HUD, chat and menus stay sharp. **+15% FPS at 50%** on our test PC; most useful on integrated graphics. **Dynamic Render Scale** lowers it only when you're below your FPS target. (Off with Iris, which has its own resolution settings.)
 - **Lag Doctor** *(2.4, Tools...)*: measures 10, 30 or 60 seconds and tells you what costs you FPS ("Drawing terrain 56%, Clouds 1%..."), with a one-click fix next to each finding. Frames over 50 ms are written to `config/minemeboost/spikes.log` with what was happening.

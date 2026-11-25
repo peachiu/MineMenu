@@ -1,6 +1,29 @@
-# MineBoost FPS measurements (2.4.0)
+# MineBoost FPS measurements (2.5.0)
 
-## 2.4.0: the new options
+## 2.5.0: Sharpen, Impostors, presets from your A/B test
+
+Same test PC (no graphics card, Mesa llvmpipe software rendering, 4 CPU cores), real MineMeBoost 3.5.0 jar, measured
+by the in-game test suite (`./gradlew runClientTests -Psuite=ab` and `-Psuite=quick`).
+
+| Option | Scene | Avg FPS off → on | 1% low off → on | Verdict |
+|---|---|---|---|---|
+| **Impostors 24**, *new* | 150 armored zombies 28-44 blocks away, render distance 2 (mobs are the cost) ³ | 102.0 → 113.1 (**+11%**) | 41.3 → 63.2 (**+53%**) | Kept, **off by default**: far mobs stop animating, you choose |
+| Impostors 24 | the 2.4 A/B scene (terrain is the cost) | 17.4 → 17.7 (+2%) | 10.1 → 12.0 | Within noise when mobs aren't the bottleneck |
+| **Sharpen 50%** at Render Scale 75%, *new* | 150 armored zombies ³ | 100.1 → 82.2 (**−18%**) | 47.0 → 44.0 | **Kept at 50%** (Render Scale itself is off by default): on this CPU renderer every texture read is expensive; on a graphics card the 9 reads per pixel cost a fraction of a millisecond. Set it Off for maximum FPS |
+| Render Scale 75% (with Sharpen 50%) | the A/B scene | 10.5 → 13.5 (**+28%**) | 6.2 → 7.6 | Net gain even with the sharpening |
+| Sharpen, picture quality | edge contrast of the middle of the screen at 75% | 3.89 → 9.65 (100% strength); 6.21 → 7.28 (50%) | | The 75% picture looks as crisp as 100% |
+| Far Entity Ticks (beta) | the A/B scene ³ | 17.2 → 17.2 (0%) | 14.3 → 12.4 | Still no gain → off by default |
+| Smooth Fog Edge | the A/B scene ³ | 17.2 → 17.2 (0%) | 13.3 → 13.4 | Looks only, no cost |
+
+³ = off/on three times. The other boosts in the 2.5 A/B table stayed within ±6% in its terrain-heavy scene (render distance −4: +79%).
+
+**Presets from your A/B test**: after an A/B test, Toaster uses 50% if that gained ≥15% (and 5% more than 75%), else 75% if
+that gained ≥8%; Potato and Intel iGPU use 75% if that gained ≥8%; otherwise 100%. Checked in the test suite with
+three made-up results (big gains, no gains, no A/B test).
+
+---
+
+## 2.4.0
 
 Same test PC as below (no graphics card, Mesa llvmpipe software rendering, 4 CPU cores, 854×480), real
 MineMeBoost 3.4.0 jar. Each line is **off 4 s / on 4 s, twice** (the in-game **A/B test**, Tools → A/B all boosts)
