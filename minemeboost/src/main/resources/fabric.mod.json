@@ -3,7 +3,7 @@
   "id": "minemeboost",
   "version": "${version}",
   "name": "MineMeBoost",
-  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with MineMenu (80+ singleplayer cheats on 7 pages: build tools, fun events, utility HUD, creators, morph...) and MineBoost (FPS boost: Render Scale, Lag Doctor, Intel iGPU preset, Idle Mode, A/B test; works alongside Sodium and friends). Ctrl+K opens the Command Palette, . opens MineBoost directly.",
+  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with MineMenu (80+ singleplayer cheats on 7 pages: build tools, fun events, utility HUD, creators, morph...) and MineBoost (FPS boost: Render Scale, Lag Doctor, Intel iGPU preset, Idle Mode, A/B test; works alongside Sodium and friends). Ctrl+K opens the Command Palette, . opens MineBoost directly. In English and Portuguese (Portugal).",
   "authors": [
     "peachiu"
   ],

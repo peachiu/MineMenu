@@ -1,6 +1,6 @@
 # MineMenu
 
-A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). New in 3.4: freecam, morph into mobs, copy/paste and schematics, instant structures, a minimap, Chaos Mode, Lucky Blocks, a Command Palette (Ctrl+K) and Safe Mode. Also: fly, noclip, god mode, zoom, tame any mob, Chest ESP, waypoints, time and weather control, a structure finder, X-ray style Ore Vision, Vein Miner, Water Walk, Spider Climb, Thor Mode, explosive arrows, auto smelt, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
+A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric), in **English and Portuguese (Portugal)** *(3.5)*. New in 3.4: freecam, morph into mobs, copy/paste and schematics, instant structures, a minimap, Chaos Mode, Lucky Blocks, a Command Palette (Ctrl+K) and Safe Mode. Also: fly, noclip, god mode, zoom, tame any mob, Chest ESP, waypoints, time and weather control, a structure finder, X-ray style Ore Vision, Vein Miner, Water Walk, Spider Climb, Thor Mode, explosive arrows, auto smelt, item magnet, one-shot mobs, spawn any mob, fireballs, arrow rain, super enchants, Revenge Mode and more. Made for messing around and filming videos.
 
 ![The MineMenu menu](docs/menu.png)
 
@@ -16,7 +16,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric). New in 
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemenu-3.4.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemenu-3.5.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile and open a singleplayer world.
 5. Press **Right Shift** to open the menu.
 
@@ -34,6 +34,12 @@ New in 3.4:
 - **⚙ Settings**: theme (Dark, Light, Glass), accent colour, animations, **profiles** (save which hacks are on, and share them as a code), and **Reset everything** (makes a backup first).
 - **Safe Mode**: if a hack throws an error, only that hack is switched off, with a message in the corner, instead of crashing the game. If the game fails to start twice in a row, the next start keeps every hack off.
 - Your hacks, favorites, keys and settings are saved in `config/minemeboost/cheats.json` and come back the next time you play (except Freecam, Morph and Noclip).
+
+### New in 3.5
+
+- **Português (Portugal)**: every text in the mod (menus, hacks, settings, messages) is in the lang files, with a full Portuguese translation. Pick **Português (Portugal)** in Options → Language.
+- **Schematics browser** (Build → Schematics...): your saved schematics with a search box, their size and block count, and two pictures (from above and from the front). Load & paste, rename, delete (asks twice), open the folder.
+- **Undo for vanilla structures**: villages, temples, igloos and the rest from Structures... can now be undone like everything else. Every block the structure changes is remembered while it's placed (mobs that came with it stay).
 
 ### New in 3.4
 
@@ -296,7 +302,7 @@ You need **Java 21**.
 ./gradlew build
 ```
 
-The mod jar ends up in `build/libs/minemenu-3.4.0.jar`. Ignore the `-sources.jar` file.
+The mod jar ends up in `build/libs/minemenu-3.5.0.jar`. Ignore the `-sources.jar` file.
 
 To try it straight from the source code, run `./gradlew runClient`.
 

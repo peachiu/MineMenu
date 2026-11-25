@@ -3,7 +3,7 @@
   "id": "mineboost",
   "version": "${version}",
   "name": "MineBoost",
-  "description": "An FPS boost menu. Press . (period) for presets (including Intel iGPU), Render Scale (sharp HUD, lower world resolution), Lag Doctor (finds what costs you FPS), measured extra boosts, Idle Mode, Battery Saver, memory/JVM advice and an A/B test of every boost. Works alongside Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling.",
+  "description": "An FPS boost menu. Press . (period) for presets (including Intel iGPU), Render Scale (sharp HUD, lower world resolution), Lag Doctor (finds what costs you FPS), measured extra boosts, Idle Mode, Battery Saver, memory/JVM advice and an A/B test of every boost. Works alongside Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling. 2.5: sharpening (CAS) for Render Scale, Impostors for far mobs, presets that use your own A/B results. In English and Portuguese (Portugal).",
   "authors": [
     "peachiu"
   ],

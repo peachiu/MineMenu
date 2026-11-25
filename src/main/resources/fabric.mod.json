@@ -3,7 +3,7 @@
   "id": "minemenu",
   "version": "${version}",
   "name": "MineMenu",
-  "description": "A singleplayer fun menu with 80+ hacks on 7 pages (Player, Combat, World, Items, Build, Fun, Utility): fly, noclip, freecam, morph, copy/paste and schematics, item/potion/mob creators, chaos mode, minimap, waypoints... with search, favorites, keys for any hack and a Command Palette (Ctrl+K). Right Shift in your own world.",
+  "description": "A singleplayer fun menu with 80+ hacks on 7 pages (Player, Combat, World, Items, Build, Fun, Utility): fly, noclip, freecam, morph, copy/paste and schematics, item/potion/mob creators, chaos mode, minimap, waypoints... with search, favorites, keys for any hack and a Command Palette (Ctrl+K). Right Shift in your own world. In English and Portuguese (Portugal).",
   "authors": [
     "peachiu"
   ],

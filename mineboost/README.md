@@ -4,6 +4,9 @@ An **FPS boost menu** for **Minecraft Java 1.21.1** (Fabric). Press **`.`** (per
 
 ![The MineBoost menu](docs/menu.png)
 
+- **Sharpen (CAS)** *(2.5)*: Render Scale now stretches the picture with AMD's Contrast Adaptive Sharpening, in the same pass, so 75% looks close to 100%. Strength 0-100% (50% by default).
+- **Impostors** *(2.5)*: mobs farther than 16-64 blocks are drawn as one flat picture of themselves (photographed from 8 sides) instead of the full model with armor and items. Off by default; see the measurements.
+- **Presets that use your A/B results** *(2.5)*: after you run the A/B test, Toaster, Potato and Intel iGPU pick the Render Scale that really gave FPS on your PC (Toaster 50% or 75%, the others 75% or 100%); the preset's tooltip says why.
 - **Render Scale** *(2.4)*: draws the world at 50-99% of your screen's resolution and scales it up, while the HUD, chat and menus stay sharp. **+15% FPS at 50%** on our test PC; most useful on integrated graphics. **Dynamic Render Scale** lowers it only when you're below your FPS target. (Off with Iris, which has its own resolution settings.)
 - **Lag Doctor** *(2.4, Tools...)*: measures 10, 30 or 60 seconds and tells you what costs you FPS ("Drawing terrain 56%, Clouds 1%..."), with a one-click fix next to each finding. Frames over 50 ms are written to `config/minemeboost/spikes.log` with what was happening.
 - **Tools...** *(2.4)*: **A/B test of every boost** (each one off/on twice, results in chat and in `config/minemeboost/benchmark-results.md`), **Memory panel** with a JVM Advisor (how much RAM to give Minecraft on your PC and the flags to copy), **context rules** (switch preset in the Nether, underground, while flying with an elytra...), **FPS profiles** you can share as a code, a **frame-time graph** and **Battery Saver** (30 FPS and Render Scale 70%, one key).
@@ -26,7 +29,7 @@ Works in singleplayer and on servers. It only changes what your own game draws.
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `mineboost-2.4.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `mineboost-2.5.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile, join a world and press **`.`**.
 
 You can change the key in **Options → Controls → Key Binds → MineBoost**.
@@ -84,6 +87,8 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 | Setting | What it does |
 |---|---|
 | **Render Scale** *(2.4)* | Draws the world at 50% to 99% of your window's resolution, then scales it up to the full window; the HUD, chat and menus are drawn at full resolution on top, so text stays sharp. **Upscale Filter** picks smooth or sharp pixels. Not available with Iris (shaders have their own setting) or with Fabulous graphics. |
+| **Sharpen (CAS)** *(2.5)* | How much Render Scale sharpens the stretched picture (Off, 10-100%). Contrast Adaptive Sharpening: edges that are already sharp get less, so there are no halos. Only used while Render Scale is below 100%. |
+| **Impostors** *(2.5)* | Mobs farther than this (16, 24, 32, 48 or 64 blocks) are drawn as a flat picture of themselves that turns towards you. Each kind of mob (type, baby, equipment, colour) is photographed once from 8 sides into a small texture; far mobs don't animate. Players, bosses, glowing, burning and ridden mobs are always drawn normally. Off with Iris. |
 | **Dynamic Render Scale** *(2.4)* | Once a second: below 90% of your FPS Target (60 if off) the scale goes down 5% (10% when far below), down to **Dynamic Scale Minimum**; after 3 s above the target it goes back up, never above Render Scale. |
 | **Section Culling** *(2.4)* | Skips entities in chunk sections that aren't drawn this frame. Measured: no gain on top of Smart Culling, so off by default. Not available with Sodium (it does this itself). |
 | **Far Entity Ticks (beta)** *(2.4)* | Mobs more than 48 blocks away and behind you are updated on your side every 4th tick. Measured: no gain, off by default. |
@@ -155,7 +160,7 @@ cd mineboost
 ./gradlew build
 ```
 
-The jar ends up in `mineboost/build/libs/mineboost-2.4.0.jar`.
+The jar ends up in `mineboost/build/libs/mineboost-2.5.0.jar`.
 
 ### Making a release
 

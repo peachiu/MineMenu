@@ -160,22 +160,31 @@ public class MineMenuScreen extends Screen {
     }
 
     private final List<ButtonWidget> gridButtons = new ArrayList<>();
+    /** Width of the grid buttons this time (fits the longest label, see rebuildGrid). */
+    private int buttonWidth = BUTTON_WIDTH;
 
     /** The scrollable grid. Only the rows that fit between the search box and the bottom row get buttons. */
     private void rebuildGrid() {
         gridButtons.forEach(this::remove);
         gridButtons.clear();
-        int columns = Math.max(2, Math.min(5, (this.width - 8) / (BUTTON_WIDTH + GAP)));
-        int gridWidth = columns * BUTTON_WIDTH + (columns - 1) * GAP;
-        int left = (this.width - gridWidth) / 2;
         List<MenuEntry> list = entries();
+        // Buttons as wide as the longest label (longer in some languages), then as many columns as fit.
+        int widest = 0;
+        for (MenuEntry entry : list) {
+            widest = Math.max(widest, this.textRenderer.getWidth(label(entry)));
+        }
+        buttonWidth = Math.max(BUTTON_WIDTH, Math.min(170, widest + 10));
+        int columns = Math.max(2, Math.min(5, (this.width - 8) / (buttonWidth + GAP)));
+        buttonWidth = Math.min(buttonWidth, (this.width - 8 - (columns - 1) * GAP) / columns);
+        int gridWidth = columns * buttonWidth + (columns - 1) * GAP;
+        int left = (this.width - gridWidth) / 2;
         boolean size = search.isBlank() && !favoritesPage && currentCategory == Category.PLAYER;
         int count = list.size() + (size ? 1 : 0);
         int rows = (count + columns - 1) / columns;
         contentHeight = rows * (BUTTON_HEIGHT + GAP);
         scroll = Math.max(0, Math.min(scroll, Math.max(0, contentHeight - (gridBottom - gridTop))));
         for (int i = 0; i < count; i++) {
-            int x = left + (i % columns) * (BUTTON_WIDTH + GAP);
+            int x = left + (i % columns) * (buttonWidth + GAP);
             int y = gridTop + (i / columns) * (BUTTON_HEIGHT + GAP) - scroll;
             if (y < gridTop || y + BUTTON_HEIGHT > gridBottom) {
                 continue;
@@ -184,7 +193,7 @@ public class MineMenuScreen extends Screen {
                     : ButtonWidget.builder(sizeLabel(), b -> {
                         CheatState.cycleSize();
                         b.setMessage(sizeLabel());
-                    }).dimensions(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+                    }).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
                     .tooltip(Tooltip.of(Text.translatable("minemenu.text.click_to_cycle_normal_giant_4x")))
                     .build();
             button.active &= singleplayer();
@@ -208,7 +217,7 @@ public class MineMenuScreen extends Screen {
         private final MenuEntry entry;
 
         EntryButton(int x, int y, MenuEntry entry, Tooltip tooltip) {
-            super(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, label(entry), b -> { }, DEFAULT_NARRATION_SUPPLIER);
+            super(x, y, buttonWidth, BUTTON_HEIGHT, label(entry), b -> { }, DEFAULT_NARRATION_SUPPLIER);
             this.entry = entry;
             setTooltip(tooltip);
         }
