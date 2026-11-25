@@ -98,3 +98,70 @@ loom {
         }
     }
 }
+
+// In-game tests: ./gradlew runClientTests -Psuite=full|soak|ab|mp|iris [-Pminutes=15] [-PextraMods=dir]
+// Starts the real (remapped) jar plus a small test mod (src/clienttest, never shipped) in a production client
+// under Xvfb, runs the suite, then checkClientTests fails the build if any check failed.
+sourceSets {
+    clienttest {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+def clientTestSuite = (project.findProperty("suite") ?: "full").toString()
+def clientTestRunDir = file("build/clienttest-run")
+
+tasks.register("clienttestJar", Jar) {
+    from sourceSets.clienttest.output
+    archiveClassifier = "clienttest-dev"
+    destinationDirectory = layout.buildDirectory.dir("clienttest")
+}
+
+tasks.register("remapClienttestJar", net.fabricmc.loom.task.RemapJarTask) {
+    dependsOn tasks.clienttestJar
+    inputFile = tasks.clienttestJar.archiveFile
+    archiveClassifier = "clienttest"
+    destinationDirectory = layout.buildDirectory.dir("clienttest")
+    addNestedDependencies = false
+}
+
+tasks.register("runClientTests", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    dependsOn remapJar, tasks.remapClienttestJar
+    mods.from(remapJar.archiveFile)
+    mods.from(tasks.remapClienttestJar.archiveFile)
+    mods.from(configurations.detachedConfiguration(dependencies.create("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")).setTransitive(false))
+    if (project.hasProperty("extraMods")) {
+        mods.from(fileTree(project.property("extraMods")) { include "*.jar" })
+    }
+    jvmArgs.add("-Xmx2G")
+    jvmArgs.add("-Dminemeboost.clienttest.suite=" + clientTestSuite)
+    jvmArgs.add("-Dminemeboost.clienttest.minutes=" + (project.findProperty("minutes") ?: "15"))
+    runDir = clientTestRunDir
+    useXVFB = (project.findProperty("xvfb") ?: "true") != "false"
+    doFirst {
+        // A fresh world and the settings an unattended run needs; plus 3.3-era config files to test migration.
+        delete fileTree(clientTestRunDir) { include "saves/**", "screenshots/**", "clienttest/**", "config/**" }
+        copy {
+            from "src/clienttest/run"
+            into clientTestRunDir
+        }
+    }
+    finalizedBy "checkClientTests"
+}
+
+tasks.register("checkClientTests") {
+    doLast {
+        def results = new File(clientTestRunDir, "clienttest/results-${clientTestSuite}.txt")
+        if (!results.exists()) {
+            throw new GradleException("No results: the game didn't finish the '${clientTestSuite}' suite (see ${clientTestRunDir}/logs/latest.log)")
+        }
+        def lines = results.readLines()
+        def failed = lines.findAll { it.startsWith("FAIL") || it.startsWith("ERROR") }
+        println "In-game tests (${clientTestSuite}): ${lines.count { it.startsWith('PASS') }} passed, ${failed.size()} failed"
+        failed.each { println "  " + it }
+        if (!failed.isEmpty()) {
+            throw new GradleException("${failed.size()} in-game check(s) failed, see ${results}")
+        }
+    }
+}

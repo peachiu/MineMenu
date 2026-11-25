@@ -1,0 +1,11 @@
+{
+    "vertex": "blit_screen",
+    "fragment": "mineboost:cas",
+    "samplers": [
+        { "name": "DiffuseSampler" }
+    ],
+    "uniforms": [
+        { "name": "InSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+        { "name": "Sharpness", "type": "float", "count": 1, "values": [ 0.5 ] }
+    ]
+}

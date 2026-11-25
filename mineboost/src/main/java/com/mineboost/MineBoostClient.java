@@ -16,6 +16,7 @@ public class MineBoostClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         BoostConfig.load();
+        com.mineboost.renderscale.Sharpen.register();
 
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.mineboost.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, "key.categories.mineboost"));
@@ -26,6 +27,7 @@ public class MineBoostClient implements ClientModInitializer {
             BoostGuard.run("Dynamic Render Scale", () -> com.mineboost.renderscale.RenderScale.tick(client),
                     () -> BoostConfig.get().dynamicRenderScale = false);
             BoostGuard.run("Context rules", () -> com.mineboost.tools.ContextRules.tick(client), () -> BoostConfig.get().contextRules = false);
+            BoostGuard.run("Impostors", () -> Impostors.tick(client), () -> BoostConfig.get().impostorDistance = 0);
             if (++ticks % 10 == 0) {
                 com.mineboost.doctor.MemoryScreen.sample();
             }
@@ -44,6 +46,7 @@ public class MineBoostClient implements ClientModInitializer {
             EntityBudget.clear();
             SectionCulling.clear();
             com.mineboost.renderscale.RenderScale.release();
+            Impostors.clear();
             com.mineboost.tools.BoostAB.cancel(client);
         });
         ClientTickEvents.END_CLIENT_TICK.register(SmartRenderDistance::tick);

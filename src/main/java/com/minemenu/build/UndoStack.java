@@ -69,6 +69,11 @@ public final class UndoStack {
         redo.clear();
     }
 
+    /** The step Undo would take back next, or null (used by tests). */
+    public static Entry last() {
+        return undo.peek();
+    }
+
     public static int size() {
         return undo.size();
     }

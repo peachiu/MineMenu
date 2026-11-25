@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "minemeboost-clienttest",
+  "version": "1.0.0",
+  "name": "MineMeBoost in-game tests",
+  "description": "Test driver for the runClientTests Gradle task. Not part of any release.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.minemeboost.clienttest.ClientTestMod"]
+  },
+  "depends": {
+    "minemeboost": "*",
+    "fabric-api": "*"
+  }
+}

@@ -50,6 +50,8 @@ public final class BoostAB {
         List<Test> list = new ArrayList<>();
         list.add(new Test("Render Scale 75%", c -> BoostConfig.get().renderScale = 75));
         list.add(new Test("Render Scale 50%", c -> BoostConfig.get().renderScale = 50));
+        list.add(new Test("Sharpen at 75%", c -> { BoostConfig.get().renderScale = 75; BoostConfig.get().renderScaleSharpen = 50; }));
+        list.add(new Test("Impostors 24", c -> BoostConfig.get().impostorDistance = 24));
         list.add(new Test("Simple Far Mobs 16", c -> BoostConfig.get().farMobDetail = 16));
         list.add(new Test("Max Entities 50", c -> BoostConfig.get().maxEntities = 50));
         list.add(new Test("Entity Distance 24", c -> BoostConfig.get().entityDistance = 3));
@@ -85,6 +87,11 @@ public final class BoostAB {
         BoostConfig c = BoostConfig.get();
         switch (tests.get(index).name()) {
             case "Render Scale 75%", "Render Scale 50%" -> c.renderScale = 100;
+            case "Sharpen at 75%" -> { // the cost of sharpening: 75% without it vs 75% with it
+                c.renderScale = 75;
+                c.renderScaleSharpen = 0;
+            }
+            case "Impostors 24" -> c.impostorDistance = 0;
             case "Simple Far Mobs 16" -> c.farMobDetail = -1;
             case "Max Entities 50" -> c.maxEntities = -1;
             case "Entity Distance 24" -> c.entityDistance = BoostConfig.ENTITY_DISTANCE_UNLIMITED;
@@ -192,7 +199,9 @@ public final class BoostAB {
             double gain = r[0] > 0 ? (r[2] - r[0]) * 100 / r[0] : 0;
             md.append(String.format("| %s | %.1f | %.1f | %+.0f%% | %.1f | %.1f |\n", tests.get(i).name(), r[0], r[2], gain, r[1], r[3]));
             best.add(String.format("%+.0f%% %s", gain, tests.get(i).name()));
+            BoostConfig.get().abGains.put(tests.get(i).name(), (int) Math.round(gain)); // presets read the Render Scale ones
         }
+        BoostConfig.save();
         best.sort((a, b) -> Double.compare(Double.parseDouble(b.substring(0, b.indexOf('%'))), Double.parseDouble(a.substring(0, a.indexOf('%')))));
         Path file = FabricLoader.getInstance().getConfigDir().resolve("minemeboost").resolve("benchmark-results.md");
         try {

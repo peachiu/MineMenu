@@ -152,6 +152,7 @@ public enum Preset {
         c.simpleItems = simpleItems;
         c.particleRange = particleRange;
         c.farMobDetail = farMobDetail;
+        c.renderScale = renderScale();
         // Smart Render Distance (if on) now works below this preset's distance.
         SmartRenderDistance.restartFrom(clampedRenderDistance(o));
         BoostConfig.save();
@@ -187,7 +188,46 @@ public enum Preset {
                 && c.itemDistance == itemDistance
                 && c.simpleItems == simpleItems
                 && c.particleRange == particleRange
-                && c.farMobDetail == farMobDetail;
+                && c.farMobDetail == farMobDetail
+                && c.renderScale == renderScale();
+    }
+
+    /**
+     * The Render Scale this preset uses on this PC. After an A/B test (Tools...), the low presets use the scale that
+     * really gave FPS here: Toaster 50% if that gained at least 15% (and 5% more than 75%), else 75% if that gained
+     * at least 8%; Potato and Intel iGPU 75% if that gained at least 8%. Without an A/B test only Toaster lowers it
+     * (to 75%), because the gain depends a lot on the graphics card. The higher presets always use 100%.
+     */
+    public int renderScale() {
+        java.util.Map<String, Integer> gains = BoostConfig.get().abGains;
+        Integer g75 = gains.get("Render Scale 75%");
+        Integer g50 = gains.get("Render Scale 50%");
+        boolean low = this == TOASTER || this == POTATO || this == INTEL_IGPU;
+        if (!low) {
+            return 100;
+        }
+        if (g75 == null || g50 == null) {
+            return this == TOASTER ? 75 : 100;
+        }
+        if (this == TOASTER && g50 >= 15 && g50 >= g75 + 5) {
+            return 50;
+        }
+        return g75 >= 8 ? 75 : 100;
+    }
+
+    /** One line for the preset's tooltip: which Render Scale it uses and why. */
+    public String renderScaleNote() {
+        int scale = renderScale();
+        java.util.Map<String, Integer> gains = BoostConfig.get().abGains;
+        boolean low = this == TOASTER || this == POTATO || this == INTEL_IGPU;
+        if (!low) {
+            return "Render Scale: 100%.";
+        }
+        if (!gains.containsKey("Render Scale 75%")) {
+            return "Render Scale: " + scale + "%. Run the A/B test (Tools...) and this preset picks the best scale for your PC.";
+        }
+        return "Render Scale: " + scale + "% (your A/B test: 75% gave " + String.format("%+d%%", gains.get("Render Scale 75%"))
+                + ", 50% gave " + String.format("%+d%%", gains.getOrDefault("Render Scale 50%", 0)) + ").";
     }
 
     /** Same rule as vanilla: under 1 GB of memory caps render distance at 16. */

@@ -1,0 +1,118 @@
+package com.minemeboost.clienttest;
+
+import com.mineboost.BoostConfig;
+import com.mineboost.BoostScreen;
+import com.mineboost.doctor.LagDoctor;
+import com.mineboost.doctor.LagDoctorScreen;
+import com.mineboost.tools.BoostAB;
+import com.minemenu.CheatState;
+import com.minemenu.Feature;
+import com.minemenu.MineMenuClient;
+import com.minemenu.MineMenuScreen;
+import com.minemenu.ServerCheats;
+import com.minemenu.Waypoints;
+import com.minemenu.build.BlockPlacer;
+import com.minemenu.build.Clipboard;
+import com.minemenu.build.GravityGun;
+import com.minemenu.build.UndoStack;
+import com.minemenu.combat.MindControl;
+import com.minemenu.core.CheatConfig;
+import com.minemenu.core.FeatureSettings;
+import com.minemenu.core.Guard;
+import com.minemenu.core.KeyBinds;
+import com.minemenu.esp.EspModules;
+import com.minemenu.esp.SectionScanner;
+import com.minemenu.fun.FunEvents;
+import com.minemenu.hud.BigMapScreen;
+import com.minemenu.player.Freecam;
+import com.minemenu.player.Morph;
+import com.minemenu.player.PlayerModules;
+import com.minemenu.ui.CommandPalette;
+import com.minemenu.ui.MenuEntries;
+import com.minemenu.ui.Profiles;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.resource.DataConfiguration;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.gen.GeneratorOptions;
+import net.minecraft.world.gen.WorldPresets;
+import net.minecraft.world.level.LevelInfo;
+import org.lwjgl.glfw.GLFW;
+
+/** Multiplayer: joins a dedicated server on localhost:25599 and checks that cheats stay off. */
+class MpSuite extends Harness {
+    MpSuite() {
+        super("mp");
+    }
+
+    @Override
+    protected void build() {
+        buildMultiplayer();
+    }
+
+    private void buildMultiplayer() {
+        step(100, c -> {});
+        step(60, c -> {
+            log.add("connected to a server: " + (c.getCurrentServerEntry() != null));
+            check("Multiplayer: not seen as singleplayer", !MineMenuClient.isSingleplayer(c));
+            on(Feature.FLY);
+            on(Feature.ORE_VISION);
+            on(Feature.CHEST_ESP);
+            on(Feature.MINIMAP);
+            on(Feature.INFO_HUD);
+            on(Feature.FREECAM);
+            on(Feature.FULL_BRIGHT);
+            on(Feature.MOB_HEALTH_BARS);
+        });
+        step(60, c -> {
+            check("Multiplayer: Fly not granted", !c.player.getAbilities().allowFlying);
+            check("Multiplayer: Freecam not active", !Freecam.active() && c.getCameraEntity() == c.player);
+            check("Multiplayer: Full Bright not active", !PlayerModules.fullBrightOn);
+            check("Multiplayer: Ore Vision doesn't scan", SectionScanner.cachedSections() == 0);
+            check("Multiplayer: Chest ESP doesn't scan", EspModules.chestCount() == 0);
+            check("Multiplayer: Health bars off", !com.minemenu.hud.HealthBars.on);
+            shot(c, "mp_hud.png");
+            c.setScreen(new MineMenuScreen());
+        });
+        step(10, c -> { shot(c, "mp_menu.png"); c.setScreen(new BoostScreen(null, c.options)); });
+        step(10, c -> { shot(c, "mp_boost.png"); c.setScreen(null); BoostConfig.get().renderScale = 75; });
+        step(20, c -> { shot(c, "mp_renderscale75.png"); check("Multiplayer: Render Scale works", com.mineboost.renderscale.RenderScale.active(c)); BoostConfig.get().renderScale = 100; });
+        step(5, c -> { for (Feature f : Feature.values()) off(f); });
+    }
+
+}

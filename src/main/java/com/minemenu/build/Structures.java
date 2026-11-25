@@ -48,8 +48,7 @@ public final class Structures {
         if (at == null) {
             return;
         }
-        var source = player.getCommandSource().withLevel(4);
-        player.getServer().getCommandManager().executeWithPrefix(source, "place structure " + id + " " + at.getX() + " " + at.getY() + " " + at.getZ());
+        VanillaStructures.place(player, id, at); // remembers the area first, so Undo works
     }
 
     public static void place(ServerPlayerEntity player, Built kind) {

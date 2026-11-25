@@ -29,6 +29,8 @@
   "mineboost.option.render_scale_filter": "Upscale Filter",
   "mineboost.option.dynamic_render_scale": "Dynamic Render Scale",
   "mineboost.option.render_scale_min": "Dynamic Scale Minimum",
+  "mineboost.option.render_scale_sharpen": "Sharpen (CAS)",
+  "mineboost.option.impostors": "Impostors",
   "mineboost.option.section_culling": "Section Culling",
   "mineboost.option.far_entity_ticks": "Far Entity Ticks (beta)",
   "mineboost.option.smooth_fog": "Smooth Fog Edge",

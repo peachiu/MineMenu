@@ -83,7 +83,7 @@ public class BoostScreen extends GameOptionsScreen {
             }
             presets.add(ButtonWidget.builder(label, b -> applyPreset(preset))
                     .width(Math.max(40, this.textRenderer.getWidth(label) + 10))
-                    .tooltip(Tooltip.of(Text.literal(preset.description()
+                    .tooltip(Tooltip.of(Text.literal(preset.description() + "\n\n" + preset.renderScaleNote()
                             + (active ? "\n\nThis preset is active." : "\n\nClick to apply."))))
                     .build());
         }
@@ -119,6 +119,10 @@ public class BoostScreen extends GameOptionsScreen {
         String scaleReason = com.mineboost.renderscale.RenderScale.unavailableReason(this.client);
         if (scaleReason != null) {
             lock(BoostOptions.renderScaleOption, scaleReason);
+            lock(BoostOptions.renderScaleSharpenOption, scaleReason);
+        }
+        if (Compat.IRIS) {
+            lock(BoostOptions.impostorsOption, "Off with Iris: shader packs draw mobs their own way.");
         }
         if (Compat.SODIUM || Compat.ENTITYCULLING) {
             lock(BoostOptions.sectionCullingOption, Compat.SODIUM ? "Off: Sodium already skips entities in hidden sections."
@@ -294,6 +298,8 @@ public class BoostScreen extends GameOptionsScreen {
                 java.util.Map.entry("mineboost.option.hide_vignette", "Tiny (about one full-screen layer less per frame)."),
                 java.util.Map.entry("mineboost.option.fps_overlay", "None (it only shows the numbers)."),
                 java.util.Map.entry("mineboost.option.render_scale", IMPACT_RENDER_SCALE),
+                java.util.Map.entry("mineboost.option.impostors", "Measured below."),
+                java.util.Map.entry("mineboost.option.render_scale_sharpen", "None by itself; costs about 9 texture reads per pixel while Render Scale is on (measured below)."),
                 java.util.Map.entry("mineboost.option.dynamic_render_scale", "Holds your FPS target by trading sharpness for FPS only when needed."),
                 java.util.Map.entry("mineboost.option.section_culling", IMPACT_SECTION_CULLING),
                 java.util.Map.entry("mineboost.option.far_entity_ticks", IMPACT_FAR_TICKS),
@@ -327,7 +333,9 @@ public class BoostScreen extends GameOptionsScreen {
 
         /** The biggest boosts, shown first. */
         static SimpleOption<Integer> renderScaleOption;
+        static SimpleOption<Integer> renderScaleSharpenOption;
         static SimpleOption<Boolean> sectionCullingOption;
+        static SimpleOption<Integer> impostorsOption;
 
         static SimpleOption<?>[] smart(GameOptions gameOptions) {
             BoostConfig c = BoostConfig.get();
@@ -477,9 +485,18 @@ public class BoostScreen extends GameOptionsScreen {
                     toggle("mineboost.option.render_scale_filter",
                             "How Render Scale stretches the picture: ON = Nearest (sharp pixels, a bit faster), OFF = Linear (smooth).",
                             c.renderScaleNearest, v -> c.renderScaleNearest = v),
+                    renderScaleSharpenOption = listSlider("mineboost.option.render_scale_sharpen",
+                            "Sharpen (CAS) for Render Scale: makes the smaller picture look crisp again, without halos around "
+                                    + "edges. Only used while Render Scale is below 100%.",
+                            BoostConfig.SHARPEN_LEVELS, c.renderScaleSharpen, v -> v == 0 ? "Off" : v + "%", v -> c.renderScaleSharpen = v),
                     listSlider("mineboost.option.render_scale_min",
                             "The lowest scale Dynamic Render Scale may go down to.",
                             BoostConfig.RENDER_SCALES, c.renderScaleMin, v -> v + "%", v -> c.renderScaleMin = v),
+                    impostorsOption = listSlider("mineboost.option.impostors",
+                            "Impostors: mobs farther than this are drawn as a flat picture of themselves that turns "
+                                    + "towards you, instead of the full model with armor and items. They don't animate, so "
+                                    + "use it for far mobs only. Players, bosses and glowing mobs are always drawn normally.",
+                            BoostConfig.IMPOSTOR_DISTANCES, c.impostorDistance, v -> v == 0 ? "Off" : v + " blocks", v -> c.impostorDistance = v),
                     sectionCullingOption = toggle("mineboost.option.section_culling",
                             "Section Culling: the game already knows which chunk sections you can't see (caves under you, "
                                     + "behind hills) but still draws the mobs in them. This skips those mobs.",

@@ -22,6 +22,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /** Entity render distance: skip drawing mobs, items, item frames etc. beyond the limit. */
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
+    /** Impostors: far mobs as a flat picture (one config check while off). */
+    @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            at = @At("HEAD"), cancellable = true)
+    private void mineboost$impostor(Entity entity, double x, double y, double z, float yaw, float tickDelta,
+                                    net.minecraft.client.util.math.MatrixStack matrices, net.minecraft.client.render.VertexConsumerProvider consumers,
+                                    int light, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (com.mineboost.Impostors.enabled()) {
+            try {
+                if (com.mineboost.Impostors.draw(entity, x, y, z, matrices, consumers, light)) {
+                    ci.cancel();
+                }
+            } catch (Throwable t) {
+                com.mineboost.BoostGuard.fail("Impostors", t, () -> BoostConfig.get().impostorDistance = 0);
+            }
+        }
+    }
+
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private <E extends Entity> void mineboost$limitDistance(E entity, Frustum frustum, double x, double y, double z,
                                                          CallbackInfoReturnable<Boolean> cir) {

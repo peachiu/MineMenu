@@ -72,7 +72,7 @@ public final class BuildTools {
         return names;
     }
 
-    private static Path file(String name) {
+    public static Path schematicFile(String name) {
         String safe = name.replaceAll("[^A-Za-z0-9 _.-]", "_").trim();
         return SCHEMATICS.resolve((safe.isEmpty() ? "schematic" : safe) + ".nbt");
     }
@@ -85,7 +85,7 @@ public final class BuildTools {
         }
         try {
             Files.createDirectories(SCHEMATICS);
-            NbtIo.writeCompressed(template.writeNbt(new NbtCompound()), file(name));
+            NbtIo.writeCompressed(template.writeNbt(new NbtCompound()), schematicFile(name));
             player.sendMessage(Text.literal("Saved schematic " + name).formatted(Formatting.GREEN), true);
         } catch (Exception e) {
             player.sendMessage(Text.literal("Couldn't save: " + e.getMessage()).formatted(Formatting.RED), true);
@@ -95,7 +95,7 @@ public final class BuildTools {
     public static void loadSchematic(ServerPlayerEntity player, String name) {
         MinecraftServer server = player.getServer();
         try {
-            NbtCompound nbt = NbtIo.readCompressed(file(name), NbtSizeTracker.ofUnlimitedBytes());
+            NbtCompound nbt = NbtIo.readCompressed(schematicFile(name), NbtSizeTracker.ofUnlimitedBytes());
             StructureTemplate template = new StructureTemplate();
             template.readNbt(server.getRegistryManager().getWrapperOrThrow(RegistryKeys.BLOCK), nbt);
             Clipboard.set(template);

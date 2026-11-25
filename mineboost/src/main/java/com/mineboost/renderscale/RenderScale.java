@@ -86,7 +86,7 @@ public final class RenderScale {
         } finally {
             accessor.mineboost$setFramebuffer(main);
             main.beginWrite(true);
-            target.draw(fullWidth, fullHeight, true);
+            Sharpen.drawScaled(target, fullWidth, fullHeight);
             main.beginWrite(true);
         }
     }

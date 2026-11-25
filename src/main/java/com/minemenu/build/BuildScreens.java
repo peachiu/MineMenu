@@ -33,18 +33,7 @@ public final class BuildScreens {
     }
 
     static Screen schematics(Screen parent) {
-        List<PickerScreen.Choice> choices = new ArrayList<>();
-        for (String name : BuildTools.listSchematics()) {
-            choices.add(new PickerScreen.Choice(name, name));
-        }
-        ButtonWidget save = ButtonWidget.builder(Text.literal("Save copy as..."), b -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            client.setScreen(new NameScreen(client.currentScreen, "Schematic name", name -> server(p -> BuildTools.saveSchematic(p, name))));
-        }).build();
-        return new PickerScreen(parent, "Schematics (click one to load and paste)", choices, choice -> {
-            MinecraftClient.getInstance().setScreen(null);
-            server(p -> BuildTools.loadSchematic(p, choice.id()));
-        }, List.of(save));
+        return new SchematicBrowserScreen(parent);
     }
 
     static Screen structures(Screen parent) {

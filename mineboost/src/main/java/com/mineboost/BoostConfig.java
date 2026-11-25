@@ -76,12 +76,18 @@ public final class BoostConfig {
     public Benchmark.Result lastBenchmark = null;
 
     // --- MineBoost 2.4 (MineMeBoost 3.4) ---
-    /** File format version: 0 = 2.3 or older (no field), 1 = 2.4. See {@link #migrate()}. */
+    /** File format version: 0 = 2.3 or older (no field), 1 = 2.4, 2 = 2.5. See {@link #migrate()}. */
     public int configVersion = 0;
     /** Render Scale: the world is drawn at this % of the window's resolution (HUD stays sharp). 100 = off. */
     public int renderScale = 100;
     /** Upscale filter: true = Nearest (pixelated, fastest), false = Linear (smooth). */
     public boolean renderScaleNearest = false;
+    /** Sharpen (CAS) strength 0-100 when Render Scale is below 100%; 0 = plain stretch. */
+    public int renderScaleSharpen = 50;
+    /** Impostors: mobs farther than this (blocks) are drawn as a flat picture of themselves. 0 = off. */
+    public int impostorDistance = 0;
+    /** Gains (percent) from the last A/B test on this PC, by test name; presets use the Render Scale ones. */
+    public java.util.Map<String, Integer> abGains = new java.util.HashMap<>();
     /** Dynamic Render Scale: moves between {@link #renderScaleMin} and {@link #renderScale} to hold the FPS target. */
     public boolean dynamicRenderScale = false;
     public int renderScaleMin = 50;
@@ -104,6 +110,8 @@ public final class BoostConfig {
     public boolean contextRules = false;
 
     public static final int[] RENDER_SCALES = {50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100};
+    public static final int[] IMPOSTOR_DISTANCES = {0, 16, 24, 32, 48, 64};
+    public static final int[] SHARPEN_LEVELS = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     public static final int[] MAX_SOUNDS = {0, 16, 32, 64};
 
     public static final int[] FAR_MOB_DETAIL = {12, 16, 24, 32, 48, -1};
@@ -142,6 +150,13 @@ public final class BoostConfig {
         if (configVersion < 1) {
             // 2.3 and older: the new fields already have their defaults; nothing to convert.
             configVersion = 1;
+        }
+        if (configVersion < 2) {
+            // 2.4: Sharpen and A/B results are new; their defaults are already set.
+            configVersion = 2;
+        }
+        if (abGains == null) {
+            abGains = new java.util.HashMap<>();
         }
         if (contextPresets == null) {
             contextPresets = new java.util.HashMap<>();
@@ -227,6 +242,10 @@ public final class BoostConfig {
         }
         renderScale = Math.max(50, Math.min(100, renderScale / 5 * 5));
         renderScaleMin = Math.max(50, Math.min(renderScale, renderScaleMin / 5 * 5));
+        renderScaleSharpen = Math.max(0, Math.min(100, renderScaleSharpen / 10 * 10));
+        if (java.util.Arrays.stream(IMPOSTOR_DISTANCES).noneMatch(d -> d == impostorDistance)) {
+            impostorDistance = 0;
+        }
         if (indexOf(MAX_SOUNDS, maxSounds) < 0) {
             maxSounds = 0;
         }
