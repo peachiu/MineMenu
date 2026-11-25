@@ -39,10 +39,10 @@ public final class RenderScale {
     /** Why it can't run right now, or null if it can. */
     public static String unavailableReason(MinecraftClient client) {
         if (Compat.IRIS) {
-            return "Not available with Iris (shaders have their own resolution settings).";
+            return com.mineboost.Tr.get("mineboost.render_scale.iris", "Not available with Iris (shaders have their own resolution settings).");
         }
         if (client.options.getGraphicsMode().getValue() == GraphicsMode.FABULOUS) {
-            return "Not available with Fabulous graphics. Use Fancy or Fast.";
+            return com.mineboost.Tr.get("mineboost.render_scale.fabulous", "Not available with Fabulous graphics. Use Fancy or Fast.");
         }
         return null;
     }

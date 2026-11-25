@@ -20,7 +20,7 @@ public class XpScreen extends Screen {
     private ButtonWidget addButton;
 
     public XpScreen(Screen parent) {
-        super(Text.literal("Give XP"));
+        super(Text.translatable("minemenu.text.give_xp"));
         this.parent = parent;
     }
 
@@ -30,33 +30,33 @@ public class XpScreen extends Screen {
         int y = this.height / 2 - 30;
 
         String previous = levelsField != null ? levelsField.getText() : "";
-        levelsField = new TextFieldWidget(this.textRenderer, left, y, PANEL_WIDTH, 20, Text.literal("Levels"));
+        levelsField = new TextFieldWidget(this.textRenderer, left, y, PANEL_WIDTH, 20, Text.translatable("minemenu.text.levels"));
         levelsField.setMaxLength(6);
         levelsField.setTextPredicate(text -> text.chars().allMatch(Character::isDigit));
-        levelsField.setPlaceholder(Text.literal("Levels, e.g. 64").formatted(Formatting.DARK_GRAY));
+        levelsField.setPlaceholder(Text.translatable("minemenu.text.levels_e_g_64").formatted(Formatting.DARK_GRAY));
         levelsField.setText(previous);
         levelsField.setChangedListener(text -> updateButtons());
         addDrawableChild(levelsField);
 
         int buttonWidth = (PANEL_WIDTH - 4) / 2;
         y += 26;
-        setButton = addDrawableChild(ButtonWidget.builder(Text.literal("Set Level").formatted(Formatting.GREEN), b -> give(true))
+        setButton = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.set_level").formatted(Formatting.GREEN), b -> give(true))
                 .dimensions(left, y, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Your level becomes exactly this number. Enter does this too.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.your_level_becomes_exactly_this_number")))
                 .build());
-        addButton = addDrawableChild(ButtonWidget.builder(Text.literal("Add Levels"), b -> give(false))
+        addButton = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.add_levels"), b -> give(false))
                 .dimensions(left + buttonWidth + 4, y, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Add this many levels on top of what you have.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.add_this_many_levels_on_top")))
                 .build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Reset to 0"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.reset_to_0"), b -> {
                     levelsField.setText("0");
                     give(true);
                 })
                 .dimensions(left, y, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Remove all your XP.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.remove_all_your_xp")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close())
                 .dimensions(left + buttonWidth + 4, y, buttonWidth, 20)
                 .build());
 
@@ -118,11 +118,11 @@ public class XpScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         int top = this.height / 2 - 30;
         context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("Give XP").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+                Text.translatable("minemenu.text.give_xp").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                 this.width / 2, top - 30, 0xFFFFFF);
         if (this.client != null && this.client.player != null) {
             context.drawCenteredTextWithShadow(this.textRenderer,
-                    Text.literal("You have " + this.client.player.experienceLevel + " levels. How many do you want?")
+                    Text.translatable("minemenu.text.you_have_s_levels_how_many", this.client.player.experienceLevel)
                             .formatted(Formatting.GRAY),
                     this.width / 2, top - 14, 0xFFFFFF);
         }

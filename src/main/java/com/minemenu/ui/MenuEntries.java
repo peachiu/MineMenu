@@ -71,12 +71,12 @@ public final class MenuEntries {
             Waypoints.Waypoint w = Waypoints.get(i);
             if (w != null) {
                 int slot = i;
-                list.add(new MenuEntry("waypoint:" + slot, "Go to " + w.name, "Teleport to the waypoint " + w.name + ".", null,
+                list.add(new MenuEntry("waypoint:" + slot, com.minemenu.core.Tr.format("minemenu.entry.go_to", "Go to %s", w.name), com.minemenu.core.Tr.format("minemenu.entry.go_to.desc", "Teleport to the waypoint %s.", w.name), null,
                         MenuEntry.Kind.WAYPOINT, null, onServer(player -> Waypoints.go(player, slot)), false));
             }
         }
         for (CheatConfig.Macro macro : CheatConfig.get().macros) {
-            list.add(new MenuEntry("macro:" + macro.name, "Macro: " + macro.name, String.join(", ", macro.steps), null,
+            list.add(new MenuEntry("macro:" + macro.name, com.minemenu.core.Tr.format("minemenu.entry.macro", "Macro: %s", macro.name), String.join(", ", macro.steps), null,
                     MenuEntry.Kind.MACRO, null, (client, parent) -> com.minemenu.hud.Macros.run(macro), false));
         }
         list.addAll(extra.get());

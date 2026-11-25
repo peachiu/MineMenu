@@ -69,9 +69,9 @@ public final class DeleteMode {
             if (!active || !isInventory(screen)) {
                 return;
             }
-            ButtonWidget undo = ButtonWidget.builder(Text.literal("Undo Delete"), b -> undo(client))
+            ButtonWidget undo = ButtonWidget.builder(Text.translatable("minemenu.text.undo_delete"), b -> undo(client))
                     .dimensions(scaledWidth / 2 - 50, scaledHeight - 24, 100, 20)
-                    .tooltip(Tooltip.of(Text.literal("Give back the last item you deleted.")))
+                    .tooltip(Tooltip.of(Text.translatable("minemenu.text.give_back_the_last_item_you")))
                     .build();
             undo.active = undoable > 0;
             Screens.getButtons(screen).add(undo);
@@ -94,7 +94,7 @@ public final class DeleteMode {
         }
         MinecraftClient client = MinecraftClient.getInstance();
         context.drawCenteredTextWithShadow(client.textRenderer,
-                Text.literal("DELETE MODE: right-click an item to delete it").formatted(Formatting.RED, Formatting.BOLD),
+                Text.translatable("minemenu.text.delete_mode_right_click_an_item").formatted(Formatting.RED, Formatting.BOLD),
                 screen.width / 2, 6, 0xFFFFFF);
         HandledScreenAccessor accessor = (HandledScreenAccessor) screen;
         Slot slot = accessor.minemenu$getFocusedSlot();

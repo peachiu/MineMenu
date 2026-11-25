@@ -33,7 +33,7 @@ public class FormScreen extends Screen {
     private String message = "";
 
     public FormScreen(Screen parent, String heading, List<Field> fields, List<String> toggles, List<Action> actions, Map<String, String> values) {
-        super(Text.literal(heading));
+        super(Text.translatable(heading));
         this.parent = parent;
         this.heading = heading;
         this.fields = fields;
@@ -61,10 +61,10 @@ public class FormScreen extends Screen {
             Field field = fields.get(i);
             int x = left + (i % 2) * (columnWidth + 8);
             int y = top + (i / 2) * rowHeight + 10;
-            TextFieldWidget widget = new TextFieldWidget(this.textRenderer, x, y, columnWidth, 18, Text.literal(field.label()));
+            TextFieldWidget widget = new TextFieldWidget(this.textRenderer, x, y, columnWidth, 18, Text.translatable(field.label()));
             widget.setMaxLength(512);
             widget.setText(values.getOrDefault(field.key(), ""));
-            widget.setPlaceholder(Text.literal(field.hint()).formatted(Formatting.DARK_GRAY));
+            widget.setPlaceholder(Text.translatable(field.hint()).formatted(Formatting.DARK_GRAY));
             widget.setChangedListener(text -> values.put(field.key(), text));
             addDrawableChild(widget);
         }
@@ -73,7 +73,7 @@ public class FormScreen extends Screen {
         for (int i = 0; i < toggles.size(); i++) {
             String key = toggles.get(i);
             boolean on = "true".equals(values.get(key));
-            addDrawableChild(ButtonWidget.builder(Text.literal(key + ": " + (on ? "ON" : "OFF")), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.translatable(com.minemenu.core.Tr.get("minemenu.form." + key.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]+", "_"), key)).append(": ").append(Text.translatable(on ? "minemenu.text.on" : "minemenu.text.off")), b -> {
                 values.put(key, on ? "false" : "true");
                 clearAndInit();
             }).dimensions(left + i * (toggleWidth + 4), y, toggleWidth, 20).build());
@@ -82,26 +82,26 @@ public class FormScreen extends Screen {
         int buttonWidth = Math.min(100, (columnWidth * 2 + 8 - actions.size() * 4) / (actions.size() + 1));
         int x = this.width / 2 - ((actions.size() + 1) * (buttonWidth + 4) - 4) / 2;
         for (Action action : actions) {
-            addDrawableChild(ButtonWidget.builder(Text.literal(action.label()), b -> action.run().accept(values))
-                    .dimensions(x, bottom, buttonWidth, 20).tooltip(Tooltip.of(Text.literal(action.label()))).build());
+            addDrawableChild(ButtonWidget.builder(Text.translatable(action.label()), b -> action.run().accept(values))
+                    .dimensions(x, bottom, buttonWidth, 20).tooltip(Tooltip.of(Text.translatable(action.label()))).build());
             x += buttonWidth + 4;
         }
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close()).dimensions(x, bottom, buttonWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close()).dimensions(x, bottom, buttonWidth, 20).build());
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(heading).formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable(heading).formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
         int columnWidth = Math.min(200, (this.width - 24) / 2);
         int left = this.width / 2 - columnWidth - 4;
         int rowHeight = this.height < 300 ? 30 : 34;
         for (int i = 0; i < fields.size(); i++) {
             int x = left + (i % 2) * (columnWidth + 8);
             int y = 24 + (i / 2) * rowHeight;
-            context.drawTextWithShadow(this.textRenderer, Text.literal(fields.get(i).label()).formatted(Formatting.GRAY), x, y, 0xFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, Text.translatable(fields.get(i).label()).formatted(Formatting.GRAY), x, y, 0xFFFFFF);
         }
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(message).formatted(Formatting.GREEN), this.width / 2, this.height - 36, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable(message).formatted(Formatting.GREEN), this.width / 2, this.height - 36, 0xFFFFFF);
     }
 
     @Override

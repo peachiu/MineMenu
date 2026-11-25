@@ -281,6 +281,11 @@ public final class Impostors {
         bakeOrder.clear();
     }
 
+    /** For tests: how many kinds of mob are waiting for their picture. */
+    public static int waiting() {
+        return toBake.size();
+    }
+
     /** For tests: how many kinds of mob have a picture. */
     public static int count() {
         return impostors.size();

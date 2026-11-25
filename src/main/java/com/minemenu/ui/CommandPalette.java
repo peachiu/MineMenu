@@ -27,15 +27,15 @@ public class CommandPalette extends Screen {
     private int selected;
 
     public CommandPalette(@Nullable Screen parent) {
-        super(Text.literal("Command Palette"));
+        super(Text.translatable("minemenu.text.command_palette"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         String text = field != null ? field.getText() : "";
-        field = new TextFieldWidget(this.textRenderer, (this.width - WIDTH) / 2, 30, WIDTH, 20, Text.literal("Search"));
-        field.setPlaceholder(Text.literal("Type a hack, action, preset or waypoint...").formatted(Formatting.DARK_GRAY));
+        field = new TextFieldWidget(this.textRenderer, (this.width - WIDTH) / 2, 30, WIDTH, 20, Text.translatable("minemenu.text.search"));
+        field.setPlaceholder(Text.translatable("minemenu.text.type_a_hack_action_preset_or").formatted(Formatting.DARK_GRAY));
         field.setMaxLength(64);
         field.setText(text);
         field.setChangedListener(t -> refresh());
@@ -102,7 +102,7 @@ public class CommandPalette extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         int left = (this.width - WIDTH) / 2;
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Command Palette").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.command_palette").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                 this.width / 2, 14, 0xFFFFFF);
         int y = 56;
         for (int i = 0; i < results.size(); i++) {
@@ -112,7 +112,7 @@ public class CommandPalette extends Screen {
                 context.fill(left - 2, y - 2, left + WIDTH + 2, y + ROW - 2, i == selected ? 0x80FF55FF : 0x40FFFFFF);
             }
             String kind = switch (entry.kind()) {
-                case HACK -> entry.isOn() != null && entry.isOn().getAsBoolean() ? "ON " : "OFF";
+                case HACK -> entry.isOn() != null && entry.isOn().getAsBoolean() ? "ON " : "OFF"; // short tags, same in every language
                 case ACTION -> "run";
                 case SCREEN -> "open";
                 case PRESET -> "FPS";
@@ -120,7 +120,7 @@ public class CommandPalette extends Screen {
                 case MACRO -> "macro";
             };
             int kindColor = kind.equals("ON ") ? 0x55FF55 : kind.equals("OFF") ? 0xFF5555 : 0xAAAAAA;
-            context.drawTextWithShadow(this.textRenderer, Text.literal(kind), left, y, kindColor);
+            context.drawTextWithShadow(this.textRenderer, Text.literal(com.minemenu.core.Tr.get("minemenu.palette." + kind.trim().toLowerCase(java.util.Locale.ROOT), kind)), left, y, kindColor);
             Text name = Text.literal((CheatConfig.get().isFavorite(entry.id()) ? "★ " : "") + entry.name());
             context.drawTextWithShadow(this.textRenderer, name, left + 34, y, 0xFFFFFF);
             if (entry.category() != null) {
@@ -130,7 +130,7 @@ public class CommandPalette extends Screen {
             y += ROW;
         }
         if (results.isEmpty()) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Nothing found").formatted(Formatting.GRAY), this.width / 2, 60, 0xFFFFFF);
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.nothing_found").formatted(Formatting.GRAY), this.width / 2, 60, 0xFFFFFF);
         } else if (selected >= 0 && selected < results.size()) {
             String description = results.get(selected).description();
             context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(description.length() > 90 ? description.substring(0, 88) + "..." : description)

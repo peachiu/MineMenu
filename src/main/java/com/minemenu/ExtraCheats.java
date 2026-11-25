@@ -338,7 +338,7 @@ public final class ExtraCheats {
             world.spawnEntity(wolf);
             spawned++;
         }
-        player.sendMessage(Text.literal(spawned + " wolves are on your side!").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.s_wolves_are_on_your_side", spawned).formatted(Formatting.GREEN), true);
     }
 
     public static void clearGroundItems(ServerPlayerEntity player) {
@@ -351,8 +351,7 @@ public final class ExtraCheats {
             entity.discard();
             cleared++;
         }
-        player.sendMessage(Text.literal(cleared == 0 ? "Nothing on the ground"
-                : "Cleared " + cleared + " item" + (cleared == 1 ? "" : "s") + " from the ground").formatted(Formatting.GREEN), true);
+        player.sendMessage((cleared == 0 ? Text.translatable("minemenu.text.nothing_on_the_ground") : Text.translatable("minemenu.text.cleared_s_item_s_from_the", cleared, (cleared == 1 ? "" : "s"))).formatted(Formatting.GREEN), true);
     }
 
     public static void fireball(ServerPlayerEntity player) {

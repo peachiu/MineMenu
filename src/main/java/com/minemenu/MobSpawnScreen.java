@@ -34,7 +34,7 @@ public class MobSpawnScreen extends Screen {
     private ButtonWidget amountButton;
 
     public MobSpawnScreen(Screen parent) {
-        super(Text.literal("Spawn Mob"));
+        super(Text.translatable("minemenu.text.spawn_mob"));
         this.parent = parent;
     }
 
@@ -44,8 +44,8 @@ public class MobSpawnScreen extends Screen {
         int top = 20;
 
         String previousSearch = search != null ? search.getText() : "";
-        search = new TextFieldWidget(this.textRenderer, left, top, PANEL_WIDTH, 18, Text.literal("Search"));
-        search.setPlaceholder(Text.literal("Search mobs...").formatted(Formatting.DARK_GRAY));
+        search = new TextFieldWidget(this.textRenderer, left, top, PANEL_WIDTH, 18, Text.translatable("minemenu.text.search"));
+        search.setPlaceholder(Text.translatable("minemenu.text.search_mobs").formatted(Formatting.DARK_GRAY));
         search.setText(previousSearch);
         addDrawableChild(search);
 
@@ -64,13 +64,13 @@ public class MobSpawnScreen extends Screen {
                     spawnButton.setMessage(spawnLabel());
                 })
                 .dimensions(left, buttonY, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("How many to spawn at once: 1, 5 or 10.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.how_many_to_spawn_at_once")))
                 .build());
         spawnButton = addDrawableChild(ButtonWidget.builder(spawnLabel(), b -> spawnSelected())
                 .dimensions(left + buttonWidth + 4, buttonY, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Spawn on the block you're looking at. Double-clicking a mob works too.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.spawn_on_the_block_you_re")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close())
                 .dimensions(left + 2 * (buttonWidth + 4), buttonY, buttonWidth, 20)
                 .build());
         updateSpawnButton();
@@ -78,11 +78,11 @@ public class MobSpawnScreen extends Screen {
     }
 
     private Text amountLabel() {
-        return Text.literal("Amount: " + CheatState.spawnAmount());
+        return Text.translatable("minemenu.text.amount_s", CheatState.spawnAmount());
     }
 
     private Text spawnLabel() {
-        return Text.literal("Spawn").formatted(Formatting.GREEN);
+        return Text.translatable("minemenu.text.spawn").formatted(Formatting.GREEN);
     }
 
     private void updateSpawnButton() {
@@ -134,7 +134,7 @@ public class MobSpawnScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("Spawn Mob").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+                Text.translatable("minemenu.text.spawn_mob").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                 this.width / 2, 7, 0xFFFFFF);
     }
 
@@ -215,7 +215,7 @@ public class MobSpawnScreen extends Screen {
 
         @Override
         public Text getNarration() {
-            return Text.literal("Spawn " + name.getString());
+            return Text.translatable("minemenu.text.spawn_s", name.getString());
         }
 
         @Override

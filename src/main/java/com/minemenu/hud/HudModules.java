@@ -177,7 +177,7 @@ public final class HudModules {
         int chaos = FunModules.chaosTicksLeft;
         if (singleplayer && CheatState.isOn(Feature.CHAOS_MODE) && chaos > 0) {
             int seconds = chaos / 20;
-            context.drawCenteredTextWithShadow(client.textRenderer, Text.literal(String.format("Chaos in %d:%02d", seconds / 60, seconds % 60))
+            context.drawCenteredTextWithShadow(client.textRenderer, Text.translatable("minemenu.hud.chaos_in", String.format("%d:%02d", seconds / 60, seconds % 60))
                     .formatted(Formatting.LIGHT_PURPLE), context.getScaledWindowWidth() / 2, 4, 0xFFFFFF);
         }
     }
@@ -189,31 +189,31 @@ public final class HudModules {
             lines.add(String.format("§7XYZ §f%d %d %d", p.getBlockX(), p.getBlockY(), p.getBlockZ()));
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "direction")) {
-            String[] names = {"South", "South-West", "West", "North-West", "North", "North-East", "East", "South-East"};
+            String[] names = {"south", "south_west", "west", "north_west", "north", "north_east", "east", "south_east"};
             int index = Math.floorMod(Math.round(MathHelper.wrapDegrees(p.getYaw()) / 45f), 8);
-            lines.add("§7Facing §f" + names[index]);
+            lines.add("§7" + com.minemenu.core.Tr.get("minemenu.hud.facing", "Facing") + " §f" + com.minemenu.core.Tr.get("minemenu.hud.dir." + names[index], names[index]));
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "biome")) {
-            lines.add("§7Biome §f" + client.world.getBiome(p.getBlockPos()).getKey().map(k -> k.getValue().getPath().replace('_', ' ')).orElse("?"));
+            lines.add("§7" + com.minemenu.core.Tr.get("minemenu.hud.biome", "Biome") + " §f" + client.world.getBiome(p.getBlockPos()).getKey().map(k -> k.getValue().getPath().replace('_', ' ')).orElse("?"));
         }
         long time = client.world.getTimeOfDay();
         if (FeatureSettings.is(Feature.INFO_HUD, "time")) {
             int minutes = (int) ((time % 24000 / 1000.0 + 6) * 60) % (24 * 60);
-            lines.add(String.format("§7Time §f%02d:%02d", minutes / 60, minutes % 60));
+            lines.add(String.format("§7%s §f%02d:%02d", com.minemenu.core.Tr.get("minemenu.hud.time", "Time"), minutes / 60, minutes % 60));
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "day")) {
-            lines.add("§7Day §f" + (time / 24000 + 1));
+            lines.add("§7" + com.minemenu.core.Tr.get("minemenu.hud.day", "Day") + " §f" + (time / 24000 + 1));
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "speed")) {
             double speed = p.getVelocity().multiply(1, 0, 1).length() * 20;
-            lines.add(String.format("§7Speed §f%.1f m/s", speed));
+            lines.add(String.format("§7%s §f%.1f m/s", com.minemenu.core.Tr.get("minemenu.hud.speed", "Speed"), speed));
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "chunk")) {
-            lines.add("§7Chunk §f" + p.getChunkPos().x + ", " + p.getChunkPos().z);
+            lines.add("§7" + com.minemenu.core.Tr.get("minemenu.hud.chunk", "Chunk") + " §f" + p.getChunkPos().x + ", " + p.getChunkPos().z);
         }
         if (FeatureSettings.is(Feature.INFO_HUD, "light") && client.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult hit) {
             BlockPos at = hit.getBlockPos().offset(hit.getSide());
-            lines.add("§7Light §f" + client.world.getLightLevel(LightType.BLOCK, at) + " §7(sky " + client.world.getLightLevel(LightType.SKY, at) + ")");
+            lines.add("§7" + com.minemenu.core.Tr.get("minemenu.hud.light", "Light") + " §f" + client.world.getLightLevel(LightType.BLOCK, at) + " §7(" + com.minemenu.core.Tr.get("minemenu.hud.sky", "sky") + " " + client.world.getLightLevel(LightType.SKY, at) + ")");
         }
         return lines;
     }

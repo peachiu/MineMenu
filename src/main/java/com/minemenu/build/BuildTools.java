@@ -43,14 +43,14 @@ public final class BuildTools {
 
     public static void fillWithHeld(ServerPlayerEntity player) {
         if (!(player.getMainHandStack().getItem() instanceof BlockItem blockItem)) {
-            player.sendMessage(Text.literal("Hold the block to fill with in your main hand").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.hold_the_block_to_fill_with").formatted(Formatting.YELLOW), true);
             return;
         }
-        fill(player, blockItem.getBlock().getDefaultState(), "Fill");
+        fill(player, blockItem.getBlock().getDefaultState(), "minemenu.job.fill");
     }
 
     public static void clear(ServerPlayerEntity player) {
-        fill(player, Blocks.AIR.getDefaultState(), "Clear");
+        fill(player, Blocks.AIR.getDefaultState(), "minemenu.job.clear");
     }
 
     // --- schematics ---
@@ -80,15 +80,15 @@ public final class BuildTools {
     public static void saveSchematic(ServerPlayerEntity player, String name) {
         StructureTemplate template = Clipboard.template();
         if (template == null) {
-            player.sendMessage(Text.literal("Copy something first").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.copy_something_first").formatted(Formatting.YELLOW), true);
             return;
         }
         try {
             Files.createDirectories(SCHEMATICS);
             NbtIo.writeCompressed(template.writeNbt(new NbtCompound()), schematicFile(name));
-            player.sendMessage(Text.literal("Saved schematic " + name).formatted(Formatting.GREEN), true);
+            player.sendMessage(Text.translatable("minemenu.text.saved_schematic_s", name).formatted(Formatting.GREEN), true);
         } catch (Exception e) {
-            player.sendMessage(Text.literal("Couldn't save: " + e.getMessage()).formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.couldn_t_save_s", e.getMessage()).formatted(Formatting.RED), true);
         }
     }
 
@@ -101,7 +101,7 @@ public final class BuildTools {
             Clipboard.set(template);
             Clipboard.startPreview(player);
         } catch (Exception e) {
-            player.sendMessage(Text.literal("Couldn't load " + name + ": " + e.getMessage()).formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.couldn_t_load_s_s", name, e.getMessage()).formatted(Formatting.RED), true);
         }
     }
 
@@ -127,7 +127,7 @@ public final class BuildTools {
                 }
             }
         }
-        player.sendMessage(Text.literal("Biome set to " + biomeId + " (" + pieces + " pieces). Leave and come back if colours look old.")
+        player.sendMessage(Text.translatable("minemenu.text.biome_set_to_s_s_pieces", biomeId, pieces)
                 .formatted(Formatting.GREEN), true);
     }
 }

@@ -202,18 +202,18 @@ public final class MoreCheats {
     public static void rideMob(ServerPlayerEntity player) {
         LivingEntity mob = lookedAtMob(player);
         if (mob == null) {
-            player.sendMessage(Text.literal("Look at a mob to ride it").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_mob_to_ride").formatted(Formatting.YELLOW), true);
             return;
         }
         if (player.startRiding(mob, true)) {
-            player.sendMessage(Text.literal("Riding a " + mob.getName().getString() + "! Sneak to get off").formatted(Formatting.GREEN), true);
+            player.sendMessage(Text.translatable("minemenu.text.riding_a_s_sneak_to_get", mob.getName().getString()).formatted(Formatting.GREEN), true);
         }
     }
 
     public static void resizeMob(ServerPlayerEntity player) {
         LivingEntity mob = lookedAtMob(player);
         if (mob == null) {
-            player.sendMessage(Text.literal("Look at a mob to resize it").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_mob_to_resize").formatted(Formatting.YELLOW), true);
             return;
         }
         EntityAttributeInstance scale = mob.getAttributeInstance(EntityAttributes.GENERIC_SCALE);
@@ -229,8 +229,8 @@ public final class MoreCheats {
             // Persistent: the mob stays that size, even after you reload the world.
             scale.addPersistentModifier(new EntityAttributeModifier(MOB_SIZE_ID, next, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }
-        String size = next > 0 ? "GIANT" : next < 0 ? "tiny" : "normal size";
-        player.sendMessage(Text.literal(mob.getName().getString() + " is now " + size).formatted(Formatting.LIGHT_PURPLE), true);
+        Text size = Text.translatable(next > 0 ? "minemenu.resize.giant" : next < 0 ? "minemenu.resize.tiny" : "minemenu.resize.normal");
+        player.sendMessage(Text.translatable("minemenu.text.s_is_now_s", mob.getName().getString(), size).formatted(Formatting.LIGHT_PURPLE), true);
     }
 
     private static final Set<EntityType<?>> NO_RAIN = Set.of(EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.WARDEN,
@@ -251,7 +251,7 @@ public final class MoreCheats {
                 spawned++;
             }
         }
-        player.sendMessage(Text.literal("It's raining " + spawned + " mobs!").formatted(Formatting.GOLD), true);
+        player.sendMessage(Text.translatable("minemenu.text.it_s_raining_s_mobs", spawned).formatted(Formatting.GOLD), true);
     }
 
     /** Grow Plants: every crop, sapling, stem, bush, bamboo and mushroom within 8 blocks grows fully. */
@@ -285,7 +285,7 @@ public final class MoreCheats {
                 grown++;
             }
         }
-        player.sendMessage(Text.literal(grown == 0 ? "Nothing to grow nearby" : "Grew " + grown + " plant" + (grown == 1 ? "" : "s"))
+        player.sendMessage((grown == 0 ? Text.translatable("minemenu.text.nothing_to_grow_nearby") : Text.translatable("minemenu.text.grew_s_plant_s", grown, (grown == 1 ? "" : "s")))
                 .formatted(Formatting.GREEN), true);
     }
 

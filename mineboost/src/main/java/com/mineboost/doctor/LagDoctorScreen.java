@@ -1,5 +1,7 @@
 package com.mineboost.doctor;
 
+import com.mineboost.Tr;
+
 import com.mineboost.BoostConfig;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -16,7 +18,7 @@ public class LagDoctorScreen extends Screen {
     private final java.util.Set<Integer> fixed = new java.util.HashSet<>();
 
     public LagDoctorScreen(Screen parent) {
-        super(Text.literal("Lag Doctor"));
+        super(Text.translatable("mineboost.text.lag_doctor"));
         this.parent = parent;
     }
 
@@ -31,7 +33,7 @@ public class LagDoctorScreen extends Screen {
                 LagDoctor.Finding finding = findings.get(i);
                 int index = i;
                 if (finding.fixLabel() != null && finding.fix() != null) {
-                    ButtonWidget fix = addDrawableChild(ButtonWidget.builder(Text.literal(fixed.contains(i) ? "Done ✔" : "Fix: " + finding.fixLabel()), b -> {
+                    ButtonWidget fix = addDrawableChild(ButtonWidget.builder((fixed.contains(i) ? Text.translatable("mineboost.text.done") : Text.translatable("mineboost.text.fix_s", Tr.auto("mineboost.doctor.fix.", finding.fixLabel()))), b -> {
                         finding.fix().run();
                         BoostConfig.save();
                         this.client.options.write();
@@ -40,37 +42,37 @@ public class LagDoctorScreen extends Screen {
                     }).dimensions(left + WIDTH - 120, y - 4, 120, 18).build());
                     fix.active = !fixed.contains(i);
                 } else if ("JVM Advisor".equals(finding.fixLabel())) {
-                    addDrawableChild(ButtonWidget.builder(Text.literal("Open JVM Advisor"), b -> this.client.setScreen(new MemoryScreen(this)))
+                    addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.open_jvm_advisor"), b -> this.client.setScreen(new MemoryScreen(this)))
                             .dimensions(left + WIDTH - 120, y - 4, 120, 18).build());
                 }
                 y += 22;
             }
         }
         int bottom = this.height - 26;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Run again (30s)"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.run_again_30s"), b -> {
             this.client.setScreen(null);
             LagDoctor.start(30);
         }).dimensions(this.width / 2 - 154, bottom, 100, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Run again (60s)"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.run_again_60s"), b -> {
             this.client.setScreen(null);
             LagDoctor.start(60);
         }).dimensions(this.width / 2 - 50, bottom, 100, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(this.width / 2 + 54, bottom, 100, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.done_2"), b -> close()).dimensions(this.width / 2 + 54, bottom, 100, 20).build());
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         int left = (this.width - WIDTH) / 2;
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Lag Doctor").formatted(Formatting.AQUA, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.lag_doctor").formatted(Formatting.AQUA, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
         LagDoctor.Report report = LagDoctor.lastReport();
         if (report == null) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("No report yet: press Run, then play normally for 30 seconds.")
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.no_report_yet_press_run_then")
                     .formatted(Formatting.GRAY), this.width / 2, 50, 0xFFFFFF);
             return;
         }
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(String.format("%d frames, average %.0f FPS (%.1f ms per frame). What costs you FPS:",
-                report.frames(), report.avgFps(), report.avgMs())).formatted(Formatting.GRAY), this.width / 2, 22, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.doctor.summary",
+                report.frames(), String.format("%.0f", report.avgFps()), String.format("%.1f", report.avgMs())).formatted(Formatting.GRAY), this.width / 2, 22, 0xFFFFFF);
         int y = 44;
         List<LagDoctor.Finding> findings = report.findings();
         for (int i = 0; i < Math.min(6, findings.size()); i++) {
@@ -88,7 +90,7 @@ public class LagDoctorScreen extends Screen {
         }
         List<String> spikes = SpikeDetector.recent();
         y += 4;
-        context.drawTextWithShadow(this.textRenderer, Text.literal("Recent spikes (frames over 50 ms), also in config/minemeboost/spikes.log:")
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.recent_spikes_frames_over_50_ms")
                 .formatted(Formatting.YELLOW), left, y, 0xFFFFFF);
         y += 11;
         for (int i = 0; i < Math.min(spikes.size(), (this.height - 40 - y) / 10); i++) {
@@ -100,7 +102,7 @@ public class LagDoctorScreen extends Screen {
             y += 10;
         }
         if (spikes.isEmpty()) {
-            context.drawTextWithShadow(this.textRenderer, Text.literal("None so far.").formatted(Formatting.GRAY), left, y, 0xFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.none_so_far").formatted(Formatting.GRAY), left, y, 0xFFFFFF);
         }
     }
 

@@ -171,7 +171,7 @@ public final class CombatModules {
     public static void mobWar(ServerPlayerEntity player) {
         List<HostileEntity> mobs = new java.util.ArrayList<>(player.getServerWorld().getEntitiesByClass(HostileEntity.class, player.getBoundingBox().expand(48), e -> e.isAlive() && !e.isAiDisabled()));
         if (mobs.size() < 2) {
-            player.sendMessage(Text.literal("Need at least 2 hostile mobs nearby").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.need_at_least_2_hostile_mobs").formatted(Formatting.YELLOW), true);
             return;
         }
         // Pairs that fight each other (a mob only hits back at its own target), the odd one out joins a pair.
@@ -183,6 +183,6 @@ public final class CombatModules {
         if (mobs.size() % 2 == 1) {
             fight(mobs.get(mobs.size() - 1), mobs.get(0));
         }
-        player.sendMessage(Text.literal("Mob War! " + mobs.size() + " mobs are fighting each other").formatted(Formatting.RED), true);
+        player.sendMessage(Text.translatable("minemenu.text.mob_war_s_mobs_are_fighting", mobs.size()).formatted(Formatting.RED), true);
     }
 }

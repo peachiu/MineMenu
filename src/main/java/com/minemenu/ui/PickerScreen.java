@@ -28,7 +28,7 @@ public class PickerScreen extends Screen {
     private final List<ButtonWidget> grid = new ArrayList<>();
 
     public PickerScreen(Screen parent, String heading, List<Choice> choices, Consumer<Choice> onPick, List<ButtonWidget> extra) {
-        super(Text.literal(heading));
+        super(Text.translatable(heading));
         this.parent = parent;
         this.heading = heading;
         this.choices = choices;
@@ -38,8 +38,8 @@ public class PickerScreen extends Screen {
 
     @Override
     protected void init() {
-        search = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 18, Text.literal("Search"));
-        search.setPlaceholder(Text.literal("Search...").formatted(Formatting.DARK_GRAY));
+        search = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 18, Text.translatable("minemenu.text.search"));
+        search.setPlaceholder(Text.translatable("minemenu.text.search_2").formatted(Formatting.DARK_GRAY));
         search.setText(query);
         search.setChangedListener(text -> {
             query = text;
@@ -54,7 +54,7 @@ public class PickerScreen extends Screen {
             addDrawableChild(button);
             x += 104;
         }
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close()).dimensions(x, y, 100, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close()).dimensions(x, y, 100, 20).build());
         rebuild();
         setInitialFocus(search);
     }
@@ -81,7 +81,7 @@ public class PickerScreen extends Screen {
             while (this.textRenderer.getWidth(label) > 112 && label.length() > 4) {
                 label = label.substring(0, label.length() - 2);
             }
-            grid.add(addDrawableChild(ButtonWidget.builder(Text.literal(label), b -> onPick.accept(choice))
+            grid.add(addDrawableChild(ButtonWidget.builder(Text.translatable(label), b -> onPick.accept(choice))
                     .dimensions(left + (i % columns) * 124, 44 + (i / columns) * 22, 120, 20).build()));
         }
         if (pages > 1) {
@@ -103,7 +103,7 @@ public class PickerScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(heading).formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable(heading).formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
     }
 
     @Override

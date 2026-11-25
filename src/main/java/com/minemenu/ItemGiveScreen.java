@@ -49,7 +49,7 @@ public class ItemGiveScreen extends Screen {
     private Text searchInfo = Text.empty();
 
     public ItemGiveScreen(Screen parent) {
-        super(Text.literal("Give Item"));
+        super(Text.translatable("minemenu.text.give_item"));
         this.parent = parent;
     }
 
@@ -84,8 +84,8 @@ public class ItemGiveScreen extends Screen {
         int top = 20;
 
         String previousSearch = search != null ? search.getText() : "";
-        search = new TextFieldWidget(this.textRenderer, left, top, PANEL_WIDTH, 18, Text.literal("Search"));
-        search.setPlaceholder(Text.literal("Search an item or a category: comida, armadura, ferramentas...").formatted(Formatting.DARK_GRAY));
+        search = new TextFieldWidget(this.textRenderer, left, top, PANEL_WIDTH, 18, Text.translatable("minemenu.text.search"));
+        search.setPlaceholder(Text.translatable("minemenu.text.search_an_item_or_a_category").formatted(Formatting.DARK_GRAY));
         search.setText(previousSearch);
         addDrawableChild(search);
 
@@ -102,22 +102,20 @@ public class ItemGiveScreen extends Screen {
                     updateGiveButton();
                 })
                 .dimensions(left, buttonY, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("How many: 1, 16, 32 or 64. Items that don't stack (tools, armor) "
-                        + "always come one at a time.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.how_many_1_16_32_or")))
                 .build());
         addDrawableChild(ButtonWidget.builder(destinationLabel(), b -> {
                     CheatState.toggleGiveToGround();
                     b.setMessage(destinationLabel());
                 })
                 .dimensions(left + (buttonWidth + 4), buttonY, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Inventory: straight into your inventory (if it's full, the rest "
-                        + "drops at your feet). Ground: dropped on the block you're looking at.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.inventory_straight_into_your_inventory_if")))
                 .build());
-        giveButton = addDrawableChild(ButtonWidget.builder(Text.literal("Give"), b -> giveSelected())
+        giveButton = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.give"), b -> giveSelected())
                 .dimensions(left + 2 * (buttonWidth + 4), buttonY, buttonWidth, 20)
-                .tooltip(Tooltip.of(Text.literal("Give the selected item. Enter or double-clicking an item works too.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.give_the_selected_item_enter_or")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close())
                 .dimensions(left + 3 * (buttonWidth + 4), buttonY, buttonWidth, 20)
                 .build());
 
@@ -127,13 +125,13 @@ public class ItemGiveScreen extends Screen {
     }
 
     private Text amountLabel() {
-        return Text.literal("Amount: " + CheatState.giveAmount());
+        return Text.translatable("minemenu.text.amount_s", CheatState.giveAmount());
     }
 
     private Text destinationLabel() {
         return CheatState.giveToGround()
-                ? Text.literal("To: ").append(Text.literal("Ground").formatted(Formatting.GOLD))
-                : Text.literal("To: ").append(Text.literal("Inventory").formatted(Formatting.AQUA));
+                ? Text.translatable("minemenu.text.to").append(Text.translatable("minemenu.text.ground").formatted(Formatting.GOLD))
+                : Text.translatable("minemenu.text.to").append(Text.translatable("minemenu.text.inventory").formatted(Formatting.AQUA));
     }
 
     /** How many you'd actually get of the selected item (non-stackables come one at a time). */
@@ -148,8 +146,8 @@ public class ItemGiveScreen extends Screen {
         }
         ItemEntry entry = list.getSelectedOrNull();
         giveButton.active = entry != null;
-        giveButton.setMessage(entry == null ? Text.literal("Give")
-                : Text.literal("Give " + effectiveAmount()).formatted(Formatting.GREEN));
+        giveButton.setMessage(entry == null ? Text.translatable("minemenu.text.give")
+                : Text.translatable("minemenu.text.give_s", effectiveAmount()).formatted(Formatting.GREEN));
     }
 
     private void giveSelected() {
@@ -167,7 +165,7 @@ public class ItemGiveScreen extends Screen {
                 ItemCheats.giveItem(player, id, amount, ground);
             }
         });
-        status = Text.literal((ground ? "Dropped " : "Gave ") + effectiveAmount() + "x " + entry.data.name())
+        status = Text.translatable(ground ? "minemenu.give.dropped" : "minemenu.give.gave", effectiveAmount(), entry.data.name())
                 .formatted(Formatting.GREEN);
     }
 
@@ -191,7 +189,7 @@ public class ItemGiveScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("Give Item").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+                Text.translatable("minemenu.text.give_item").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                 this.width / 2, 7, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer, status.getString().isEmpty() ? searchInfo : status,
                 this.width / 2, this.height - 38, 0xFFFFFF);
@@ -262,10 +260,10 @@ public class ItemGiveScreen extends Screen {
             }
             status = Text.empty();
             searchInfo = category != null
-                    ? Text.literal("Category: ").formatted(Formatting.GRAY)
+                    ? Text.translatable("minemenu.text.category").formatted(Formatting.GRAY)
                             .append(Text.literal(category.name()).formatted(Formatting.AQUA))
-                            .append(Text.literal(" (" + matches.size() + " items)").formatted(Formatting.GRAY))
-                    : Text.literal(matches.size() + " items").formatted(Formatting.GRAY);
+                            .append(Text.translatable("minemenu.text.s_items", matches.size()).formatted(Formatting.GRAY))
+                    : Text.translatable("minemenu.text.s_items_2", matches.size()).formatted(Formatting.GRAY);
 
             clearEntries();
             ItemEntry toSelect = null;
@@ -335,7 +333,7 @@ public class ItemGiveScreen extends Screen {
 
         @Override
         public Text getNarration() {
-            return Text.literal("Give " + data.name());
+            return Text.translatable("minemenu.text.give_s", data.name());
         }
 
         @Override

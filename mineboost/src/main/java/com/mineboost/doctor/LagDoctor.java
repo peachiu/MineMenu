@@ -1,5 +1,7 @@
 package com.mineboost.doctor;
 
+import com.mineboost.Tr;
+
 import com.mineboost.BoostConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -141,7 +143,7 @@ public final class LagDoctor {
             Runnable fix = null;
             switch (name) {
                 case "Drawing mobs and other entities" -> {
-                    text = name + " (" + entityDetail + ")";
+                    text = Tr.auto("mineboost.doctor.", name) + " (" + entityDetail + ")";
                     if (c.maxEntities < 0) {
                         fixLabel = "Max Entities 100";
                         fix = () -> c.maxEntities = 100;
@@ -166,7 +168,7 @@ public final class LagDoctor {
                     fix = () -> client.options.getViewDistance().setValue(Math.max(2, client.options.getViewDistance().getValue() - 2));
                 }
                 case "Waiting for the graphics card" -> {
-                    text = name + ": your graphics card is the limit";
+                    text = Tr.auto("mineboost.doctor.", name) + ": " + Tr.auto("mineboost.doctor.", "your graphics card is the limit");
                     fixLabel = "Render Scale 75%";
                     fix = () -> c.renderScale = 75;
                 }
@@ -185,17 +187,17 @@ public final class LagDoctor {
                 default -> {
                 }
             }
-            findings.add(new Finding(text, ms, fixLabel, fix));
+            findings.add(new Finding(text.equals(name) ? Tr.auto("mineboost.doctor.", name) : text, ms, fixLabel, fix));
         }
         double gcMs = (gcMillis() - gcStartMillis) / (double) Math.max(1, frames);
         if (gcMs >= 0.2) {
-            findings.add(new Finding("Java cleaning up memory (garbage collection)", gcMs, "JVM Advisor", null));
+            findings.add(new Finding(Tr.auto("mineboost.doctor.", "Java cleaning up memory (garbage collection)"), gcMs, "JVM Advisor", null));
         }
         IntegratedServer server = client.getServer();
         if (server != null) {
             double mspt = server.getAverageNanosPerTick() / 1e6;
             if (mspt > 30) {
-                findings.add(new Finding(String.format("The singleplayer world itself is slow: %.0f ms per tick (50 is the limit)", mspt),
+                findings.add(new Finding(String.format(Tr.get("mineboost.doctor.server_slow", "The singleplayer world itself is slow: %.0f ms per tick (50 is the limit)"), mspt),
                         mspt / 5, "Simulation distance -2",
                         () -> client.options.getSimulationDistance().setValue(Math.max(5, client.options.getSimulationDistance().getValue() - 2))));
             }
@@ -225,7 +227,8 @@ public final class LagDoctor {
                 mostCount = entry.getValue();
             }
         }
-        return total + " mobs within 32 blocks" + (most == null ? "" : ", most: " + most.getName().getString() + " x" + mostCount);
+        return Tr.format("mineboost.doctor.mobs_nearby", "%s mobs within 32 blocks", total)
+                + (most == null ? "" : Tr.format("mineboost.doctor.most", ", most: %s x%s", most.getName().getString(), mostCount));
     }
 
     /** HUD while recording. */
@@ -235,7 +238,7 @@ public final class LagDoctor {
         }
         MinecraftClient client = MinecraftClient.getInstance();
         int left = (int) Math.ceil((endAt - System.nanoTime()) / 1e9);
-        context.drawCenteredTextWithShadow(client.textRenderer, Text.literal("Lag Doctor: " + left + "s, keep playing normally")
+        context.drawCenteredTextWithShadow(client.textRenderer, Text.translatable("mineboost.text.lag_doctor_ss_keep_playing_normally", left)
                 .formatted(Formatting.AQUA), context.getScaledWindowWidth() / 2, 42, 0xFFFFFF);
     }
 }

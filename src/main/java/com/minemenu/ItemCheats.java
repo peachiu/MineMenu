@@ -72,13 +72,13 @@ public final class ItemCheats {
     public static void superEnchantHeld(ServerPlayerEntity player) {
         ItemStack stack = player.getMainHandStack();
         if (stack.isEmpty()) {
-            player.sendMessage(Text.literal("Hold an item to enchant it").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.hold_an_item_to_enchant_it").formatted(Formatting.YELLOW), true);
             return;
         }
         int added = superEnchant(player.getServer(), stack);
         player.sendMessage(added == 0
-                ? Text.literal("No more enchantments fit on this item").formatted(Formatting.YELLOW)
-                : Text.literal("Added " + added + " enchantment" + (added == 1 ? "" : "s")).formatted(Formatting.LIGHT_PURPLE), true);
+                ? Text.translatable("minemenu.text.no_more_enchantments_fit_on_this").formatted(Formatting.YELLOW)
+                : Text.translatable("minemenu.text.added_s_enchantment_s", added, (added == 1 ? "" : "s")).formatted(Formatting.LIGHT_PURPLE), true);
     }
 
     /**
@@ -140,10 +140,10 @@ public final class ItemCheats {
             player.getInventory().insertStack(leftover);
             if (!leftover.isEmpty()) {
                 player.dropItem(leftover, false, false);
-                player.sendMessage(Text.literal("Inventory full: " + leftover.getCount() + " dropped at your feet")
+                player.sendMessage(Text.translatable("minemenu.text.inventory_full_s_dropped_at_your", leftover.getCount())
                         .formatted(Formatting.YELLOW), true);
             } else {
-                player.sendMessage(Text.literal("Got " + what).formatted(Formatting.GREEN), true);
+                player.sendMessage(Text.translatable("minemenu.text.got_s", what).formatted(Formatting.GREEN), true);
             }
             return;
         }
@@ -161,7 +161,7 @@ public final class ItemCheats {
         entity.setVelocity(Vec3d.ZERO);
         entity.setPickupDelay(40); // same as items you throw yourself: you get to see it land
         world.spawnEntity(entity);
-        player.sendMessage(Text.literal("Dropped " + what).formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.dropped_s", what).formatted(Formatting.GREEN), true);
     }
 
     /** What Clear Junk deletes: useless mob drops and the stone you dig through while mining. */
@@ -192,22 +192,22 @@ public final class ItemCheats {
             }
         }
         if (removed.isEmpty()) {
-            player.sendMessage(Text.literal("No junk to clear").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.no_junk_to_clear").formatted(Formatting.YELLOW), true);
             return;
         }
         lastClearedJunk = removed;
         inventory.markDirty();
         StringBuilder summary = new StringBuilder();
         counts.forEach((name, count) -> summary.append(summary.isEmpty() ? "" : ", ").append(count).append("x ").append(name));
-        player.sendMessage(Text.literal("Cleared: ").formatted(Formatting.GREEN)
+        player.sendMessage(Text.translatable("minemenu.text.cleared").formatted(Formatting.GREEN)
                 .append(Text.literal(summary.toString()).formatted(Formatting.WHITE))
-                .append(Text.literal("  (Undo Clear brings it back)").formatted(Formatting.GRAY)), false);
+                .append(Text.translatable("minemenu.text.undo_clear_brings_it_back").formatted(Formatting.GRAY)), false);
     }
 
     /** Gives back what the last Clear Junk removed (anything that doesn't fit drops at your feet). */
     public static void undoClearJunk(ServerPlayerEntity player) {
         if (lastClearedJunk.isEmpty()) {
-            player.sendMessage(Text.literal("Nothing to undo").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.nothing_to_undo").formatted(Formatting.YELLOW), true);
             return;
         }
         int total = 0;
@@ -220,7 +220,7 @@ public final class ItemCheats {
             }
         }
         lastClearedJunk = List.of();
-        player.sendMessage(Text.literal("Gave back " + total + " items").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.gave_back_s_items", total).formatted(Formatting.GREEN), true);
     }
 
     /** Items deleted with Delete Items, newest last, with the slot they came from (server thread only). */
@@ -277,8 +277,7 @@ public final class ItemCheats {
                 repaired++;
             }
         }
-        player.sendMessage(Text.literal(repaired == 0 ? "Nothing needed repairing"
-                : "Repaired " + repaired + " item" + (repaired == 1 ? "" : "s")).formatted(Formatting.GREEN), true);
+        player.sendMessage((repaired == 0 ? Text.translatable("minemenu.text.nothing_needed_repairing") : Text.translatable("minemenu.text.repaired_s_item_s", repaired, (repaired == 1 ? "" : "s"))).formatted(Formatting.GREEN), true);
     }
 
     public static void netheriteKit(ServerPlayerEntity player) {
@@ -305,6 +304,6 @@ public final class ItemCheats {
             player.getInventory().offerOrDrop(stack);
         }
         player.getInventory().offerOrDrop(new ItemStack(Items.ARROW, 64));
-        player.sendMessage(Text.literal("Netherite kit ready!").formatted(Formatting.LIGHT_PURPLE), true);
+        player.sendMessage(Text.translatable("minemenu.text.netherite_kit_ready").formatted(Formatting.LIGHT_PURPLE), true);
     }
 }

@@ -26,7 +26,7 @@ public final class CheatState {
         }
 
         public String displayName() {
-            return displayName;
+            return com.minemenu.core.Tr.get("minemenu.size." + name().toLowerCase(java.util.Locale.ROOT), displayName);
         }
 
         public double scaleModifier() {

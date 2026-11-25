@@ -37,7 +37,7 @@ public final class Structures {
     private static BlockPos target(ServerPlayerEntity player) {
         HitResult hit = player.raycast(64, 1.0f, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            player.sendMessage(Text.literal("Look at the ground where it should go").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_the_ground_where_it").formatted(Formatting.YELLOW), true);
             return null;
         }
         return blockHit.getBlockPos().up();

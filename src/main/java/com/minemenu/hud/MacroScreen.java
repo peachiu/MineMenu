@@ -26,7 +26,7 @@ public class MacroScreen extends Screen {
     private final TextFieldWidget[] stepFields = new TextFieldWidget[4];
 
     public MacroScreen(Screen parent) {
-        super(Text.literal("Macros"));
+        super(Text.translatable("minemenu.text.macros"));
         this.parent = parent;
     }
 
@@ -43,7 +43,7 @@ public class MacroScreen extends Screen {
         for (int i = 0; i < Math.min(4, macros.size()); i++) {
             CheatConfig.Macro macro = macros.get(i);
             int index = i;
-            TextFieldWidget steps = new TextFieldWidget(this.textRenderer, left, y, 200, 20, Text.literal("Steps"));
+            TextFieldWidget steps = new TextFieldWidget(this.textRenderer, left, y, 200, 20, Text.translatable("minemenu.text.steps"));
             steps.setMaxLength(1000);
             steps.setText(String.join(", ", macro.steps));
             steps.setChangedListener(text -> {
@@ -56,11 +56,11 @@ public class MacroScreen extends Screen {
                 CheatConfig.markDirty();
             });
             stepFields[i] = addDrawableChild(steps);
-            addDrawableChild(ButtonWidget.builder(Text.literal(waitingKeyFor == i ? "> key <" : "Key: " + Keys.name(macro.key)), b -> {
+            addDrawableChild(ButtonWidget.builder((waitingKeyFor == i ? Text.translatable("minemenu.text.key") : Text.translatable("minemenu.text.key_s", Keys.name(macro.key))), b -> {
                 waitingKeyFor = index;
                 clearAndInit();
             }).dimensions(left + 204, y, 70, 20).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("Run"), b -> Macros.run(macro)).dimensions(left + 278, y, 30, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.run"), b -> Macros.run(macro)).dimensions(left + 278, y, 30, 20).build());
             addDrawableChild(ButtonWidget.builder(Text.literal("X").formatted(Formatting.RED), b -> {
                 macros.remove(index);
                 CheatConfig.markDirty();
@@ -69,9 +69,9 @@ public class MacroScreen extends Screen {
             y += 24;
         }
         if (macros.size() < 4) {
-            addDrawableChild(ButtonWidget.builder(Text.literal("New macro"), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.new_macro"), b -> {
                 CheatConfig.Macro macro = new CheatConfig.Macro();
-                macro.name = "Macro " + (macros.size() + 1);
+                macro.name = com.minemenu.core.Tr.get("minemenu.macro.default_name", "Macro") + " " + (macros.size() + 1);
                 macro.steps.add("action:DAY");
                 macro.steps.add("action:CLEAR_WEATHER");
                 macro.steps.add("action:HEAL");
@@ -80,12 +80,12 @@ public class MacroScreen extends Screen {
                 clearAndInit();
             }).dimensions(left, y, 168, 20).build());
         }
-        addDrawableChild(ButtonWidget.builder(Text.literal(Macros.isRecording() ? "Stop recording" : "Record new macro").formatted(Formatting.RED), b -> {
+        addDrawableChild(ButtonWidget.builder((Macros.isRecording() ? Text.translatable("minemenu.text.stop_recording") : Text.translatable("minemenu.text.record_new_macro")).formatted(Formatting.RED), b -> {
             if (Macros.isRecording()) {
                 List<String> steps = Macros.stopRecording();
                 if (!steps.isEmpty() && macros.size() < 4) {
                     CheatConfig.Macro macro = new CheatConfig.Macro();
-                    macro.name = "Macro " + (macros.size() + 1);
+                    macro.name = com.minemenu.core.Tr.get("minemenu.macro.default_name", "Macro") + " " + (macros.size() + 1);
                     macro.steps.addAll(steps);
                     macros.add(macro);
                     CheatConfig.markDirty();
@@ -95,9 +95,8 @@ public class MacroScreen extends Screen {
                 Macros.startRecording();
                 close();
             }
-        }).dimensions(left + 172, y, 168, 20).tooltip(Tooltip.of(Text.literal("Then use hacks and actions from the menu, keys or the "
-                + "Command Palette. Come back here and press Stop."))).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(this.width / 2 - 75, this.height - 26, 150, 20).build());
+        }).dimensions(left + 172, y, 168, 20).tooltip(Tooltip.of(Text.translatable("minemenu.text.then_use_hacks_and_actions_from"))).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.done"), b -> close()).dimensions(this.width / 2 - 75, this.height - 26, 150, 20).build());
     }
 
     @Override
@@ -118,8 +117,8 @@ public class MacroScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Macros").formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Steps: action:DAY, feature:FLY, cmd:time set noon, wait:20 (ticks), screen:waypoints...")
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.macros").formatted(Formatting.BOLD), this.width / 2, 8, Theme.accent());
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.steps_action_day_feature_fly_cmd")
                 .formatted(Formatting.GRAY), this.width / 2, 18, 0xFFFFFF);
     }
 

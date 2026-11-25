@@ -44,9 +44,9 @@ public class FeatureScreen extends Screen {
             return List.of();
         }
         return switch (feature) {
-            case MAGNET_FILTER -> List.of(new TextSetting("magnet.items", "Items (ids, commas)", "diamond, emerald, iron_ingot, gold_ingot, netherite_scrap"));
-            case LUCKY_BLOCKS -> List.of(new TextSetting("lucky.block", "Lucky block", "sponge"));
-            case MORPH -> List.of(new TextSetting("morph.mob", "Mob (spider, bat, blaze, enderman, creeper, phantom...)", "spider"));
+            case MAGNET_FILTER -> List.of(new TextSetting("magnet.items", "minemenu.feature_text.magnet_items", "diamond, emerald, iron_ingot, gold_ingot, netherite_scrap"));
+            case LUCKY_BLOCKS -> List.of(new TextSetting("lucky.block", "minemenu.feature_text.lucky_block", "sponge"));
+            case MORPH -> List.of(new TextSetting("morph.mob", "minemenu.feature_text.morph_mob", "spider"));
             default -> List.of();
         };
     }
@@ -59,18 +59,17 @@ public class FeatureScreen extends Screen {
         descriptionBottom = y;
 
         boolean favorite = CheatConfig.get().isFavorite(entry.id());
-        addDrawableChild(ButtonWidget.builder(Text.literal(favorite ? "★ Favorite" : "☆ Add to favorites").formatted(Formatting.YELLOW), b -> {
+        addDrawableChild(ButtonWidget.builder((favorite ? Text.translatable("minemenu.text.favorite") : Text.translatable("minemenu.text.add_to_favorites")).formatted(Formatting.YELLOW), b -> {
             CheatConfig.get().toggleFavorite(entry.id());
             clearAndInit();
         }).dimensions(left, y, WIDTH / 2 - 2, 20).build());
         Integer key = CheatConfig.get().keys.get(entry.id());
-        addDrawableChild(ButtonWidget.builder(Text.literal(waitingForKey ? "> Press a key <" : "Key: " + Keys.name(key == null ? -1 : key)), b -> {
+        addDrawableChild(ButtonWidget.builder((waitingForKey ? Text.translatable("minemenu.text.press_a_key") : Text.translatable("minemenu.text.key_s", Keys.name(key == null ? -1 : key))), b -> {
                     waitingForKey = true;
                     clearAndInit();
                 })
                 .dimensions(left + WIDTH / 2 + 2, y, WIDTH / 2 - 2, 20)
-                .tooltip(Tooltip.of(Text.literal("Click, then press the key you want (Esc or Backspace = no key). "
-                        + "Works when no menu is open.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.click_then_press_the_key_you")))
                 .build());
         y += 24;
 
@@ -78,7 +77,7 @@ public class FeatureScreen extends Screen {
             for (Setting setting : FeatureSettings.of(feature)) {
                 if (setting.isToggle()) {
                     boolean on = FeatureSettings.is(feature, setting.key());
-                    addDrawableChild(ButtonWidget.builder(Text.literal(setting.label() + ": " + (on ? "ON" : "OFF")), b -> {
+                    addDrawableChild(ButtonWidget.builder(Text.literal(setting.label() + ": ").append(Text.translatable(on ? "minemenu.text.on" : "minemenu.text.off")), b -> {
                         FeatureSettings.set(feature, setting, on ? 0 : 1);
                         clearAndInit();
                     }).dimensions(left, y, WIDTH, 20).build());
@@ -88,7 +87,7 @@ public class FeatureScreen extends Screen {
                 y += 22;
             }
             for (TextSetting text : textSettings()) {
-                TextFieldWidget field = new TextFieldWidget(this.textRenderer, left, y + 10, WIDTH, 18, Text.literal(text.label()));
+                TextFieldWidget field = new TextFieldWidget(this.textRenderer, left, y + 10, WIDTH, 18, Text.translatable(text.label()));
                 field.setMaxLength(256);
                 field.setText(CheatConfig.get().text(text.key(), text.defaultValue()));
                 field.setChangedListener(value -> CheatConfig.get().setText(text.key(), value.trim()));
@@ -97,14 +96,14 @@ public class FeatureScreen extends Screen {
             }
             if (feature == Feature.MAGNET_FILTER) {
                 boolean except = com.minemenu.MagnetFilter.exceptMode();
-                addDrawableChild(ButtonWidget.builder(Text.literal(except ? "Mode: pull everything EXCEPT these" : "Mode: pull ONLY these"), b -> {
+                addDrawableChild(ButtonWidget.builder((except ? Text.translatable("minemenu.text.mode_pull_everything_except_these") : Text.translatable("minemenu.text.mode_pull_only_these")), b -> {
                     CheatConfig.get().setText("magnet.mode", except ? "only" : "except");
                     clearAndInit();
                 }).dimensions(left, y, WIDTH, 20).build());
                 y += 24;
             }
         }
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions((this.width - 150) / 2, Math.min(y + 6, this.height - 24), 150, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.done"), b -> close()).dimensions((this.width - 150) / 2, Math.min(y + 6, this.height - 24), 150, 20).build());
     }
 
     private SliderWidget slider(Setting setting, int x, int y) {
@@ -157,14 +156,14 @@ public class FeatureScreen extends Screen {
         if (key != null) {
             List<String> conflicts = Keys.conflicts(this.client, key, entry.id());
             if (!conflicts.isEmpty()) {
-                context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("⚠ This key is also: " + String.join(", ", conflicts))
+                context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.this_key_is_also_s", String.join(", ", conflicts))
                         .formatted(Formatting.RED), this.width / 2, descriptionBottom + 22, 0xFFFFFF);
             }
         }
         if (feature != null) {
             int y = descriptionBottom + 24 + FeatureSettings.of(feature).size() * 22;
             for (TextSetting text : textSettings()) {
-                context.drawTextWithShadow(this.textRenderer, Text.literal(text.label()).formatted(Formatting.GRAY), (this.width - WIDTH) / 2, y, 0xFFFFFF);
+                context.drawTextWithShadow(this.textRenderer, Text.translatable(text.label()).formatted(Formatting.GRAY), (this.width - WIDTH) / 2, y, 0xFFFFFF);
                 y += 32;
             }
         }

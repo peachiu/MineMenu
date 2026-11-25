@@ -48,13 +48,13 @@ public final class FpsOverlay {
 
         int fps = client.getCurrentFps();
         Text line = Text.empty()
-                .append(Text.literal(fps + " FPS").formatted(color(fps), Formatting.BOLD))
-                .append(Text.literal("  avg ").formatted(Formatting.GRAY))
+                .append(Text.translatable("mineboost.text.s_fps", fps).formatted(color(fps), Formatting.BOLD))
+                .append(Text.translatable("mineboost.text.avg").formatted(Formatting.GRAY))
                 .append(Text.literal(String.valueOf(avgFps)).formatted(color(avgFps)))
-                .append(Text.literal("  1% low ").formatted(Formatting.GRAY))
+                .append(Text.translatable("mineboost.text.1_low").formatted(Formatting.GRAY))
                 .append(Text.literal(String.valueOf(lowFps)).formatted(color(lowFps)));
         if (BoostConfig.get().fpsTarget > 0) {
-            line = line.copy().append(Text.literal("  RD " + client.options.getViewDistance().getValue())
+            line = line.copy().append(Text.translatable("mineboost.text.rd_s", client.options.getViewDistance().getValue())
                     .formatted(Formatting.AQUA));
         }
 

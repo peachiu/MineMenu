@@ -64,7 +64,7 @@ public final class FunEvents {
             }
             return false;
         });
-        player.sendMessage(Text.literal("Incoming meteor!").formatted(Formatting.GOLD), true);
+        player.sendMessage(Text.translatable("minemenu.text.incoming_meteor").formatted(Formatting.GOLD), true);
     }
 
     public static void meteorAtLook(ServerPlayerEntity player) {
@@ -98,7 +98,7 @@ public final class FunEvents {
             }
             return true;
         });
-        player.sendMessage(Text.literal("A tornado appears!").formatted(Formatting.GRAY), true);
+        player.sendMessage(Text.translatable("minemenu.text.a_tornado_appears").formatted(Formatting.GRAY), true);
     }
 
     /** Chaos events by id (see ChaosMode.EVENTS). */
@@ -178,7 +178,7 @@ public final class FunEvents {
         mob.refreshPositionAndAngles(me.x, me.y, me.z, mob.getYaw(), mob.getPitch());
         player.networkHandler.requestTeleport(it.x, it.y, it.z, player.getYaw(), player.getPitch());
         player.fallDistance = 0;
-        player.sendMessage(Text.literal("Swapped places with a " + mob.getName().getString() + "!").formatted(Formatting.LIGHT_PURPLE), true);
+        player.sendMessage(Text.translatable("minemenu.text.swapped_places_with_a_s", mob.getName().getString()).formatted(Formatting.LIGHT_PURPLE), true);
         return true;
     }
 }

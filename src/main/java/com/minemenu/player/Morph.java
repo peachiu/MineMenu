@@ -71,7 +71,7 @@ public final class Morph implements CheatModule {
             EntityType<?> type = typeId == null ? null : Registries.ENTITY_TYPE.getOrEmpty(typeId).orElse(null);
             Entity created = type == null ? null : type.create(client.world);
             if (!(created instanceof LivingEntity living)) {
-                player.sendMessage(Text.literal("Morph: \"" + id + "\" isn't a mob. Right-click Morph to pick one.").formatted(Formatting.RED), true);
+                player.sendMessage(Text.translatable("minemenu.text.morph_s_isn_t_a_mob", id).formatted(Formatting.RED), true);
                 CheatState.toggle(Feature.MORPH);
                 return;
             }
@@ -183,7 +183,7 @@ public final class Morph implements CheatModule {
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 5, 4, false, false));
                 world.createExplosion(player, player.getX(), player.getY(), player.getZ(), 3.0f, World.ExplosionSourceType.MOB);
             }
-            default -> player.sendMessage(Text.literal("This mob has no power to use. Try blaze, ghast, enderman or creeper.").formatted(Formatting.YELLOW), true);
+            default -> player.sendMessage(Text.translatable("minemenu.text.this_mob_has_no_power_to").formatted(Formatting.YELLOW), true);
         }
     }
 

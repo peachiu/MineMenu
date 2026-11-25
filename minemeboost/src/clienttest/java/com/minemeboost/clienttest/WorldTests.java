@@ -179,7 +179,8 @@ abstract class WorldTests extends PlayerTests {
         step(5, c -> { set(rel(0, 0, -2), Blocks.STONE.getDefaultState()); on(Feature.RANDOM_DROPS); run(() -> host().interactionManager.tryBreakBlock(rel(0, 0, -2))); });
         step(10, c -> { check("Random Drops: a random item instead of cobblestone", srv(() -> sw().getEntitiesByClass(ItemEntity.class, host().getBoundingBox().expand(6), e -> !e.getStack().isOf(Items.COBBLESTONE)).size() >= 1)); off(Feature.RANDOM_DROPS); clearMobs(); });
         step(5, c -> { on(Feature.FLOOR_IS_LAVA); on(Feature.GOD_MODE); });
-        step(20, c -> { check("Floor is Lava: magma under you", srv(() -> sw().getBlockState(host().getBlockPos().down()).isOf(Blocks.MAGMA_BLOCK))); off(Feature.FLOOR_IS_LAVA); });
+        step(20, c -> { check("Floor is Lava: magma under you", srv(() -> sw().getBlockState(host().getBlockPos().down()).isOf(Blocks.MAGMA_BLOCK))); off(Feature.FLOOR_IS_LAVA);
+            run(() -> { for (BlockPos q : BlockPos.iterate(rel(-30, -1, -40), rel(30, -1, 30))) sw().setBlockState(q, Blocks.STONE.getDefaultState()); }); });
         step(5, c -> { a = spawn(EntityType.COW, 8, -8, false); run(() -> FunEvents.swapWithMob(host())); });
         step(10, c -> { check("Mob Swap: swapped places with the cow", srv(() -> Math.abs(host().getX() - (base.getX() + 8.5)) < 1)); clearMobs(); tp(0, 0, 0, 180, 30); });
         step(60, c -> run(() -> FunEvents.meteor(host(), Vec3d.ofCenter(rel(0, 0, -15)))));

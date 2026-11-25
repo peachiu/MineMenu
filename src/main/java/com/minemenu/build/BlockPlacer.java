@@ -60,9 +60,16 @@ public final class BlockPlacer {
         }
         jobs.add(new Job(world, changes, name, player, recordUndo));
         if (changes.size() > PER_TICK && player != null) {
-            player.sendMessage(Text.literal(name + ": " + changes.size() + " blocks, about " + Math.max(1, changes.size() / PER_TICK / 20)
-                    + " s...").formatted(Formatting.GRAY), true);
+            player.sendMessage(Text.translatable("minemenu.text.s_s_blocks_about_s_s", jobName(name), changes.size(), Math.max(1, changes.size() / PER_TICK / 20)).formatted(Formatting.GRAY), true);
         }
+    }
+
+    /** Job names are lang keys ("minemenu.job.paste"), "undo:"/"redo:" + a name, or a plain name (structures). */
+    public static Text jobName(String name) {
+        if (name.startsWith("undo:") || name.startsWith("redo:")) {
+            return Text.translatable("minemenu.job." + name.substring(0, 4), jobName(name.substring(5)));
+        }
+        return Text.translatable(name);
     }
 
     public static void clear() {
@@ -114,7 +121,7 @@ public final class BlockPlacer {
                 UndoStack.push(new UndoStack.Entry(job.name, job.world, job.before, job.changes));
             }
             if (job.player != null) {
-                job.player.sendMessage(Text.literal(job.name + " done (" + job.changes.size() + " blocks)").formatted(Formatting.GREEN), true);
+                job.player.sendMessage(Text.translatable("minemenu.text.s_done_s_blocks", jobName(job.name), job.changes.size()).formatted(Formatting.GREEN), true);
             }
         }
     }

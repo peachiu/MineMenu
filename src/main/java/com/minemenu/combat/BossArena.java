@@ -30,7 +30,7 @@ import java.util.List;
  * hovers and dives at you: still a fight, just not the vanilla one.
  */
 public class BossArena extends Screen {
-    private static final String[] BOSSES = {"Wither", "Ender Dragon", "Warden", "Elder Guardian"};
+    private static final String[] BOSSES = {"entity.minecraft.wither", "entity.minecraft.ender_dragon", "entity.minecraft.warden", "entity.minecraft.elder_guardian"}; // vanilla names
     private static final double[] HEALTH = {0.5, 1, 2, 5};
     private static int boss;
     private static int health = 1;
@@ -38,7 +38,7 @@ public class BossArena extends Screen {
     private final Screen parent;
 
     public BossArena(Screen parent) {
-        super(Text.literal("Boss Arena"));
+        super(Text.translatable("minemenu.text.boss_arena"));
         this.parent = parent;
     }
 
@@ -46,29 +46,29 @@ public class BossArena extends Screen {
     protected void init() {
         int left = this.width / 2 - 100;
         int y = 36;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Boss: " + BOSSES[boss]), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.boss_s", Text.translatable(BOSSES[boss])), b -> {
             boss = (boss + 1) % BOSSES.length;
             clearAndInit();
         }).dimensions(left, y, 200, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Health: " + HEALTH[health] + "x"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.health_sx", HEALTH[health]), b -> {
             health = (health + 1) % HEALTH.length;
             clearAndInit();
         }).dimensions(left, y, 200, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Arena: " + (arena ? "ON" : "OFF")), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.arena_s", Text.translatable(arena ? "minemenu.text.on" : "minemenu.text.off")), b -> {
             arena = !arena;
             clearAndInit();
         }).dimensions(left, y, 200, 20).build());
         y += 30;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Fight!").formatted(Formatting.RED), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.fight").formatted(Formatting.RED), b -> {
             int which = boss;
             double multiplier = HEALTH[health];
             boolean withArena = arena;
             MenuEntries.onServer(p -> summon(p, which, multiplier, withArena)).accept(MinecraftClient.getInstance(), null);
             this.client.setScreen(null);
         }).dimensions(left, y, 98, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close()).dimensions(left + 102, y, 98, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close()).dimensions(left + 102, y, 98, 20).build());
     }
 
     public static void summon(ServerPlayerEntity player, int which, double multiplier, boolean withArena) {
@@ -87,7 +87,7 @@ public class BossArena extends Screen {
                 boolean shell = dx == r || dz == r || dy == -1 || dy == h;
                 changes.add(new BlockChange(pos.toImmutable(), shell ? (dy == -1 ? Blocks.STONE_BRICKS.getDefaultState() : wall) : inside, null));
             }
-            BlockPlacer.submit(world, changes, "Boss arena", player, true);
+            BlockPlacer.submit(world, changes, "minemenu.job.boss_arena", player, true);
         }
         EntityType<?> type = switch (which) {
             case 0 -> EntityType.WITHER;
@@ -102,15 +102,15 @@ public class BossArena extends Screen {
                 max.setBaseValue(max.getBaseValue() * multiplier);
                 living.setHealth(living.getMaxHealth());
             }
-            player.sendMessage(Text.literal(BOSSES[which] + " summoned with " + Math.round(living.getMaxHealth()) + " health. Good luck!").formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.s_summoned_with_s_health_good", Text.translatable(BOSSES[which]), Math.round(living.getMaxHealth())).formatted(Formatting.RED), true);
         }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Boss Arena").formatted(Formatting.BOLD), this.width / 2, 12, Theme.accent());
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Summoned 16 blocks in front of you. God Mode recommended.").formatted(Formatting.GRAY), this.width / 2, 23, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.boss_arena").formatted(Formatting.BOLD), this.width / 2, 12, Theme.accent());
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.summoned_16_blocks_in_front_of").formatted(Formatting.GRAY), this.width / 2, 23, 0xFFFFFF);
     }
 
     @Override

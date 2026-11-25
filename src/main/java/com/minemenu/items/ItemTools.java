@@ -28,14 +28,14 @@ public final class ItemTools {
     public static void duplicate(ServerPlayerEntity player) {
         ItemStack held = player.getMainHandStack();
         if (held.isEmpty()) {
-            player.sendMessage(Text.literal("Hold something to duplicate").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.hold_something_to_duplicate").formatted(Formatting.YELLOW), true);
             return;
         }
         ItemStack copy = held.copy();
         if (!player.getInventory().insertStack(copy)) {
             player.dropItem(copy, false);
         }
-        player.sendMessage(Text.literal("Duplicated " + held.getCount() + "x " + held.getName().getString()).formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.duplicated_sx_s", held.getCount(), held.getName().getString()).formatted(Formatting.GREEN), true);
     }
 
     /** Sorts slots 9-35 (not the hotbar): stacks merged, ordered by item id. */
@@ -69,7 +69,7 @@ public final class ItemTools {
         for (int i = 0; i < merged.size() && i < 27; i++) {
             inventory.setStack(9 + i, merged.get(i));
         }
-        player.sendMessage(Text.literal("Inventory sorted").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.inventory_sorted").formatted(Formatting.GREEN), true);
     }
 
     /** The loot table chests in this structure normally get, or null. */
@@ -129,7 +129,6 @@ public final class ItemTools {
                 }
             }
         }
-        player.sendMessage(Text.literal(refilled == 0 ? "No empty structure chests nearby (it only refills chests in villages, temples, mineshafts...)"
-                : refilled + " chest" + (refilled == 1 ? "" : "s") + " will have new loot when you open them").formatted(refilled == 0 ? Formatting.YELLOW : Formatting.GREEN), true);
+        player.sendMessage((refilled == 0 ? Text.translatable("minemenu.text.no_empty_structure_chests_nearby_it") : Text.translatable("minemenu.text.s_chest_s_will_have_new", refilled, (refilled == 1 ? "" : "s"))).formatted(refilled == 0 ? Formatting.YELLOW : Formatting.GREEN), true);
     }
 }

@@ -111,7 +111,7 @@ public enum Preset {
     }
 
     public String displayName() {
-        return displayName;
+        return Tr.get("mineboost.preset." + name().toLowerCase(java.util.Locale.ROOT), displayName);
     }
 
     public Formatting color() {
@@ -119,7 +119,7 @@ public enum Preset {
     }
 
     public String description() {
-        return description;
+        return Tr.get("mineboost.preset." + name().toLowerCase(java.util.Locale.ROOT) + ".desc", description);
     }
 
     /** Applies the preset. Mipmaps are applied by the caller (they need a resource reload). */

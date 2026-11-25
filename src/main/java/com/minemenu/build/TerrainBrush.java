@@ -59,7 +59,7 @@ public final class TerrainBrush {
             case FLATTEN, RAISE, LOWER, SMOOTH -> heights(world, center, r, mode, changes);
             case PAINT -> {
                 if (paint == null) {
-                    player.sendMessage(Text.literal("Hold the block to paint with in your off hand").formatted(Formatting.YELLOW), true);
+                    player.sendMessage(Text.translatable("minemenu.text.hold_the_block_to_paint_with").formatted(Formatting.YELLOW), true);
                     return;
                 }
                 columns(center, r, (x, z) -> {
@@ -71,7 +71,7 @@ public final class TerrainBrush {
             }
             case REPLACE -> {
                 if (paint == null) {
-                    player.sendMessage(Text.literal("Hold the new block in your off hand; the block you look at is replaced").formatted(Formatting.YELLOW), true);
+                    player.sendMessage(Text.translatable("minemenu.text.hold_the_new_block_in_your").formatted(Formatting.YELLOW), true);
                     return;
                 }
                 BlockState from = world.getBlockState(center);
@@ -90,7 +90,7 @@ public final class TerrainBrush {
                 }
             });
         }
-        BlockPlacer.submit(world, changes, "Brush " + mode.name().toLowerCase(), player, true);
+        BlockPlacer.submit(world, changes, "minemenu.job.brush", player, true);
     }
 
     private interface Column {

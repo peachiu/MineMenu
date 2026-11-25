@@ -70,10 +70,10 @@ public final class Pets {
         if (!world.isClient()) {
             if (pet) {
                 mob.removeCommandTag(PET_TAG);
-                player.sendMessage(Text.literal(mob.getName().getString() + " is free again").formatted(Formatting.YELLOW), true);
+                player.sendMessage(Text.translatable("minemenu.text.s_is_free_again", mob.getName().getString()).formatted(Formatting.YELLOW), true);
             } else {
                 tame(mob);
-                player.sendMessage(Text.literal(mob.getName().getString() + " is now your pet!").formatted(Formatting.GREEN), true);
+                player.sendMessage(Text.translatable("minemenu.text.s_is_now_your_pet", mob.getName().getString()).formatted(Formatting.GREEN), true);
             }
         }
         return ActionResult.SUCCESS;

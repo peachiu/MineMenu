@@ -467,12 +467,13 @@ public final class ServerCheats {
             return category;
         }
 
+        /** In the player's language (minemenu.action.NAME in the lang files), English if there's no translation. */
         public String displayName() {
-            return displayName;
+            return com.minemenu.core.Tr.get("minemenu.action." + name().toLowerCase(java.util.Locale.ROOT), displayName);
         }
 
         public String description() {
-            return description;
+            return com.minemenu.core.Tr.get("minemenu.action." + name().toLowerCase(java.util.Locale.ROOT) + ".desc", description);
         }
     }
 

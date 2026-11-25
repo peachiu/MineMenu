@@ -24,7 +24,7 @@ public class MemoryScreen extends Screen {
     private String message = "";
 
     public MemoryScreen(Screen parent) {
-        super(Text.literal("Memory"));
+        super(Text.translatable("mineboost.text.memory"));
         this.parent = parent;
     }
 
@@ -65,11 +65,11 @@ public class MemoryScreen extends Screen {
     @Override
     protected void init() {
         int gb = recommendedGb(physicalMemory());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Copy JVM arguments (" + gb + " GB)"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.copy_jvm_arguments_s_gb", gb), b -> {
             this.client.keyboard.setClipboard(jvmLine(gb));
-            message = "Copied. Paste it into your launcher: Installations > Edit > More options > JVM arguments.";
+            message = com.mineboost.Tr.get("mineboost.memory.copied", "Copied. Paste it into your launcher: Installations > Edit > More options > JVM arguments.");
         }).dimensions(this.width / 2 - 154, this.height - 26, 200, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(this.width / 2 + 50, this.height - 26, 104, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.done_2"), b -> close()).dimensions(this.width / 2 + 50, this.height - 26, 104, 20).build());
     }
 
     @Override
@@ -79,15 +79,15 @@ public class MemoryScreen extends Screen {
         long max = runtime.maxMemory();
         long now = runtime.totalMemory() - runtime.freeMemory();
         int left = this.width / 2 - 160;
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Memory & JVM Advisor").formatted(Formatting.GREEN, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
-        context.drawTextWithShadow(this.textRenderer, Text.literal(String.format("RAM used: %d / %d MB (%d%%)", now >> 20, max >> 20, now * 100 / max)), left, 24, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.memory_jvm_advisor").formatted(Formatting.GREEN, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("mineboost.memory.ram_used", now >> 20, max >> 20, now * 100 / max), left, 24, 0xFFFFFF);
         long gcCount = 0;
         long gcTime = 0;
         for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
             gcCount += Math.max(0, bean.getCollectionCount());
             gcTime += Math.max(0, bean.getCollectionTime());
         }
-        context.drawTextWithShadow(this.textRenderer, Text.literal(String.format("Garbage collections: %d (%.1f s in total)", gcCount, gcTime / 1000.0))
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("mineboost.memory.gc", gcCount, String.format("%.1f", gcTime / 1000.0))
                 .formatted(Formatting.GRAY), left, 35, 0xFFFFFF);
         // Graph of the last minute.
         int graphTop = 48;
@@ -103,12 +103,13 @@ public class MemoryScreen extends Screen {
         int gb = recommendedGb(physical);
         int y = graphTop + graphHeight + 10;
         List<String> advice = List.of(
-                physical > 0 ? String.format("This PC has %.1f GB of RAM. Minecraft may use up to %.1f GB now.", physical / 1073741824.0, max / 1073741824.0)
-                        : String.format("Minecraft may use up to %.1f GB now.", max / 1073741824.0),
-                "Recommended: " + gb + " GB. More isn't faster: Java then cleans up less often but for longer (stutters),",
-                "and with integrated graphics the rest of the RAM is also your video memory.",
-                max >> 30 < gb - 0.5 ? "You give it less than recommended: copy the line below into your launcher."
-                        : max >> 30 > gb + 1 ? "You give it more than needed: lowering it can reduce stutters." : "Your setting is fine.");
+                physical > 0 ? String.format(com.mineboost.Tr.get("mineboost.memory.pc_ram", "This PC has %.1f GB of RAM. Minecraft may use up to %.1f GB now."), physical / 1073741824.0, max / 1073741824.0)
+                        : String.format(com.mineboost.Tr.get("mineboost.memory.may_use", "Minecraft may use up to %.1f GB now."), max / 1073741824.0),
+                com.mineboost.Tr.format("mineboost.memory.recommended", "Recommended: %s GB. More isn't faster: Java then cleans up less often but for longer (stutters),", gb),
+                com.mineboost.Tr.get("mineboost.memory.igpu", "and with integrated graphics the rest of the RAM is also your video memory."),
+                max >> 30 < gb - 0.5 ? com.mineboost.Tr.get("mineboost.memory.too_little", "You give it less than recommended: copy the line below into your launcher.")
+                        : max >> 30 > gb + 1 ? com.mineboost.Tr.get("mineboost.memory.too_much", "You give it more than needed: lowering it can reduce stutters.")
+                        : com.mineboost.Tr.get("mineboost.memory.fine", "Your setting is fine."));
         for (String line : advice) {
             context.drawTextWithShadow(this.textRenderer, Text.literal(line).formatted(Formatting.GRAY), left, y, 0xFFFFFF);
             y += 11;

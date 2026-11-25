@@ -53,7 +53,7 @@ public final class SafeMode {
         } catch (Exception ignored) {
         }
         if (active) {
-            Guard.toast("MineMenu Safe Mode", "The game crashed while starting twice, so all hacks are off. Turn them back on in the menu.");
+            Guard.toast(Tr.get("minemenu.safe_mode.title", "MineMenu Safe Mode"), Tr.get("minemenu.safe_mode.crash_loop", "The game crashed while starting twice, so all hacks are off. Turn them back on in the menu."));
         }
     }
 }

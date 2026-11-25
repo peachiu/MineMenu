@@ -43,9 +43,9 @@ public final class BuildScreens {
             choices.add(new PickerScreen.Choice(name, "built:" + built.name()));
         }
         for (String[] vanilla : Structures.VANILLA) {
-            choices.add(new PickerScreen.Choice(vanilla[1] + " (vanilla)", "vanilla:" + vanilla[0]));
+            choices.add(new PickerScreen.Choice(com.minemenu.core.Tr.get("minemenu.vanilla_structure." + vanilla[0].substring(10), vanilla[1]) + " " + com.minemenu.core.Tr.get("minemenu.vanilla_structure.suffix", "(vanilla)"), "vanilla:" + vanilla[0]));
         }
-        return new PickerScreen(parent, "Structures (placed where you look)", choices, choice -> {
+        return new PickerScreen(parent, "minemenu.picker.structures_placed_where_you_look", choices, choice -> {
             MinecraftClient.getInstance().setScreen(null);
             if (choice.id().startsWith("built:")) {
                 Structures.Built built = Structures.Built.valueOf(choice.id().substring(6));
@@ -63,7 +63,7 @@ public final class BuildScreens {
             String label = mode.name().charAt(0) + mode.name().substring(1).toLowerCase() + (mode == TerrainBrush.mode() ? " ✔" : "");
             choices.add(new PickerScreen.Choice(label, mode.name()));
         }
-        return new PickerScreen(parent, "Terrain Brush: right-click with a golden shovel", choices, choice -> {
+        return new PickerScreen(parent, "minemenu.picker.terrain_brush_right_click_with_a_golden_", choices, choice -> {
             TerrainBrush.setMode(TerrainBrush.Mode.valueOf(choice.id()));
             MinecraftClient.getInstance().setScreen(brush(parent));
         }, List.of());
@@ -78,7 +78,7 @@ public final class BuildScreens {
             }
         }
         choices.sort((a, b) -> a.label().compareToIgnoreCase(b.label()));
-        return new PickerScreen(parent, "Biome Painter (applied to the selection)", choices, choice -> {
+        return new PickerScreen(parent, "minemenu.picker.biome_painter_applied_to_the_selection", choices, choice -> {
             MinecraftClient.getInstance().setScreen(null);
             server(p -> BuildTools.paintBiome(p, choice.id()));
         }, List.of());

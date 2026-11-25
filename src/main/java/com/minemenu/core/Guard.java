@@ -36,7 +36,7 @@ public final class Guard {
             if (CheatState.isOn(feature)) {
                 CheatState.toggle(feature);
             }
-            toast(feature.displayName() + " was disabled because of an error", "Details are in logs/latest.log");
+            toast(Tr.format("minemenu.safe_mode.disabled", "%s was disabled because of an error", feature.displayName()), Tr.get("minemenu.safe_mode.details", "Details are in logs/latest.log"));
             return false;
         }
     }
@@ -53,7 +53,7 @@ public final class Guard {
             int count = systemErrors.merge(system, 1, Integer::sum);
             LOGGER.error("[Safe Mode] error in {} (#{})", system, count, t);
             if (count <= 3) {
-                toast("MineMenu: an error in " + system + " was caught", "The game keeps running. Details in logs/latest.log");
+                toast(Tr.format("minemenu.safe_mode.caught", "MineMenu: an error in %s was caught", system), Tr.get("minemenu.safe_mode.keeps_running", "The game keeps running. Details in logs/latest.log"));
             }
             return false;
         }

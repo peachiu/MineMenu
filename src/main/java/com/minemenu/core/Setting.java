@@ -5,10 +5,18 @@ package com.minemenu.core;
  * hack's button. {@code step} is the slider's step; {@code unit} is shown after the value ("blocks", "x", "s").
  */
 public record Setting(String key, String label, double min, double max, double step, double defaultValue, String unit) {
+    /** In the player's language (minemenu.setting.LABEL_IN_ENGLISH in the lang files). */
+    @Override
+    public String label() {
+        return Tr.get("minemenu.setting." + label.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]+", "_"), label);
+    }
+
     public String format(double value) {
         String number = step >= 1 ? String.valueOf((int) Math.round(value)) : String.format("%.2f", value)
                 .replaceAll("0+$", "").replaceAll("\\.$", "");
-        return number + (unit.isEmpty() ? "" : unit.startsWith("x") || unit.equals("%") ? unit : " " + unit);
+        String shownUnit = unit.isEmpty() || unit.startsWith("x") || unit.equals("%") || unit.equals("s") || unit.equals("px") ? unit
+                : Tr.get("minemenu.unit." + unit, unit);
+        return number + (unit.isEmpty() ? "" : unit.startsWith("x") || unit.equals("%") ? unit : " " + shownUnit);
     }
 
     /** A yes/no setting, shown as an ON/OFF button. */

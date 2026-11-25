@@ -21,7 +21,7 @@ public class TimeWeatherScreen extends Screen {
     private final Screen parent;
 
     public TimeWeatherScreen(Screen parent) {
-        super(Text.literal("Time & Weather"));
+        super(Text.translatable("minemenu.text.time_weather"));
         this.parent = parent;
     }
 
@@ -52,7 +52,7 @@ public class TimeWeatherScreen extends Screen {
 
             @Override
             protected void updateMessage() {
-                setMessage(Text.literal("Time: " + clock(ticks())));
+                setMessage(Text.translatable("minemenu.text.time_s", clock(ticks())));
             }
 
             @Override
@@ -60,14 +60,14 @@ public class TimeWeatherScreen extends Screen {
                 int t = ticks();
                 onServer(server -> WorldCheats.setTime(server, t));
             }
-        }).setTooltip(Tooltip.of(Text.literal("Drag to set the exact time of day. (Always Day overrides this.)")));
+        }).setTooltip(Tooltip.of(Text.translatable("minemenu.text.drag_to_set_the_exact_time")));
         y += 24;
         int quarter = (WIDTH - 12) / 4;
-        String[] names = {"Sunrise", "Noon", "Sunset", "Midnight"};
+        String[] names = {"minemenu.time.sunrise", "minemenu.time.noon", "minemenu.time.sunset", "minemenu.time.midnight"};
         int[] times = {0, 6000, 12000, 18000};
         for (int i = 0; i < 4; i++) {
             int t = times[i];
-            addDrawableChild(ButtonWidget.builder(Text.literal(names[i]), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.translatable(names[i]), b -> {
                         onServer(server -> WorldCheats.setTime(server, t));
                         this.client.setScreen(new TimeWeatherScreen(parent)); // move the slider too
                     })
@@ -94,7 +94,7 @@ public class TimeWeatherScreen extends Screen {
             @Override
             protected void updateMessage() {
                 int s = speed();
-                setMessage(Text.literal("Day Speed: " + (s == 0 ? "Stopped" : s == 1 ? "Normal" : s + "x faster")));
+                setMessage(Text.translatable("minemenu.text.day_speed_s", (s == 0 ? Text.translatable("minemenu.time.stopped") : s == 1 ? Text.translatable("minemenu.time.normal") : Text.translatable("minemenu.time.faster", s))));
             }
 
             @Override
@@ -102,22 +102,21 @@ public class TimeWeatherScreen extends Screen {
                 int s = speed();
                 onServer(server -> WorldCheats.setDaySpeed(server, s));
             }
-        }).setTooltip(Tooltip.of(Text.literal("How fast the sun moves. Normal is a 20 minute day. "
-                + "Goes back to Normal when you leave the world.")));
+        }).setTooltip(Tooltip.of(Text.translatable("minemenu.text.how_fast_the_sun_moves_normal")));
         y += 30;
 
         int third = (WIDTH - 8) / 3;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Sun").formatted(Formatting.YELLOW),
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.sun").formatted(Formatting.YELLOW),
                         b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.CLEAR)))
                 .dimensions(left, y, third, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Rain").formatted(Formatting.AQUA),
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.rain").formatted(Formatting.AQUA),
                         b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.RAIN)))
                 .dimensions(left + third + 4, y, third, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Thunder").formatted(Formatting.GOLD),
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.thunder").formatted(Formatting.GOLD),
                         b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.THUNDER)))
                 .dimensions(left + 2 * (third + 4), y, third, 20).build());
         y += 34;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.done"), b -> close())
                 .dimensions((this.width - 150) / 2, y, 150, 20).build());
     }
 
@@ -143,9 +142,9 @@ public class TimeWeatherScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Time & Weather").formatted(Formatting.GREEN, Formatting.BOLD),
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.time_weather").formatted(Formatting.GREEN, Formatting.BOLD),
                 this.width / 2, 12, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Now: " + clock(currentTicks())).formatted(Formatting.GRAY),
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.now_s", clock(currentTicks())).formatted(Formatting.GRAY),
                 this.width / 2, 25, 0xFFFFFF);
     }
 

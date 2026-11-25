@@ -38,30 +38,30 @@ public final class UndoStack {
 
     public static void undo(ServerPlayerEntity player) {
         if (BlockPlacer.busy()) {
-            player.sendMessage(Text.literal("Still building, try again in a moment").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.still_building_try_again_in_a").formatted(Formatting.YELLOW), true);
             return;
         }
         Entry entry = undo.poll();
         if (entry == null) {
-            player.sendMessage(Text.literal("Nothing to undo").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.nothing_to_undo").formatted(Formatting.YELLOW), true);
             return;
         }
         redo.push(entry);
-        BlockPlacer.submit(entry.world(), entry.before(), "Undo " + entry.name(), player, false);
+        BlockPlacer.submit(entry.world(), entry.before(), "undo:" + entry.name(), player, false);
     }
 
     public static void redo(ServerPlayerEntity player) {
         if (BlockPlacer.busy()) {
-            player.sendMessage(Text.literal("Still building, try again in a moment").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.still_building_try_again_in_a").formatted(Formatting.YELLOW), true);
             return;
         }
         Entry entry = redo.poll();
         if (entry == null) {
-            player.sendMessage(Text.literal("Nothing to redo").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.nothing_to_redo").formatted(Formatting.YELLOW), true);
             return;
         }
         undo.push(entry);
-        BlockPlacer.submit(entry.world(), entry.after(), "Redo " + entry.name(), player, false);
+        BlockPlacer.submit(entry.world(), entry.after(), "redo:" + entry.name(), player, false);
     }
 
     public static void clear() {

@@ -36,13 +36,13 @@ public final class Inventories {
         }
         data.put("loadout" + slot, gear);
         WorldData.write(player.getServer(), data);
-        player.sendMessage(Text.literal("Loadout " + (slot + 1) + " saved").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.loadout_s_saved", (slot + 1)).formatted(Formatting.GREEN), true);
     }
 
     public static void equipLoadout(ServerPlayerEntity player, int slot) {
         NbtCompound data = WorldData.read(player.getServer());
         if (!data.contains("loadout" + slot)) {
-            player.sendMessage(Text.literal("Loadout " + (slot + 1) + " is empty").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.loadout_s_is_empty", (slot + 1)).formatted(Formatting.YELLOW), true);
             return;
         }
         NbtCompound gear = data.getCompound("loadout" + slot);
@@ -58,25 +58,25 @@ public final class Inventories {
                 player.dropItem(worn, false);
             }
         }
-        player.sendMessage(Text.literal("Loadout " + (slot + 1) + " equipped").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.loadout_s_equipped", (slot + 1)).formatted(Formatting.GREEN), true);
     }
 
     public static void saveSnapshot(ServerPlayerEntity player, int slot) {
         NbtCompound data = WorldData.read(player.getServer());
         data.put("snapshot" + slot, player.getInventory().writeNbt(new NbtList()));
         WorldData.write(player.getServer(), data);
-        player.sendMessage(Text.literal("Inventory snapshot " + (slot + 1) + " saved").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.inventory_snapshot_s_saved", (slot + 1)).formatted(Formatting.GREEN), true);
     }
 
     public static void restoreSnapshot(ServerPlayerEntity player, int slot) {
         NbtCompound data = WorldData.read(player.getServer());
         if (!data.contains("snapshot" + slot)) {
-            player.sendMessage(Text.literal("Snapshot " + (slot + 1) + " is empty").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.snapshot_s_is_empty", (slot + 1)).formatted(Formatting.YELLOW), true);
             return;
         }
         player.getInventory().clear();
         player.getInventory().readNbt(data.getList("snapshot" + slot, 10));
         player.playerScreenHandler.sendContentUpdates();
-        player.sendMessage(Text.literal("Inventory snapshot " + (slot + 1) + " restored").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.inventory_snapshot_s_restored", (slot + 1)).formatted(Formatting.GREEN), true);
     }
 }

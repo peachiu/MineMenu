@@ -68,7 +68,7 @@ public final class FunModules {
                     }
                     if (!events.isEmpty()) {
                         String event = events.get(player.getRandom().nextInt(events.size()));
-                        player.sendMessage(Text.literal("CHAOS: " + label(event)).formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), false);
+                        player.sendMessage(Text.translatable("minemenu.text.chaos_s", label(event)).formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), false);
                         FunEvents.chaos(player, event);
                     }
                 }
@@ -162,15 +162,15 @@ public final class FunModules {
         int roll = world.random.nextInt(12);
         String what;
         switch (roll) {
-            case 0 -> { drop(world, pos, new ItemStack(Items.DIAMOND, 8)); what = "8 diamonds!"; }
-            case 1 -> { drop(world, pos, new ItemStack(Items.GOLDEN_APPLE, 3)); what = "golden apples"; }
-            case 2 -> { drop(world, pos, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE)); what = "an enchanted golden apple!"; }
-            case 3 -> { drop(world, pos, new ItemStack(Items.NETHERITE_INGOT, 2)); what = "netherite!"; }
-            case 4 -> { player.addExperienceLevels(10); what = "10 levels of XP"; }
-            case 5 -> { EntityType.WOLF.spawn(world, pos, SpawnReason.EVENT); what = "a new friend"; }
+            case 0 -> { drop(world, pos, new ItemStack(Items.DIAMOND, 8)); what = "minemenu.lucky.8_diamonds"; }
+            case 1 -> { drop(world, pos, new ItemStack(Items.GOLDEN_APPLE, 3)); what = "minemenu.lucky.golden_apples"; }
+            case 2 -> { drop(world, pos, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE)); what = "minemenu.lucky.an_enchanted_golden_apple"; }
+            case 3 -> { drop(world, pos, new ItemStack(Items.NETHERITE_INGOT, 2)); what = "minemenu.lucky.netherite"; }
+            case 4 -> { player.addExperienceLevels(10); what = "minemenu.lucky.10_levels_of_xp"; }
+            case 5 -> { EntityType.WOLF.spawn(world, pos, SpawnReason.EVENT); what = "minemenu.lucky.a_new_friend"; }
             case 6 -> {
                 for (int i = 0; i < 4; i++) EntityType.ZOMBIE.spawn(world, pos, SpawnReason.EVENT);
-                what = "zombies!";
+                what = "minemenu.lucky.zombies";
             }
             case 7 -> {
                 LightningEntity bolt = EntityType.LIGHTNING_BOLT.create(world);
@@ -178,22 +178,22 @@ public final class FunModules {
                     bolt.refreshPositionAfterTeleport(at);
                     world.spawnEntity(bolt);
                 }
-                what = "lightning!";
+                what = "minemenu.lucky.lightning";
             }
             case 8 -> {
                 world.setBlockState(pos.up(12), Blocks.ANVIL.getDefaultState());
-                what = "look up!";
+                what = "minemenu.lucky.look_up";
             }
             case 9 -> {
                 for (int i = 0; i < 6; i++) EntityType.SILVERFISH.spawn(world, pos, SpawnReason.EVENT);
-                what = "silverfish!";
+                what = "minemenu.lucky.silverfish";
             }
-            case 10 -> { drop(world, pos, new ItemStack(Items.ELYTRA)); what = "an elytra!"; }
+            case 10 -> { drop(world, pos, new ItemStack(Items.ELYTRA)); what = "minemenu.lucky.an_elytra"; }
             default -> {
                 for (int i = 0; i < 12; i++) drop(world, pos, new ItemStack(Items.COOKIE));
-                what = "cookies";
+                what = "minemenu.lucky.cookies";
             }
         }
-        player.sendMessage(Text.literal("Lucky Block: " + what).formatted(roll <= 5 || roll >= 10 ? Formatting.GREEN : Formatting.RED), true);
+        player.sendMessage(Text.translatable("minemenu.text.lucky_block_s", Text.translatable(what)).formatted(roll <= 5 || roll >= 10 ? Formatting.GREEN : Formatting.RED), true);
     }
 }

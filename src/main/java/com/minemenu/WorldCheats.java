@@ -194,7 +194,7 @@ public final class WorldCheats {
         }
 
         public String displayName() {
-            return displayName;
+            return com.minemenu.core.Tr.get("minemenu.structure." + name().toLowerCase(java.util.Locale.ROOT), displayName);
         }
     }
 
@@ -214,7 +214,7 @@ public final class WorldCheats {
                 player.getBlockPos(), 100, false);
         if (found == null) {
             Waypoints.setFound(null);
-            player.sendMessage(Text.literal("No " + target.displayName() + " found in this dimension (searched about 1600 blocks)")
+            player.sendMessage(Text.translatable("minemenu.text.no_s_found_in_this_dimension", target.displayName())
                     .formatted(Formatting.YELLOW), false);
             return;
         }
@@ -222,7 +222,6 @@ public final class WorldCheats {
         int distance = (int) Math.sqrt(player.getBlockPos().getSquaredDistance(pos.getX(), player.getY(), pos.getZ()));
         Waypoints.setFound(new Waypoints.Found(target.displayName(), world.getRegistryKey().getValue().toString(),
                 pos.getX() + 0.5, pos.getZ() + 0.5));
-        player.sendMessage(Text.literal(target.displayName() + " found at " + pos.getX() + ", " + pos.getZ() + " (" + distance
-                + " blocks away). Follow the arrow in your HUD.").formatted(Formatting.GREEN), false);
+        player.sendMessage(Text.translatable("minemenu.text.s_found_at_s_s_s", target.displayName(), pos.getX(), pos.getZ(), distance).formatted(Formatting.GREEN), false);
     }
 }

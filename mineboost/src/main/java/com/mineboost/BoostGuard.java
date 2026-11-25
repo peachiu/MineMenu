@@ -39,7 +39,7 @@ public final class BoostGuard {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client != null) {
             client.execute(() -> SystemToast.add(client.getToastManager(), SystemToast.Type.PERIODIC_NOTIFICATION,
-                    Text.literal(name + " was disabled because of an error"), Text.literal("Details are in logs/latest.log")));
+                    Text.translatable("mineboost.text.s_was_disabled_because_of_an", name), Text.translatable("mineboost.text.details_are_in_logs_latest_log")));
         }
     }
 }

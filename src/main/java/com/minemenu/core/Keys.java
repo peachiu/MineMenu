@@ -83,13 +83,13 @@ public final class Keys {
         }
         for (CheatConfig.Macro macro : CheatConfig.get().macros) {
             if (macro.key == key && !("macro:" + macro.name).equals(exceptId)) {
-                list.add("Macro " + macro.name);
+                list.add(Tr.format("minemenu.entry.macro", "Macro: %s", macro.name));
             }
         }
         return list;
     }
 
     public static String name(int key) {
-        return key <= 0 ? "None" : InputUtil.Type.KEYSYM.createFromCode(key).getLocalizedText().getString();
+        return key <= 0 ? Tr.get("minemenu.key.none", "None") : InputUtil.Type.KEYSYM.createFromCode(key).getLocalizedText().getString();
     }
 }

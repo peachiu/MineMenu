@@ -14,7 +14,7 @@ public class BigMapScreen extends Screen {
     private double offsetZ;
 
     public BigMapScreen() {
-        super(Text.literal("Map"));
+        super(Text.translatable("minemenu.text.map"));
     }
 
     @Override
@@ -74,8 +74,7 @@ public class BigMapScreen extends Screen {
         int px = left + width / 2 - (int) (offsetX / zoom);
         int py = top + height / 2 - (int) (offsetZ / zoom);
         context.fill(px - 2, py - 2, px + 2, py + 2, 0xFFFFFF55);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Map (" + zoom + " blocks per pixel). Scroll: zoom, drag: move. "
-                + (MineMenuClient.isSingleplayer(this.client) ? "" : "Only explored chunks.")).formatted(Formatting.GRAY), this.width / 2, 6, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.map_s_blocks_per_pixel_scroll", zoom, (MineMenuClient.isSingleplayer(this.client) ? Text.empty() : Text.translatable("minemenu.bigmap.explored_only"))).formatted(Formatting.GRAY), this.width / 2, 6, 0xFFFFFF);
     }
 
     @Override

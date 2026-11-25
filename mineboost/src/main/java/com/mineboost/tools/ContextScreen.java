@@ -13,7 +13,7 @@ public class ContextScreen extends Screen {
     private final Screen parent;
 
     public ContextScreen(Screen parent) {
-        super(Text.literal("Context Rules"));
+        super(Text.translatable("mineboost.text.context_rules"));
         this.parent = parent;
     }
 
@@ -22,7 +22,7 @@ public class ContextScreen extends Screen {
         BoostConfig c = BoostConfig.get();
         int left = this.width / 2 - 150;
         int y = 30;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Context rules: " + (c.contextRules ? "ON" : "OFF")), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.context_rules_s", Text.translatable(c.contextRules ? "mineboost.text.on" : "mineboost.text.off")), b -> {
             c.contextRules = !c.contextRules;
             BoostConfig.save();
             clearAndInit();
@@ -34,15 +34,8 @@ public class ContextScreen extends Screen {
             }
             String current = c.contextPresets.get(situation.name());
             Preset preset = current == null ? null : ContextRules.find(current);
-            String label = switch (situation) {
-                case NETHER -> "In the Nether";
-                case END -> "In the End";
-                case CAVE -> "Underground (no sky)";
-                case CROWD -> "150+ mobs within 32 blocks";
-                case ELYTRA -> "Flying an elytra";
-                default -> situation.name();
-            };
-            addDrawableChild(ButtonWidget.builder(Text.literal(label + ": " + (preset == null ? "leave as is" : preset.displayName())), b -> {
+            String label = com.mineboost.Tr.get("mineboost.context." + situation.name().toLowerCase(java.util.Locale.ROOT), situation.name());
+            addDrawableChild(ButtonWidget.builder(Text.literal(label + ": " + (preset == null ? com.mineboost.Tr.get("mineboost.context.leave", "leave as is") : preset.displayName())), b -> {
                 Preset[] all = Preset.values();
                 int index = preset == null ? 0 : preset.ordinal() + 1;
                 if (index >= all.length) {
@@ -55,15 +48,14 @@ public class ContextScreen extends Screen {
             }).dimensions(left, y, 300, 20).build());
             y += 22;
         }
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(this.width / 2 - 75, y + 8, 150, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("mineboost.text.done_2"), b -> close()).dimensions(this.width / 2 - 75, y + 8, 150, 20).build());
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Context Rules").formatted(Formatting.GREEN, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Leaving a situation puts your own settings back. Now: "
-                + ContextRules.current().name().toLowerCase()).formatted(Formatting.GRAY), this.width / 2, 18, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.context_rules").formatted(Formatting.GREEN, Formatting.BOLD), this.width / 2, 8, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("mineboost.text.leaving_a_situation_puts_your_own", ContextRules.current().name().toLowerCase()).formatted(Formatting.GRAY), this.width / 2, 18, 0xFFFFFF);
     }
 
     @Override

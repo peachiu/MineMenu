@@ -50,17 +50,17 @@ public final class Compat {
     public static List<String> turnedOff() {
         List<String> lines = new ArrayList<>();
         if (ENTITYCULLING) {
-            lines.add("Smart Culling: EntityCulling already hides things behind walls.");
+            lines.add(Tr.auto("mineboost.compat.", "Smart Culling: EntityCulling already hides things behind walls."));
         }
         if (SODIUM) {
-            lines.add("Chunk Builder (vanilla setting): Sodium has its own chunk renderer and ignores it.");
-            lines.add("Section Culling: Sodium already skips entities in hidden sections.");
+            lines.add(Tr.auto("mineboost.compat.", "Chunk Builder (vanilla setting): Sodium has its own chunk renderer and ignores it."));
+            lines.add(Tr.auto("mineboost.compat.", "Section Culling: Sodium already skips entities in hidden sections."));
         }
         if (ENTITYCULLING && !SODIUM) {
-            lines.add("Section Culling: EntityCulling already hides entities you can't see.");
+            lines.add(Tr.auto("mineboost.compat.", "Section Culling: EntityCulling already hides entities you can't see."));
         }
         if (IRIS) {
-            lines.add("Render Scale: Iris draws the world itself (shaders have their own resolution settings).");
+            lines.add(Tr.auto("mineboost.compat.", "Render Scale: Iris draws the world itself (shaders have their own resolution settings)."));
         }
         return lines;
     }

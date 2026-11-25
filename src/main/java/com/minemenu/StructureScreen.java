@@ -15,7 +15,7 @@ public class StructureScreen extends Screen {
     private final Screen parent;
 
     public StructureScreen(Screen parent) {
-        super(Text.literal("Find Structure"));
+        super(Text.translatable("minemenu.text.find_structure"));
         this.parent = parent;
     }
 
@@ -32,12 +32,12 @@ public class StructureScreen extends Screen {
                     .build());
         }
         int bottom = y + ((targets.length + columns - 1) / columns) * 22 + 6;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Clear Target"), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.clear_target"), b -> {
                     Waypoints.setFound(null);
                     close();
                 })
                 .dimensions(this.width / 2 - 104, bottom, 100, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.back"), b -> close())
                 .dimensions(this.width / 2 + 4, bottom, 100, 20).build());
     }
 
@@ -47,7 +47,7 @@ public class StructureScreen extends Screen {
             return;
         }
         if (this.client.player != null) {
-            this.client.player.sendMessage(Text.literal("Searching for the nearest " + target.displayName() + "...")
+            this.client.player.sendMessage(Text.translatable("minemenu.text.searching_for_the_nearest_s", target.displayName())
                     .formatted(Formatting.GRAY), true);
         }
         server.execute(() -> {
@@ -74,10 +74,10 @@ public class StructureScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Find Structure").formatted(Formatting.GREEN, Formatting.BOLD),
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.find_structure").formatted(Formatting.GREEN, Formatting.BOLD),
                 this.width / 2, 8, 0xFFFFFF);
         context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.literal("Searches your dimension, like /locate. The result shows in your HUD.").formatted(Formatting.GRAY),
+                Text.translatable("minemenu.text.searches_your_dimension_like_locate_the").formatted(Formatting.GRAY),
                 this.width / 2, 19, 0xFFFFFF);
     }
 

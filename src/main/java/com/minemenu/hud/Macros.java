@@ -92,7 +92,7 @@ public final class Macros {
         MenuEntry entry = MenuEntries.byId(step);
         if (entry == null) {
             if (client.player != null) {
-                client.player.sendMessage(Text.literal("Macro step not found: " + step).formatted(Formatting.RED), false);
+                client.player.sendMessage(Text.translatable("minemenu.text.macro_step_not_found_s", step).formatted(Formatting.RED), false);
             }
             return;
         }

@@ -66,8 +66,7 @@ public final class DeathChest {
         }
         Bootstrap.justMadeDeathChest = true;
         BlockPos at = pos;
-        Waypoints.setLastDeath(player, "Death Chest");
-        player.sendMessage(Text.literal("Your items are in a Death Chest at " + at.getX() + ", " + at.getY() + ", " + at.getZ()
-                + " (see your waypoints)").formatted(Formatting.GOLD), false);
+        Waypoints.setLastDeath(player, com.minemenu.core.Tr.get("minemenu.death_chest.waypoint", "Death Chest"));
+        player.sendMessage(Text.translatable("minemenu.text.your_items_are_in_a_death", at.getX(), at.getY(), at.getZ()).formatted(Formatting.GOLD), false);
     }
 }

@@ -16,7 +16,7 @@ public class NameScreen extends Screen {
     private TextFieldWidget field;
 
     public NameScreen(Screen parent, String title, Consumer<String> onDone) {
-        super(Text.literal(title));
+        super(Text.translatable(title));
         this.parent = parent;
         this.onDone = onDone;
     }
@@ -26,8 +26,8 @@ public class NameScreen extends Screen {
         field = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, this.height / 2 - 20, 200, 20, this.title);
         field.setMaxLength(48);
         addDrawableChild(field);
-        addDrawableChild(ButtonWidget.builder(Text.literal("OK"), b -> done()).dimensions(this.width / 2 - 100, this.height / 2 + 6, 98, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), b -> close()).dimensions(this.width / 2 + 2, this.height / 2 + 6, 98, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.ok"), b -> done()).dimensions(this.width / 2 - 100, this.height / 2 + 6, 98, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.cancel"), b -> close()).dimensions(this.width / 2 + 2, this.height / 2 + 6, 98, 20).build());
         setInitialFocus(field);
     }
 

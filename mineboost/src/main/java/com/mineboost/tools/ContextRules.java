@@ -94,7 +94,7 @@ public final class ContextRules {
         }
         preset.apply(client);
         current = next;
-        client.player.sendMessage(Text.literal("MineBoost: " + preset.displayName() + " (" + next.name().toLowerCase() + ")").formatted(Formatting.GREEN), true);
+        client.player.sendMessage(Text.translatable("mineboost.text.mineboost_s_s", preset.displayName(), next.name().toLowerCase()).formatted(Formatting.GREEN), true);
     }
 
     private static void leave(MinecraftClient client) {

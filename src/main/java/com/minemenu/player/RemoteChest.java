@@ -67,9 +67,9 @@ public final class RemoteChest {
                 && player.getWorld().getBlockEntity(blockHit.getBlockPos()) instanceof Inventory) {
             BlockPos pos = blockHit.getBlockPos();
             CheatConfig.get().setText("remote.chest", player.getServerWorld().getRegistryKey().getValue() + " " + pos.asLong());
-            player.sendMessage(Text.literal("Chest marked. Open Marked Chest opens it from anywhere.").formatted(Formatting.GREEN), true);
+            player.sendMessage(Text.translatable("minemenu.text.chest_marked_open_marked_chest_opens").formatted(Formatting.GREEN), true);
         } else {
-            player.sendMessage(Text.literal("Look at a chest or barrel (within 8 blocks)").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_chest_or_barrel").formatted(Formatting.YELLOW), true);
         }
     }
 
@@ -77,22 +77,22 @@ public final class RemoteChest {
         String saved = CheatConfig.get().text("remote.chest", "");
         String[] parts = saved.split(" ");
         if (parts.length != 2 || !parts[0].equals(player.getServerWorld().getRegistryKey().getValue().toString())) {
-            player.sendMessage(Text.literal("Mark a chest in this dimension first").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.mark_a_chest_in_this_dimension").formatted(Formatting.YELLOW), true);
             return;
         }
         BlockPos pos = BlockPos.fromLong(Long.parseLong(parts[1]));
         if (!player.getServerWorld().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) {
-            player.sendMessage(Text.literal("The marked chest's chunk isn't loaded (too far away)").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.the_marked_chest_s_chunk_isn").formatted(Formatting.YELLOW), true);
             return;
         }
         BlockEntity blockEntity = player.getWorld().getBlockEntity(pos);
         if (!(blockEntity instanceof Inventory inventory) || inventory.size() < 27) {
-            player.sendMessage(Text.literal("The marked chest is gone").formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.the_marked_chest_is_gone").formatted(Formatting.RED), true);
             return;
         }
         Inventory anywhere = new AnywhereInventory(inventory);
         player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, playerInventory, p) ->
-                GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, anywhere), Text.literal("Marked chest")));
+                GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, anywhere), Text.translatable("minemenu.text.marked_chest")));
     }
 
     /** The chest's own inventory, except that it can be used from any distance. */

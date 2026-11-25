@@ -21,7 +21,7 @@ public enum Category {
     }
 
     public String displayName() {
-        return displayName;
+        return com.minemenu.core.Tr.get("minemenu.category." + name().toLowerCase(java.util.Locale.ROOT), displayName);
     }
 
     public Formatting color() {

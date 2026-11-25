@@ -34,7 +34,7 @@ public class BoostScreen extends GameOptionsScreen {
      * so the FPS Overlay can't be turned on as well. Null in the standalone MineBoost mod.
      */
     public static BooleanSupplier otherFpsCounterOn;
-    public static String otherFpsCounterReason = "Another FPS counter is on. Turn it off first.";
+    public static String otherFpsCounterReason = "mineboost.screen.other_fps_counter";
 
     private final int mipmapsOnOpen;
     private final int renderDistanceOnOpen;
@@ -49,7 +49,7 @@ public class BoostScreen extends GameOptionsScreen {
 
     private BoostScreen(Screen parent, GameOptions options, int mipmapsOnOpen, int renderDistanceOnOpen,
                         double initialScroll) {
-        super(parent, options, Text.literal("MineBoost").formatted(Formatting.GREEN, Formatting.BOLD));
+        super(parent, options, Text.translatable("mineboost.text.mineboost").formatted(Formatting.GREEN, Formatting.BOLD));
         this.mipmapsOnOpen = mipmapsOnOpen;
         this.renderDistanceOnOpen = renderDistanceOnOpen;
         this.initialScroll = initialScroll;
@@ -84,23 +84,23 @@ public class BoostScreen extends GameOptionsScreen {
             presets.add(ButtonWidget.builder(label, b -> applyPreset(preset))
                     .width(Math.max(40, this.textRenderer.getWidth(label) + 10))
                     .tooltip(Tooltip.of(Text.literal(preset.description() + "\n\n" + preset.renderScaleNote()
-                            + (active ? "\n\nThis preset is active." : "\n\nClick to apply."))))
+                            + "\n\n" + (active ? Tr.get("mineboost.preset.active", "This preset is active.") : Tr.get("mineboost.preset.click", "Click to apply.")))))
                     .build());
         }
         header.add(presets);
         if (!detected.isEmpty()) {
             // Other performance mods found: say which, and what MineBoost turned off so it doesn't do the same work twice.
             List<String> off = Compat.turnedOff();
-            String offText = off.isEmpty() ? "" : " (" + off.size() + " MineBoost option" + (off.size() > 1 ? "s" : "") + " off, hover)";
-            String line = "Works with: " + detected + offText;
+            String offText = off.isEmpty() ? "" : " " + Tr.format("mineboost.compat.options_off", "(%s MineBoost option(s) off, hover)", off.size());
+            String line = Tr.format("mineboost.compat.works_with", "Works with: %s", detected) + offText;
             if (this.textRenderer.getWidth(line) > this.width - 20) {
                 // Too long for this window: the names go in the tooltip instead.
-                line = "Works with " + detected.split(", ").length + " other FPS mods" + offText;
+                line = Tr.format("mineboost.compat.works_with_n", "Works with %s other FPS mods", detected.split(", ").length) + offText;
             }
             TextWidget compat = new TextWidget(Text.literal(line).formatted(Formatting.GRAY), this.textRenderer);
-            compat.setTooltip(Tooltip.of(Text.literal("Found: " + detected + "\n\n" + (off.isEmpty()
-                    ? "No conflicts: these mods and MineBoost speed up different things."
-                    : "Turned off because the other mod already does it:\n- " + String.join("\n- ", off)))));
+            compat.setTooltip(Tooltip.of(Text.translatable("mineboost.text.found_s_s", detected, (off.isEmpty()
+                    ? Tr.get("mineboost.compat.no_conflicts", "No conflicts: these mods and MineBoost speed up different things.")
+                    : Tr.get("mineboost.compat.turned_off", "Turned off because the other mod already does it:") + "\n- " + String.join("\n- ", off)))));
             header.add(compat);
         }
         layout.addHeader(header);
@@ -114,7 +114,7 @@ public class BoostScreen extends GameOptionsScreen {
         this.body.addAll(extras);
         lockFpsOverlayIfNeeded(extras[extras.length - 1]);
         if (Compat.ENTITYCULLING) {
-            lock(BoostOptions.smartCullingOption, "Off: EntityCulling is installed and already hides things behind walls.");
+            lock(BoostOptions.smartCullingOption, Tr.auto("mineboost.lock.", "Off: EntityCulling is installed and already hides things behind walls."));
         }
         String scaleReason = com.mineboost.renderscale.RenderScale.unavailableReason(this.client);
         if (scaleReason != null) {
@@ -122,11 +122,11 @@ public class BoostScreen extends GameOptionsScreen {
             lock(BoostOptions.renderScaleSharpenOption, scaleReason);
         }
         if (Compat.IRIS) {
-            lock(BoostOptions.impostorsOption, "Off with Iris: shader packs draw mobs their own way.");
+            lock(BoostOptions.impostorsOption, Tr.auto("mineboost.lock.", "Off with Iris: shader packs draw mobs their own way."));
         }
         if (Compat.SODIUM || Compat.ENTITYCULLING) {
-            lock(BoostOptions.sectionCullingOption, Compat.SODIUM ? "Off: Sodium already skips entities in hidden sections."
-                    : "Off: EntityCulling already hides entities you can't see.");
+            lock(BoostOptions.sectionCullingOption, Compat.SODIUM ? Tr.auto("mineboost.lock.", "Off: Sodium already skips entities in hidden sections.")
+                    : Tr.auto("mineboost.lock.", "Off: EntityCulling already hides entities you can't see."));
         }
 
         // Then the vanilla settings that matter most for FPS, biggest impact first.
@@ -148,32 +148,28 @@ public class BoostScreen extends GameOptionsScreen {
     @Override
     protected void initFooter() {
         DirectionalLayoutWidget footer = DirectionalLayoutWidget.horizontal().spacing(4);
-        footer.add(ButtonWidget.builder(Text.literal("Auto Preset").formatted(Formatting.AQUA), b -> {
+        footer.add(ButtonWidget.builder(Text.translatable("mineboost.text.auto_preset").formatted(Formatting.AQUA), b -> {
                     applyPendingValues();
                     close();
                     AutoPreset.start(this.client);
                 })
                 .width(100)
-                .tooltip(Tooltip.of(Text.literal("Closes the menu and tries the presets from Ultra down (about 7 seconds "
-                        + "each), then keeps the best looking one that reaches your FPS Target (or 60 FPS if that's off). "
-                        + "Keep playing normally while it runs.")))
+                .tooltip(Tooltip.of(Text.translatable("mineboost.text.closes_the_menu_and_tries_the")))
                 .build());
-        footer.add(ButtonWidget.builder(Text.literal("Benchmark (10s)").formatted(Formatting.GREEN), b -> {
+        footer.add(ButtonWidget.builder(Text.translatable("mineboost.text.benchmark_10s").formatted(Formatting.GREEN), b -> {
                     applyPendingValues();
                     close();
                     Benchmark.start();
                 })
                 .width(100)
-                .tooltip(Tooltip.of(Text.literal("Closes the menu and measures your FPS for 10 seconds. "
-                        + "Keep playing normally; the result shows up in chat. Try it with different presets!")))
+                .tooltip(Tooltip.of(Text.translatable("mineboost.text.closes_the_menu_and_measures_your")))
                 .build());
-        footer.add(ButtonWidget.builder(Text.literal("Tools...").formatted(Formatting.YELLOW), b -> {
+        footer.add(ButtonWidget.builder(Text.translatable("mineboost.text.tools").formatted(Formatting.YELLOW), b -> {
                     applyPendingValues();
                     this.client.setScreen(new com.mineboost.tools.BoostToolsScreen(this));
                 })
                 .width(100)
-                .tooltip(Tooltip.of(Text.literal("Lag Doctor, A/B test of every boost, memory and JVM advice, context rules, "
-                        + "FPS profiles and Battery Saver.")))
+                .tooltip(Tooltip.of(Text.translatable("mineboost.text.lag_doctor_a_b_test_of")))
                 .build());
         footer.add(ButtonWidget.builder(ScreenTexts.DONE, b -> close()).width(100).build());
         layout.addFooter(footer);
@@ -210,7 +206,7 @@ public class BoostScreen extends GameOptionsScreen {
         ClickableWidget widget = this.body.getWidgetFor(fpsOverlayOption);
         if (locked && widget != null) {
             widget.active = false;
-            widget.setTooltip(Tooltip.of(Text.literal(otherFpsCounterReason)));
+            widget.setTooltip(Tooltip.of(Text.translatable(otherFpsCounterReason)));
         }
     }
 
@@ -228,7 +224,7 @@ public class BoostScreen extends GameOptionsScreen {
     private Text fpsText() {
         int fps = this.client != null ? this.client.getCurrentFps() : 0;
         Formatting color = fps >= 60 ? Formatting.GREEN : fps >= 30 ? Formatting.YELLOW : Formatting.RED;
-        return Text.literal("Current FPS: ").formatted(Formatting.GRAY)
+        return Text.translatable("mineboost.text.current_fps").formatted(Formatting.GRAY)
                 .append(Text.literal(String.valueOf(fps)).formatted(color, Formatting.BOLD));
     }
 
@@ -311,8 +307,10 @@ public class BoostScreen extends GameOptionsScreen {
 
         /** The tooltip text plus its "Impact:" line, if there is one. */
         static Text withImpact(String key, String tooltip) {
-            String impact = IMPACT.get(key);
-            return Text.literal(tooltip + (impact == null ? "" : "\n\nImpact: " + impact));
+            // Translated (mineboost.option.X.tooltip / .impact in the lang files), English from here as the fallback.
+            String impact = IMPACT.containsKey(key) ? Tr.get(key + ".impact", IMPACT.get(key)) : null;
+            return Text.literal(Tr.get(key + ".tooltip", tooltip)
+                    + (impact == null ? "" : "\n\n" + Tr.get("mineboost.text.impact", "Impact:") + " " + impact));
         }
 
 
@@ -344,7 +342,7 @@ public class BoostScreen extends GameOptionsScreen {
                             "Render Scale: draw the world at a lower resolution and stretch it to the window. The HUD, text "
                                     + "and menus stay sharp. 75% means about half the pixels to fill, which is what slows "
                                     + "down integrated graphics the most.",
-                            BoostConfig.RENDER_SCALES, c.renderScale, v -> v >= 100 ? "Off (100%)" : v + "%", v -> c.renderScale = v),
+                            BoostConfig.RENDER_SCALES, c.renderScale, v -> v >= 100 ? Tr.auto("mineboost.value.", "Off (100%)") : v + "%", v -> c.renderScale = v),
                     toggle("mineboost.option.dynamic_render_scale",
                             "Dynamic Render Scale: lowers the scale by itself when you're below your FPS Target (60 if off) "
                                     + "and raises it back (up to Render Scale) when there's FPS to spare. Changes at most once a second.",
@@ -355,8 +353,8 @@ public class BoostScreen extends GameOptionsScreen {
                                             + "MineBoost lowers the render distance, and raises it again (up to the "
                                             + "distance you chose) when there's FPS to spare.")),
                             (prefix, index) -> GameOptions.getGenericValueText(prefix,
-                                    BoostConfig.FPS_TARGETS[index] == 0 ? Text.literal("Off")
-                                            : Text.literal(BoostConfig.FPS_TARGETS[index] + " FPS")),
+                                    BoostConfig.FPS_TARGETS[index] == 0 ? Text.translatable("mineboost.text.off")
+                                            : Text.translatable("mineboost.text.s_fps", BoostConfig.FPS_TARGETS[index])),
                             new SimpleOption.ValidatingIntSliderCallbacks(0, BoostConfig.FPS_TARGETS.length - 1),
                             Math.max(0, BoostConfig.indexOf(BoostConfig.FPS_TARGETS, c.fpsTarget)),
                             index -> {
@@ -372,7 +370,7 @@ public class BoostScreen extends GameOptionsScreen {
                                     "Most particles on screen at once. Stops TNT, big farms and potion clouds "
                                             + "from tanking your FPS, while normal particles still show.")),
                             (prefix, index) -> GameOptions.getGenericValueText(prefix,
-                                    BoostConfig.PARTICLE_LIMITS[index] < 0 ? Text.literal("Unlimited")
+                                    BoostConfig.PARTICLE_LIMITS[index] < 0 ? Text.translatable("mineboost.text.unlimited")
                                             : Text.literal(String.valueOf(BoostConfig.PARTICLE_LIMITS[index]))),
                             new SimpleOption.ValidatingIntSliderCallbacks(0, BoostConfig.PARTICLE_LIMITS.length - 1),
                             Math.max(0, BoostConfig.indexOf(BoostConfig.PARTICLE_LIMITS, c.particleLimit)),
@@ -380,12 +378,12 @@ public class BoostScreen extends GameOptionsScreen {
                     listSlider("mineboost.option.max_entities",
                             "Draw only this many of the closest mobs, animals and items. Huge help at farms and mob "
                                     + "grinders. Players, bosses and glowing mobs are always drawn.",
-                            BoostConfig.MAX_ENTITIES, c.maxEntities, v -> v < 0 ? "All" : String.valueOf(v),
+                            BoostConfig.MAX_ENTITIES, c.maxEntities, v -> v < 0 ? Tr.auto("mineboost.value.", "All") : String.valueOf(v),
                             v -> c.maxEntities = v),
                     listSlider("mineboost.option.particle_range",
                             "Particles farther away than this aren't created at all. Rain splashes, far-away "
                                     + "explosions and farms make lots you can barely see.",
-                            BoostConfig.DISTANCES, c.particleRange, v -> v < 0 ? "Any" : v + " blocks",
+                            BoostConfig.DISTANCES, c.particleRange, v -> v < 0 ? Tr.auto("mineboost.value.", "Any") : Tr.format("mineboost.value.n_blocks", "%s blocks", v),
                             v -> c.particleRange = v),
             };
         }
@@ -397,7 +395,7 @@ public class BoostScreen extends GameOptionsScreen {
                             "Simple Far Mobs: mobs farther than this are drawn without armor, held items, saddles, "
                                     + "heads and other extra layers (each one draws the mob again). Sheep wool, glowing "
                                     + "eyes and charged creepers are kept, and players always look normal.",
-                            BoostConfig.FAR_MOB_DETAIL, c.farMobDetail, v -> v < 0 ? "Off" : v + " blocks",
+                            BoostConfig.FAR_MOB_DETAIL, c.farMobDetail, v -> v < 0 ? Tr.auto("mineboost.value.", "Off") : Tr.format("mineboost.value.n_blocks", "%s blocks", v),
                             v -> c.farMobDetail = v),
                     new SimpleOption<>("mineboost.option.entity_distance",
                             SimpleOption.constantTooltip(withImpact("mineboost.option.entity_distance", 
@@ -405,7 +403,7 @@ public class BoostScreen extends GameOptionsScreen {
                                             + "One of the biggest boosts near farms and mob grinders.")),
                             (prefix, value) -> GameOptions.getGenericValueText(prefix,
                                     value >= BoostConfig.ENTITY_DISTANCE_UNLIMITED
-                                            ? Text.literal("Unlimited") : Text.literal(value * 8 + " blocks")),
+                                            ? Text.translatable("mineboost.text.unlimited") : Text.translatable("mineboost.text.s_blocks", value * 8)),
                             new SimpleOption.ValidatingIntSliderCallbacks(2, BoostConfig.ENTITY_DISTANCE_UNLIMITED),
                             c.entityDistance,
                             value -> c.entityDistance = value),
@@ -415,14 +413,14 @@ public class BoostScreen extends GameOptionsScreen {
                                             + "Great for big bases and storage rooms.")),
                             (prefix, value) -> GameOptions.getGenericValueText(prefix,
                                     value >= BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA
-                                            ? Text.literal("Normal") : Text.literal(value * 8 + " blocks")),
+                                            ? Text.translatable("mineboost.text.normal") : Text.translatable("mineboost.text.s_blocks", value * 8)),
                             new SimpleOption.ValidatingIntSliderCallbacks(1, BoostConfig.BLOCK_ENTITY_DISTANCE_VANILLA),
                             c.blockEntityDistance,
                             value -> c.blockEntityDistance = value),
                     listSlider("mineboost.option.item_distance",
                             "Dropped items farther than this aren't drawn (normally Minecraft draws them up to about "
                                     + "16 blocks). Farms and explosions leave lots of them around.",
-                            BoostConfig.ITEM_DISTANCES, c.itemDistance, v -> v < 0 ? "Normal" : v + " blocks",
+                            BoostConfig.ITEM_DISTANCES, c.itemDistance, v -> v < 0 ? Tr.auto("mineboost.value.", "Normal") : Tr.format("mineboost.value.n_blocks", "%s blocks", v),
                             v -> c.itemDistance = v),
                     toggle("mineboost.option.simple_items",
                             "Draw a stack of dropped items as one item instead of a pile of up to five. "
@@ -456,7 +454,7 @@ public class BoostScreen extends GameOptionsScreen {
                                             + "Minimized always drops to 1 FPS. Frees your PC for OBS, Discord or "
                                             + "your browser.")),
                             (prefix, value) -> GameOptions.getGenericValueText(prefix,
-                                    value == 0 ? Text.literal("Off") : Text.literal(value + " FPS")),
+                                    value == 0 ? Text.translatable("mineboost.text.off") : Text.translatable("mineboost.text.s_fps", value)),
                             new SimpleOption.ValidatingIntSliderCallbacks(0, 60),
                             c.backgroundFps,
                             value -> c.backgroundFps = value),
@@ -471,16 +469,16 @@ public class BoostScreen extends GameOptionsScreen {
                             "Idle Mode: when you haven't touched the keyboard or mouse for a while (see Idle After), "
                                     + "limit the FPS to this. Anything you press brings full FPS back instantly. "
                                     + "Your laptop stays cooler, so it doesn't slow down from heat later.",
-                            BoostConfig.IDLE_FPS, c.idleFps, v -> v == 0 ? "Off" : v + " FPS",
+                            BoostConfig.IDLE_FPS, c.idleFps, v -> v == 0 ? Tr.auto("mineboost.value.", "Off") : v + " FPS",
                             v -> c.idleFps = v),
                     listSlider("mineboost.option.idle_seconds",
                             "How long without input before Idle Mode starts.",
-                            BoostConfig.IDLE_SECONDS, c.idleSeconds, v -> v < 60 ? v + "s" : v / 60 + " min",
+                            BoostConfig.IDLE_SECONDS, c.idleSeconds, v -> v < 60 ? v + "s" : Tr.format("mineboost.value.n_min", "%s min", v / 60),
                             v -> c.idleSeconds = v),
                     listSlider("mineboost.option.menu_fps",
                             "FPS limit while an inventory, chest or the pause menu is open. Nothing there needs full "
                                     + "speed, so your PC runs cooler and quieter. (Chat isn't limited.)",
-                            BoostConfig.MENU_FPS, c.menuFps, v -> v == 0 ? "Off" : v + " FPS",
+                            BoostConfig.MENU_FPS, c.menuFps, v -> v == 0 ? Tr.auto("mineboost.value.", "Off") : v + " FPS",
                             v -> c.menuFps = v),
                     toggle("mineboost.option.render_scale_filter",
                             "How Render Scale stretches the picture: ON = Nearest (sharp pixels, a bit faster), OFF = Linear (smooth).",
@@ -488,7 +486,7 @@ public class BoostScreen extends GameOptionsScreen {
                     renderScaleSharpenOption = listSlider("mineboost.option.render_scale_sharpen",
                             "Sharpen (CAS) for Render Scale: makes the smaller picture look crisp again, without halos around "
                                     + "edges. Only used while Render Scale is below 100%.",
-                            BoostConfig.SHARPEN_LEVELS, c.renderScaleSharpen, v -> v == 0 ? "Off" : v + "%", v -> c.renderScaleSharpen = v),
+                            BoostConfig.SHARPEN_LEVELS, c.renderScaleSharpen, v -> v == 0 ? Tr.auto("mineboost.value.", "Off") : v + "%", v -> c.renderScaleSharpen = v),
                     listSlider("mineboost.option.render_scale_min",
                             "The lowest scale Dynamic Render Scale may go down to.",
                             BoostConfig.RENDER_SCALES, c.renderScaleMin, v -> v + "%", v -> c.renderScaleMin = v),
@@ -496,7 +494,7 @@ public class BoostScreen extends GameOptionsScreen {
                             "Impostors: mobs farther than this are drawn as a flat picture of themselves that turns "
                                     + "towards you, instead of the full model with armor and items. They don't animate, so "
                                     + "use it for far mobs only. Players, bosses and glowing mobs are always drawn normally.",
-                            BoostConfig.IMPOSTOR_DISTANCES, c.impostorDistance, v -> v == 0 ? "Off" : v + " blocks", v -> c.impostorDistance = v),
+                            BoostConfig.IMPOSTOR_DISTANCES, c.impostorDistance, v -> v == 0 ? Tr.auto("mineboost.value.", "Off") : Tr.format("mineboost.value.n_blocks", "%s blocks", v), v -> c.impostorDistance = v),
                     sectionCullingOption = toggle("mineboost.option.section_culling",
                             "Section Culling: the game already knows which chunk sections you can't see (caves under you, "
                                     + "behind hills) but still draws the mobs in them. This skips those mobs.",
@@ -511,7 +509,7 @@ public class BoostScreen extends GameOptionsScreen {
                             c.smoothFog, v -> c.smoothFog = v),
                     listSlider("mineboost.option.max_sounds",
                             "Most sounds playing at once. Huge farms and explosions can play hundreds.",
-                            BoostConfig.MAX_SOUNDS, c.maxSounds, v -> v == 0 ? "No limit" : String.valueOf(v), v -> c.maxSounds = v),
+                            BoostConfig.MAX_SOUNDS, c.maxSounds, v -> v == 0 ? Tr.auto("mineboost.value.", "No limit") : String.valueOf(v), v -> c.maxSounds = v),
                     toggle("mineboost.option.frame_graph",
                             "A small graph of the last 100 frame times under the FPS Overlay. Tall red bars are stutters.",
                             c.frameGraph, v -> c.frameGraph = v),

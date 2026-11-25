@@ -176,7 +176,7 @@ public final class Waypoints {
         Waypoint[] copy = slots.clone();
         Waypoint w = new Waypoint();
         Waypoint old = copy[slot];
-        w.name = name != null && !name.isBlank() ? name.trim() : old != null ? old.name : "Waypoint " + (slot + 1);
+        w.name = name != null && !name.isBlank() ? name.trim() : old != null ? old.name : com.minemenu.core.Tr.get("minemenu.waypoint.default_name", "Waypoint") + " " + (slot + 1);
         w.hud = old == null || old.hud;
         w.dimension = player.getServerWorld().getRegistryKey().getValue().toString();
         w.x = player.getX();
@@ -187,7 +187,7 @@ public final class Waypoints {
         copy[slot] = w;
         slots = copy;
         changed();
-        player.sendMessage(Text.literal("Waypoint \"" + w.name + "\" set here").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.waypoint_s_set_here", w.name).formatted(Formatting.GREEN), true);
     }
 
     public static void go(ServerPlayerEntity player, int slot) {
@@ -203,12 +203,12 @@ public final class Waypoints {
         ServerWorld world = server == null || id == null ? null
                 : server.getWorld(RegistryKey.of(RegistryKeys.WORLD, id));
         if (world == null) {
-            player.sendMessage(Text.literal("That dimension doesn't exist any more").formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.that_dimension_doesn_t_exist_any").formatted(Formatting.RED), true);
             return;
         }
         player.teleport(world, w.x, w.y, w.z, w.yaw, w.pitch);
         player.fallDistance = 0;
-        player.sendMessage(Text.literal(HOME.equalsIgnoreCase(w.name) ? "Welcome home!" : "Teleported to " + w.name)
+        player.sendMessage((HOME.equalsIgnoreCase(w.name) ? Text.translatable("minemenu.text.welcome_home") : Text.translatable("minemenu.text.teleported_to_s", w.name))
                 .formatted(Formatting.GREEN), true);
     }
 
@@ -266,7 +266,7 @@ public final class Waypoints {
     public static void goLastDeath(ServerPlayerEntity player) {
         Waypoint w = lastDeath;
         if (w == null) {
-            player.sendMessage(Text.literal("You haven't died in this world yet").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.you_haven_t_died_in_this").formatted(Formatting.YELLOW), true);
             return;
         }
         teleport(player, w);
@@ -291,7 +291,7 @@ public final class Waypoints {
             slot = firstFree();
         }
         if (slot < 0) {
-            player.sendMessage(Text.literal("All 10 waypoints are used: delete one in Waypoints... first").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.all_10_waypoints_are_used_delete").formatted(Formatting.YELLOW), true);
             return;
         }
         setHere(player, slot, HOME);
@@ -300,7 +300,7 @@ public final class Waypoints {
     public static void goHome(ServerPlayerEntity player) {
         int slot = indexOf(HOME);
         if (slot < 0) {
-            player.sendMessage(Text.literal("No home yet: use Set Home first").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.no_home_yet_use_set_home").formatted(Formatting.YELLOW), true);
             return;
         }
         go(player, slot);
@@ -382,9 +382,9 @@ public final class Waypoints {
 
     /** For the Waypoints screen: "x, y, z (dimension)". */
     public static String describe(Waypoint w) {
-        String dim = w.dimension.equals(World.OVERWORLD.getValue().toString()) ? "Overworld"
-                : w.dimension.equals(World.NETHER.getValue().toString()) ? "Nether"
-                : w.dimension.equals(World.END.getValue().toString()) ? "The End" : w.dimension;
+        String dim = w.dimension.equals(World.OVERWORLD.getValue().toString()) ? com.minemenu.core.Tr.get("minemenu.dimension.overworld", "Overworld")
+                : w.dimension.equals(World.NETHER.getValue().toString()) ? com.minemenu.core.Tr.get("minemenu.dimension.nether", "Nether")
+                : w.dimension.equals(World.END.getValue().toString()) ? com.minemenu.core.Tr.get("minemenu.dimension.end", "The End") : w.dimension;
         return (int) Math.floor(w.x) + ", " + (int) Math.floor(w.y) + ", " + (int) Math.floor(w.z) + " (" + dim + ")";
     }
 }

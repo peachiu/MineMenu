@@ -1,0 +1,16 @@
+{
+  "minemeboost.entry.battery": "Battery Saver (toggle)",
+  "minemeboost.entry.battery.desc": "30 FPS, lower Render Scale and fewer particles.",
+  "minemeboost.entry.lag_doctor": "Lag Doctor (30 s)",
+  "minemeboost.entry.lag_doctor.desc": "Find out what costs you FPS.",
+  "minemeboost.entry.preset": "Preset:",
+  "minemeboost.entry.tools": "MineBoost Tools...",
+  "minemeboost.entry.tools.desc": "Lag Doctor, A/B test, memory, context rules, FPS profiles.",
+  "minemeboost.fps_lock.mineboost": "MineMenu's Show FPS is on. Turn it off in the MineMenu tab to use this one.",
+  "minemeboost.fps_lock.minemenu": "MineBoost's FPS Overlay is on. Turn it off in the MineBoost tab to use this one.",
+  "minemeboost.text.cheats_only_work_in_singleplayer_on": "Cheats only work in singleplayer. On servers: Info HUD, Minimap and Chunk Borders.",
+  "minemeboost.text.fps_boost_presets_graphics_settings_and": "FPS boost: presets, graphics settings and extra boosts.",
+  "minemeboost.text.fun_cheats_fly_god_mode_spawn": "Fun cheats: fly, god mode, spawn mobs, XP, revenge mode...",
+  "minemeboost.text.mineboost": "MineBoost",
+  "minemeboost.text.minemenu": "MineMenu"
+}

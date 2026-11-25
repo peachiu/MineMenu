@@ -65,8 +65,8 @@ public final class Creators {
         return Text.literal(text.replace('&', '§'));
     }
 
-    private static void warn(ServerPlayerEntity player, String text) {
-        player.sendMessage(Text.literal(text).formatted(Formatting.YELLOW), false);
+    private static void warn(ServerPlayerEntity player, String key, Object... args) {
+        player.sendMessage(Text.translatable(key, args).formatted(Formatting.YELLOW), false);
     }
 
     private static void give(ServerPlayerEntity player, ItemStack stack) {
@@ -80,7 +80,7 @@ public final class Creators {
         Identifier itemId = id(v.getOrDefault("item", "diamond_sword"));
         Item item = itemId == null ? Items.AIR : Registries.ITEM.get(itemId);
         if (item == Items.AIR) {
-            warn(player, "Unknown item: " + v.get("item"));
+            warn(player, "minemenu.creator.unknown_item", v.get("item"));
             return;
         }
         ItemStack stack = new ItemStack(item, (int) Math.max(1, Math.min(item.getMaxCount(), number(v, "count", 1))));
@@ -115,7 +115,7 @@ public final class Creators {
                 Identifier enchantId = id(enchantName);
                 Optional<? extends RegistryEntry<net.minecraft.enchantment.Enchantment>> entry = enchantId == null ? Optional.empty() : registry.getEntry(enchantId);
                 if (entry.isEmpty()) {
-                    warn(player, "Unknown enchantment: " + enchantName);
+                    warn(player, "minemenu.creator.unknown_enchantment", enchantName);
                     continue;
                 }
                 builder.set(entry.get(), Math.max(1, Math.min(255, level)));
@@ -138,7 +138,7 @@ public final class Creators {
             stack.set(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE);
         }
         give(player, stack);
-        player.sendMessage(Text.literal("Created " + stack.getName().getString()).formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.created_s", stack.getName().getString()).formatted(Formatting.GREEN), true);
     }
 
     private static boolean attribute(AttributeModifiersComponent.Builder builder, RegistryEntry<EntityAttribute> attribute, String name,
@@ -162,7 +162,7 @@ public final class Creators {
             Identifier effectId = id(words[0]);
             var entry = effectId == null ? Optional.<RegistryEntry.Reference<net.minecraft.entity.effect.StatusEffect>>empty() : Registries.STATUS_EFFECT.getEntry(effectId);
             if (entry.isEmpty()) {
-                warn(player, "Unknown effect: " + words[0]);
+                warn(player, "minemenu.creator.unknown_effect", words[0]);
                 continue;
             }
             int level = 1;
@@ -203,14 +203,14 @@ public final class Creators {
             stack.set(DataComponentTypes.CUSTOM_NAME, colored(name));
         }
         give(player, stack);
-        player.sendMessage(Text.literal("Created " + stack.getName().getString()).formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.created_s", stack.getName().getString()).formatted(Formatting.GREEN), true);
     }
 
     /** Mob Creator: spawns the mob where you look, with name, health, baby, no AI, equipment, effects and a rider. */
     public static void createMob(ServerPlayerEntity player, Map<String, String> v) {
         HitResult hit = player.raycast(64, 1.0f, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            warn(player, "Look at a block to spawn the mob there");
+            warn(player, "minemenu.creator.look_at_block");
             return;
         }
         BlockPos at = blockHit.getBlockPos().offset(blockHit.getSide());
@@ -226,19 +226,19 @@ public final class Creators {
                 riding.startRiding(mob, true);
             }
         }
-        player.sendMessage(Text.literal("Spawned " + mob.getName().getString()).formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.spawned_s", mob.getName().getString()).formatted(Formatting.GREEN), true);
     }
 
     private static Entity spawnOne(ServerPlayerEntity player, ServerWorld world, String idText, BlockPos at, Map<String, String> v) {
         Identifier typeId = id(idText);
         EntityType<?> type = typeId == null ? null : Registries.ENTITY_TYPE.getOrEmpty(typeId).orElse(null);
         if (type == null) {
-            warn(player, "Unknown mob: " + idText);
+            warn(player, "minemenu.creator.unknown_mob", idText);
             return null;
         }
         Entity entity = type.spawn(world, at, SpawnReason.COMMAND);
         if (entity == null) {
-            warn(player, "Couldn't spawn " + idText);
+            warn(player, "minemenu.creator.cant_spawn", idText);
             return null;
         }
         String name = v.getOrDefault("name", "").trim();

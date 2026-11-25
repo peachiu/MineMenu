@@ -61,7 +61,7 @@ public final class Benchmark {
             return;
         }
         int secondsLeft = (int) Math.ceil((DURATION_NANOS - elapsed) / 1e9);
-        Text text = Text.literal("MineBoost benchmark: " + secondsLeft + "s, keep playing normally")
+        Text text = Text.translatable("mineboost.text.mineboost_benchmark_ss_keep_playing_normally", secondsLeft)
                 .formatted(Formatting.GREEN);
         context.drawCenteredTextWithShadow(client.textRenderer, text, context.getScaledWindowWidth() / 2, 30, 0xFFFFFF);
     }
@@ -81,17 +81,16 @@ public final class Benchmark {
         int low = (int) Math.round(slowest * 1e9 / slowTotal);
         int worst = (int) Math.round(1e9 / sorted[frames - 1]);
 
-        String preset = "Custom";
+        String preset = Tr.get("mineboost.benchmark.custom", "Custom");
         for (Preset p : Preset.values()) {
             if (p.isActive(client)) {
                 preset = p.displayName();
             }
         }
-        client.player.sendMessage(Text.literal("MineBoost benchmark: ").formatted(Formatting.GREEN)
-                .append(Text.literal("avg " + avg + " FPS").formatted(Formatting.WHITE, Formatting.BOLD))
-                .append(Text.literal(", 1% low " + low + ", worst frame " + worst + " FPS").formatted(Formatting.WHITE))
-                .append(Text.literal("  (" + preset + ", render distance "
-                        + client.options.getViewDistance().getValue() + ")").formatted(Formatting.GRAY)), false);
+        client.player.sendMessage(Text.translatable("mineboost.text.mineboost_benchmark").formatted(Formatting.GREEN)
+                .append(Text.translatable("mineboost.text.avg_s_fps", avg).formatted(Formatting.WHITE, Formatting.BOLD))
+                .append(Text.translatable("mineboost.text.1_low_s_worst_frame_s", low, worst).formatted(Formatting.WHITE))
+                .append(Text.translatable("mineboost.text.s_render_distance_s", preset, client.options.getViewDistance().getValue()).formatted(Formatting.GRAY)), false);
 
         Result result = new Result();
         result.avg = avg;
@@ -108,25 +107,24 @@ public final class Benchmark {
 
     /** "Before vs after": the FPS difference to the last benchmark, and which settings changed in between. */
     private static Text compare(Result before, Result after) {
-        MutableText text = Text.literal("vs last run: ").formatted(Formatting.GRAY)
-                .append(diff("avg", before.avg, after.avg))
+        MutableText text = Text.translatable("mineboost.text.vs_last_run").formatted(Formatting.GRAY)
+                .append(diff(Tr.get("mineboost.benchmark.avg", "avg"), before.avg, after.avg))
                 .append(Text.literal(", ").formatted(Formatting.GRAY))
-                .append(diff("1% low", before.low, after.low));
+                .append(diff(Tr.get("mineboost.benchmark.low", "1% low"), before.low, after.low));
         List<String> changed = new ArrayList<>();
         for (Map.Entry<String, String> entry : after.settings.entrySet()) {
             String old = before.settings.get(entry.getKey());
             if (old != null && !old.equals(entry.getValue())) {
-                changed.add(entry.getKey() + " " + old + " → " + entry.getValue());
+                changed.add(Tr.auto("mineboost.setting_name.", entry.getKey()) + " " + Tr.auto("mineboost.value.", old) + " → " + Tr.auto("mineboost.value.", entry.getValue()));
             }
         }
         if (changed.isEmpty()) {
-            text.append(Text.literal(". Same settings, so this is just normal run-to-run variation "
-                    + "(look at the same spot each time for fair results).").formatted(Formatting.GRAY));
+            text.append(Text.translatable("mineboost.text.same_settings_so_this_is_just").formatted(Formatting.GRAY));
         } else {
             int shown = Math.min(5, changed.size());
-            text.append(Text.literal(". Changed: ").formatted(Formatting.GRAY))
+            text.append(Text.translatable("mineboost.text.changed").formatted(Formatting.GRAY))
                     .append(Text.literal(String.join(", ", changed.subList(0, shown))
-                            + (changed.size() > shown ? " and " + (changed.size() - shown) + " more" : ""))
+                            + (changed.size() > shown ? " " + Tr.format("mineboost.benchmark.more", "and %s more", changed.size() - shown) : ""))
                             .formatted(Formatting.YELLOW));
         }
         return text;

@@ -53,17 +53,17 @@ public final class MindControl implements CheatModule {
     private static void take(ServerPlayerEntity player) {
         LivingEntity target = Look.livingEntity(player, 32);
         if (!(target instanceof MobEntity mob)) {
-            player.sendMessage(Text.literal("Look at a mob, then press the Mind Control key").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_mob_then_press").formatted(Formatting.YELLOW), true);
             return;
         }
         if (mob instanceof EnderDragonEntity) {
-            player.sendMessage(Text.literal("The Ender Dragon can't be mind-controlled").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.the_ender_dragon_can_t_be").formatted(Formatting.YELLOW), true);
             return;
         }
         controlled.put(mob.getUuid(), now + DURATION);
         mob.setTarget(null);
         player.getServerWorld().spawnParticles(ParticleTypes.WITCH, mob.getX(), mob.getBodyY(1.0), mob.getZ(), 20, 0.4, 0.4, 0.4, 0.05);
-        player.sendMessage(Text.literal(mob.getName().getString() + " is under your control for 60 seconds").formatted(Formatting.LIGHT_PURPLE), true);
+        player.sendMessage(Text.translatable("minemenu.text.s_is_under_your_control_for", mob.getName().getString()).formatted(Formatting.LIGHT_PURPLE), true);
     }
 
     @Override

@@ -151,7 +151,7 @@ public class MineMenuClient implements ClientModInitializer {
             return true;
         }
         if (client.player != null) {
-            client.player.sendMessage(Text.literal("Cheats only work in singleplayer (and your own LAN world).")
+            client.player.sendMessage(Text.translatable("minemenu.text.cheats_only_work_in_singleplayer_and")
                     .formatted(Formatting.RED), true);
         }
         return false;
@@ -167,7 +167,7 @@ public class MineMenuClient implements ClientModInitializer {
         boolean on = CheatState.toggle(feature);
         if (client.player != null) {
             client.player.sendMessage(Text.literal(feature.displayName() + ": ")
-                    .append(Text.literal(on ? "ON" : "OFF").formatted(on ? Formatting.GREEN : Formatting.RED)), true);
+                    .append((on ? Text.translatable("minemenu.text.on") : Text.translatable("minemenu.text.off")).formatted(on ? Formatting.GREEN : Formatting.RED)), true);
         }
     }
 
@@ -191,7 +191,7 @@ public class MineMenuClient implements ClientModInitializer {
         if (CheatState.fpsVisible()) {
             int fps = client.getCurrentFps();
             Formatting color = fps >= 60 ? Formatting.GREEN : fps >= 30 ? Formatting.YELLOW : Formatting.RED;
-            context.drawTextWithShadow(font, Text.literal(fps + " FPS").formatted(color, Formatting.BOLD), x, y, 0xFFFFFF);
+            context.drawTextWithShadow(font, Text.translatable("minemenu.text.s_fps", fps).formatted(color, Formatting.BOLD), x, y, 0xFFFFFF);
             y += 12;
         }
 
@@ -215,14 +215,14 @@ public class MineMenuClient implements ClientModInitializer {
         if (enabled.isEmpty() && size == CheatState.Size.NORMAL) {
             return;
         }
-        context.drawTextWithShadow(font, Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), x, y, 0xFFFFFF);
+        context.drawTextWithShadow(font, Text.translatable("minemenu.text.minemenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), x, y, 0xFFFFFF);
         y += 11;
         for (Feature feature : enabled) {
             context.drawTextWithShadow(font, Text.literal("• " + feature.displayName()).formatted(Formatting.GREEN), x, y, 0xFFFFFF);
             y += 10;
         }
         if (size != CheatState.Size.NORMAL) {
-            context.drawTextWithShadow(font, Text.literal("• Size: " + size.displayName()).formatted(Formatting.AQUA), x, y, 0xFFFFFF);
+            context.drawTextWithShadow(font, Text.translatable("minemenu.text.size_s", size.displayName()).formatted(Formatting.AQUA), x, y, 0xFFFFFF);
         }
     }
 }

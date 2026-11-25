@@ -47,28 +47,28 @@ public final class ItemScreens {
 
     static Screen itemCreator(Screen parent) {
         FormScreen[] screen = new FormScreen[1];
-        screen[0] = new FormScreen(parent, "Item Creator", List.of(
-                new FormScreen.Field("item", "Item", "diamond_sword"),
-                new FormScreen.Field("count", "Count", "1"),
-                new FormScreen.Field("name", "Name (&c = red, &l = bold...)", "&6Excalibur"),
-                new FormScreen.Field("lore", "Lore (lines split by |)", "Forged in lava | Very sharp"),
-                new FormScreen.Field("enchantments", "Enchantments (name level, ...)", "sharpness 255, looting 10"),
-                new FormScreen.Field("damage", "Attack damage (+)", "0"),
-                new FormScreen.Field("attack speed", "Attack speed (+)", "0"),
-                new FormScreen.Field("health", "Max health (+)", "0"),
-                new FormScreen.Field("armor", "Armor (+)", "0")),
+        screen[0] = new FormScreen(parent, "minemenu.form.item_creator", List.of(
+                new FormScreen.Field("item", "minemenu.form.item", "diamond_sword"),
+                new FormScreen.Field("count", "minemenu.form.count", "1"),
+                new FormScreen.Field("name", "minemenu.form.name_c_red_l_bold", "&6Excalibur"),
+                new FormScreen.Field("lore", "minemenu.form.lore_lines_split_by", "Forged in lava | Very sharp"),
+                new FormScreen.Field("enchantments", "minemenu.form.enchantments_name_level", "sharpness 255, looting 10"),
+                new FormScreen.Field("damage", "minemenu.form.attack_damage", "0"),
+                new FormScreen.Field("attack speed", "minemenu.form.attack_speed", "0"),
+                new FormScreen.Field("health", "minemenu.form.max_health", "0"),
+                new FormScreen.Field("armor", "minemenu.form.armor", "0")),
                 List.of("Unbreakable", "Hide tooltips"),
-                List.of(new FormScreen.Action("Give", values -> {
+                List.of(new FormScreen.Action("minemenu.form.give", values -> {
                             Map<String, String> copy = new LinkedHashMap<>(values);
                             server(p -> Creators.createItem(p, copy));
-                            screen[0].message("Given");
+                            screen[0].message("minemenu.form.given");
                         }),
-                        new FormScreen.Action("Save favorite", values -> {
+                        new FormScreen.Action("minemenu.form.save_favorite", values -> {
                             CheatConfig.get().savedItems.add(GSON.toJson(values));
                             CheatConfig.markDirty();
-                            screen[0].message("Saved to favorites");
+                            screen[0].message("minemenu.form.saved_to_favorites");
                         }),
-                        new FormScreen.Action("Favorites...", values -> MinecraftClient.getInstance().setScreen(favorites(screen[0])))),
+                        new FormScreen.Action("minemenu.form.favorites", values -> MinecraftClient.getInstance().setScreen(favorites(screen[0])))),
                 itemValues);
         return screen[0];
     }
@@ -81,7 +81,7 @@ public final class ItemScreens {
             String label = values == null ? "?" : values.getOrDefault("name", "").isBlank() ? values.getOrDefault("item", "?") : values.get("name").replaceAll("&.", "");
             choices.add(new PickerScreen.Choice(label, String.valueOf(i)));
         }
-        return new PickerScreen(form, "Saved items (click to load)", choices, choice -> {
+        return new PickerScreen(form, "minemenu.picker.saved_items_click_to_load", choices, choice -> {
             Map<String, String> values = GSON.fromJson(saved.get(Integer.parseInt(choice.id())), new TypeToken<Map<String, String>>() { }.getType());
             if (values != null) {
                 form.values().clear();
@@ -93,41 +93,41 @@ public final class ItemScreens {
 
     static Screen potionCreator(Screen parent) {
         FormScreen[] screen = new FormScreen[1];
-        screen[0] = new FormScreen(parent, "Potion Creator", List.of(
-                new FormScreen.Field("type", "Type: potion, splash, lingering or arrow", "potion"),
-                new FormScreen.Field("name", "Name (optional)", "&dSuper Potion"),
-                new FormScreen.Field("effects", "Effects (name level seconds, ...)", "speed 5 60, strength 10 120"),
-                new FormScreen.Field("color", "Colour (hex)", "FF55FF")),
+        screen[0] = new FormScreen(parent, "minemenu.form.potion_creator", List.of(
+                new FormScreen.Field("type", "minemenu.form.type_potion_splash_lingering_or_arrow", "potion"),
+                new FormScreen.Field("name", "minemenu.form.name_optional", "&dSuper Potion"),
+                new FormScreen.Field("effects", "minemenu.form.effects_name_level_seconds", "speed 5 60, strength 10 120"),
+                new FormScreen.Field("color", "minemenu.form.colour_hex", "FF55FF")),
                 List.of(),
-                List.of(new FormScreen.Action("Give", values -> {
+                List.of(new FormScreen.Action("minemenu.form.give", values -> {
                     Map<String, String> copy = new LinkedHashMap<>(values);
                     server(p -> Creators.createPotion(p, copy));
-                    screen[0].message("Given");
+                    screen[0].message("minemenu.form.given");
                 })), potionValues);
         return screen[0];
     }
 
     static Screen mobCreator(Screen parent) {
         FormScreen[] screen = new FormScreen[1];
-        screen[0] = new FormScreen(parent, "Mob Creator", List.of(
-                new FormScreen.Field("mob", "Mob", "zombie"),
-                new FormScreen.Field("name", "Name (optional)", "&cBoss Bob"),
-                new FormScreen.Field("health", "Health (0 = normal)", "100"),
-                new FormScreen.Field("rider", "Rider mob (optional)", "skeleton"),
-                new FormScreen.Field("equipment", "Head, chest, legs, feet, main hand, off hand", "diamond_helmet, , , , diamond_sword, shield"),
-                new FormScreen.Field("effects", "Effects (name level seconds, ...)", "speed 2 999")),
+        screen[0] = new FormScreen(parent, "minemenu.form.mob_creator", List.of(
+                new FormScreen.Field("mob", "minemenu.form.mob", "zombie"),
+                new FormScreen.Field("name", "minemenu.form.name_optional", "&cBoss Bob"),
+                new FormScreen.Field("health", "minemenu.form.health_0_normal", "100"),
+                new FormScreen.Field("rider", "minemenu.form.rider_mob_optional", "skeleton"),
+                new FormScreen.Field("equipment", "minemenu.form.head_chest_legs_feet_main_hand_off_hand", "diamond_helmet, , , , diamond_sword, shield"),
+                new FormScreen.Field("effects", "minemenu.form.effects_name_level_seconds", "speed 2 999")),
                 List.of("Baby", "No AI"),
-                List.of(new FormScreen.Action("Spawn", values -> {
+                List.of(new FormScreen.Action("minemenu.form.spawn", values -> {
                             Map<String, String> copy = new LinkedHashMap<>(values);
                             server(p -> Creators.createMob(p, copy));
-                            screen[0].message("Spawned where you're looking");
+                            screen[0].message("minemenu.form.spawned_where_you_re_looking");
                         }),
-                        new FormScreen.Action("Save preset", values -> {
+                        new FormScreen.Action("minemenu.form.save_preset", values -> {
                             CheatConfig.get().mobPresets.add(GSON.toJson(values));
                             CheatConfig.markDirty();
-                            screen[0].message("Preset saved");
+                            screen[0].message("minemenu.form.preset_saved");
                         }),
-                        new FormScreen.Action("Presets...", values -> MinecraftClient.getInstance().setScreen(mobPresets(screen[0])))),
+                        new FormScreen.Action("minemenu.form.presets", values -> MinecraftClient.getInstance().setScreen(mobPresets(screen[0])))),
                 mobValues);
         return screen[0];
     }
@@ -140,7 +140,7 @@ public final class ItemScreens {
             String label = values == null ? "?" : values.getOrDefault("name", "").isBlank() ? values.getOrDefault("mob", "?") : values.get("name").replaceAll("&.", "");
             choices.add(new PickerScreen.Choice(label, String.valueOf(i)));
         }
-        return new PickerScreen(form, "Mob presets (click to load)", choices, choice -> {
+        return new PickerScreen(form, "minemenu.picker.mob_presets_click_to_load", choices, choice -> {
             Map<String, String> values = GSON.fromJson(saved.get(Integer.parseInt(choice.id())), new TypeToken<Map<String, String>>() { }.getType());
             if (values != null) {
                 form.values().clear();

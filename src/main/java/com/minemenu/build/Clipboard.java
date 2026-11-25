@@ -59,17 +59,17 @@ public final class Clipboard {
         copy.saveFromWorld(player.getServerWorld(), new BlockPos(box.getMinX(), box.getMinY(), box.getMinZ()),
                 new Vec3i(box.getBlockCountX(), box.getBlockCountY(), box.getBlockCountZ()), false, Blocks.STRUCTURE_VOID);
         set(copy);
-        player.sendMessage(Text.literal("Copied " + Selection.volume(box) + " blocks. Paste (preview) shows where it goes.").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.copied_s_blocks_paste_preview_shows", Selection.volume(box)).formatted(Formatting.GREEN), true);
     }
 
     public static void rotate(ServerPlayerEntity player) {
         rotation = rotation.rotate(BlockRotation.CLOCKWISE_90);
-        player.sendMessage(Text.literal("Rotation: " + rotationName()).formatted(Formatting.AQUA), true);
+        player.sendMessage(Text.translatable("minemenu.text.rotation_s", rotationName()).formatted(Formatting.AQUA), true);
     }
 
     public static void mirror(ServerPlayerEntity player) {
         mirror = mirror == BlockMirror.NONE ? BlockMirror.FRONT_BACK : BlockMirror.NONE;
-        player.sendMessage(Text.literal("Mirror: " + (mirror == BlockMirror.NONE ? "off" : "on")).formatted(Formatting.AQUA), true);
+        player.sendMessage(Text.translatable("minemenu.text.mirror_s", (mirror == BlockMirror.NONE ? "off" : "on")).formatted(Formatting.AQUA), true);
     }
 
     private static String rotationName() {
@@ -97,18 +97,18 @@ public final class Clipboard {
 
     public static void startPreview(ServerPlayerEntity player) {
         if (template == null) {
-            player.sendMessage(Text.literal("Copy something first (or load a schematic)").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.copy_something_first_or_load_a").formatted(Formatting.YELLOW), true);
             return;
         }
         previewing = true;
-        player.sendMessage(Text.literal("Look where it should go, then Confirm Paste. Rotate / Mirror work while previewing.").formatted(Formatting.AQUA), true);
+        player.sendMessage(Text.translatable("minemenu.text.look_where_it_should_go_then").formatted(Formatting.AQUA), true);
     }
 
     public static void paste(ServerPlayerEntity player) {
         StructureTemplate t = template;
         BlockPos at = anchor;
         if (t == null || !previewing || at == null) {
-            player.sendMessage(Text.literal("Start the preview first (Paste), and look at a block").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.start_the_preview_first_paste_and").formatted(Formatting.YELLOW), true);
             return;
         }
         previewing = false;
@@ -125,6 +125,6 @@ public final class Clipboard {
             changes.add(new BlockChange(pos, info.state().mirror(mirror).rotate(rotation), info.nbt()));
         }
         ServerWorld world = player.getServerWorld();
-        BlockPlacer.submit(world, changes, "Paste", player, true);
+        BlockPlacer.submit(world, changes, "minemenu.job.paste", player, true);
     }
 }

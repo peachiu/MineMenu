@@ -1,5 +1,7 @@
 package com.mineboost.tools;
 
+import com.mineboost.Tr;
+
 import com.mineboost.BoostConfig;
 import com.mineboost.PresetState;
 import net.fabricmc.loader.api.FabricLoader;
@@ -153,8 +155,8 @@ public final class BoostAB {
                 applyOff(client);
             }
         }
-        Text text = Text.literal(String.format("MineBoost A/B test %d/%d: %s (%s) - stand still, look at a busy spot",
-                index + 1, tests.size(), tests.get(index).name(), (phase / 2) % 2 == 0 ? "off" : "on")).formatted(Formatting.GREEN);
+        Text text = Text.translatable("mineboost.ab.running", index + 1, tests.size(), Tr.auto("mineboost.ab.test.", tests.get(index).name()),
+                Text.translatable((phase / 2) % 2 == 0 ? "mineboost.text.off" : "mineboost.text.on")).formatted(Formatting.GREEN);
         context.drawCenteredTextWithShadow(client.textRenderer, text, context.getScaledWindowWidth() / 2, 54, 0xFFFFFF);
     }
 
@@ -198,7 +200,7 @@ public final class BoostAB {
             double[] r = results[i];
             double gain = r[0] > 0 ? (r[2] - r[0]) * 100 / r[0] : 0;
             md.append(String.format("| %s | %.1f | %.1f | %+.0f%% | %.1f | %.1f |\n", tests.get(i).name(), r[0], r[2], gain, r[1], r[3]));
-            best.add(String.format("%+.0f%% %s", gain, tests.get(i).name()));
+            best.add(String.format("%+.0f%% %s", gain, Tr.auto("mineboost.ab.test.", tests.get(i).name())));
             BoostConfig.get().abGains.put(tests.get(i).name(), (int) Math.round(gain)); // presets read the Render Scale ones
         }
         BoostConfig.save();
@@ -209,7 +211,6 @@ public final class BoostAB {
             Files.writeString(file, md.toString());
         } catch (Exception ignored) {
         }
-        client.player.sendMessage(Text.literal("MineBoost A/B done. Best on your PC: " + String.join(", ", best.subList(0, Math.min(5, best.size())))
-                + ". Full table: config/minemeboost/benchmark-results.md").formatted(Formatting.GREEN), false);
+        client.player.sendMessage(Text.translatable("mineboost.text.mineboost_a_b_done_best_on", String.join(", ", best.subList(0, Math.min(5, best.size())))).formatted(Formatting.GREEN), false);
     }
 }

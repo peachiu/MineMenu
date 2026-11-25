@@ -71,9 +71,9 @@ public final class AutoPreset {
                 return;
             }
         }
-        Text text = Text.literal("MineBoost: testing ").formatted(Formatting.GREEN)
+        Text text = Text.translatable("mineboost.text.mineboost_testing").formatted(Formatting.GREEN)
                 .append(Text.literal(preset.displayName()).formatted(preset.color()))
-                .append(Text.literal(" (target " + target + " FPS)... keep playing normally").formatted(Formatting.GREEN));
+                .append(Text.translatable("mineboost.text.target_s_fps_keep_playing_normally", target).formatted(Formatting.GREEN));
         context.drawCenteredTextWithShadow(client.textRenderer, text, context.getScaledWindowWidth() / 2, 30, 0xFFFFFF);
     }
 
@@ -83,10 +83,8 @@ public final class AutoPreset {
             return;
         }
         boolean reached = avg >= target;
-        client.player.sendMessage(Text.literal("MineBoost Auto Preset: ").formatted(Formatting.GREEN)
+        client.player.sendMessage(Text.translatable("mineboost.text.mineboost_auto_preset").formatted(Formatting.GREEN)
                 .append(Text.literal(preset.displayName()).formatted(preset.color(), Formatting.BOLD))
-                .append(Text.literal(reached
-                        ? " (" + avg + " FPS, target " + target + ")"
-                        : " is the fastest, but only reached " + avg + " FPS (target " + target + ")").formatted(Formatting.WHITE)), false);
+                .append((reached ? Text.translatable("mineboost.text.s_fps_target_s", avg, target) : Text.translatable("mineboost.text.is_the_fastest_but_only_reached", avg, target)).formatted(Formatting.WHITE)), false);
     }
 }

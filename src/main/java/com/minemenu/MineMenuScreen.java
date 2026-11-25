@@ -34,7 +34,7 @@ public class MineMenuScreen extends Screen {
     public static Function<Screen, List<ButtonWidget>> tabs;
     /** Set by MineMeBoost: true while MineBoost's FPS Overlay is on, so "Show FPS" can't be turned on too. */
     public static BooleanSupplier otherFpsCounterOn;
-    public static String otherFpsCounterReason = "Another FPS counter is on. Turn it off first.";
+    public static String otherFpsCounterReason = "minemenu.menu.other_fps_counter";
 
     private static final int BUTTON_WIDTH = 102;
     private static final int BUTTON_HEIGHT = 20;
@@ -55,7 +55,7 @@ public class MineMenuScreen extends Screen {
     private TextFieldWidget searchField;
 
     public MineMenuScreen() {
-        super(Text.literal("MineMenu"));
+        super(Text.translatable("minemenu.text.minemenu"));
     }
 
     private boolean singleplayer() {
@@ -109,7 +109,7 @@ public class MineMenuScreen extends Screen {
                     clearAndInit();
                 })
                 .width(Math.max(20, pageWidth / 2))
-                .tooltip(Tooltip.of(Text.literal("Favorites: right-click any button and star it to put it here.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.favorites_right_click_any_button_and")))
                 .build();
         favorites.active = !favoritesPage || !search.isBlank();
         pages.add(favorites);
@@ -131,8 +131,8 @@ public class MineMenuScreen extends Screen {
         // Search, settings and palette.
         int searchWidth = Math.min(220, this.width - 120);
         int rowLeft = (this.width - (searchWidth + 4 + 20 + 4 + 50)) / 2;
-        searchField = new TextFieldWidget(this.textRenderer, rowLeft, y, searchWidth, 18, Text.literal("Search"));
-        searchField.setPlaceholder(Text.literal("Search all hacks... (Ctrl+K anywhere)").formatted(Formatting.DARK_GRAY));
+        searchField = new TextFieldWidget(this.textRenderer, rowLeft, y, searchWidth, 18, Text.translatable("minemenu.text.search"));
+        searchField.setPlaceholder(Text.translatable("minemenu.text.search_all_hacks_ctrl_k_anywhere").formatted(Formatting.DARK_GRAY));
         searchField.setText(search);
         searchField.setChangedListener(text -> {
             search = text;
@@ -142,11 +142,11 @@ public class MineMenuScreen extends Screen {
         addDrawableChild(searchField);
         addDrawableChild(ButtonWidget.builder(Text.literal("⚙"), b -> this.client.setScreen(new MenuSettingsScreen(this)))
                 .dimensions(rowLeft + searchWidth + 4, y - 1, 20, 20)
-                .tooltip(Tooltip.of(Text.literal("Settings: theme, profiles (export/import), key conflicts, reset, what's new.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.settings_theme_profiles_export_import_key")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Ctrl+K"), b -> this.client.setScreen(new CommandPalette(this)))
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.ctrl_k"), b -> this.client.setScreen(new CommandPalette(this)))
                 .dimensions(rowLeft + searchWidth + 28, y - 1, 50, 20)
-                .tooltip(Tooltip.of(Text.literal("Command Palette: run anything by typing its name.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.command_palette_run_anything_by_typing")))
                 .build());
         gridTop = y + 22;
         gridBottom = this.height - BUTTON_HEIGHT - 8;
@@ -185,7 +185,7 @@ public class MineMenuScreen extends Screen {
                         CheatState.cycleSize();
                         b.setMessage(sizeLabel());
                     }).dimensions(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
-                    .tooltip(Tooltip.of(Text.literal("Click to cycle: Normal, Giant (4x) and Tiny (1/4).")))
+                    .tooltip(Tooltip.of(Text.translatable("minemenu.text.click_to_cycle_normal_giant_4x")))
                     .build();
             button.active &= singleplayer();
             gridButtons.add(addDrawableChild(button));
@@ -194,9 +194,9 @@ public class MineMenuScreen extends Screen {
 
     private ButtonWidget entryButton(MenuEntry entry, int x, int y) {
         boolean allowed = singleplayer() || entry.multiplayer();
-        String tooltip = entry.description() + "\n\nRight-click: settings, key, favorite.";
+        String tooltip = entry.description() + "\n\n" + com.minemenu.core.Tr.get("minemenu.menu.right_click_hint", "Right-click: settings, key, favorite.");
         if (!allowed) {
-            tooltip = "Cheats only work in singleplayer.";
+            tooltip = com.minemenu.core.Tr.get("minemenu.menu.singleplayer_only", "Cheats only work in singleplayer.");
         }
         EntryButton button = new EntryButton(x, y, entry, Tooltip.of(Text.literal(tooltip)));
         button.active = allowed;
@@ -234,7 +234,7 @@ public class MineMenuScreen extends Screen {
         return switch (entry.kind()) {
             case HACK -> {
                 boolean on = entry.isOn() != null && entry.isOn().getAsBoolean();
-                MutableText state = Text.literal(on ? "ON" : "OFF").formatted(on ? Formatting.GREEN : Formatting.RED);
+                MutableText state = (on ? Text.translatable("minemenu.text.on") : Text.translatable("minemenu.text.off")).formatted(on ? Formatting.GREEN : Formatting.RED);
                 yield Text.literal(star + entry.name() + ": ").append(state);
             }
             case SCREEN -> Text.literal(star + entry.name()).formatted(Formatting.AQUA);
@@ -246,37 +246,36 @@ public class MineMenuScreen extends Screen {
         int bottom = this.height - BUTTON_HEIGHT - 4;
         int w = 100;
         int rowLeft = (this.width - (w * 4 + 12)) / 2;
-        addDrawableChild(ButtonWidget.builder(onOff("Show HUD", CheatState.hudVisible()), b -> {
+        addDrawableChild(ButtonWidget.builder(onOff("minemenu.menu.show_hud", CheatState.hudVisible()), b -> {
                     CheatState.toggleHud();
-                    b.setMessage(onOff("Show HUD", CheatState.hudVisible()));
+                    b.setMessage(onOff("minemenu.menu.show_hud", CheatState.hudVisible()));
                 })
                 .dimensions(rowLeft, bottom, w, BUTTON_HEIGHT)
-                .tooltip(Tooltip.of(Text.literal("Show the list of active cheats in the top-left corner.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.show_the_list_of_active_cheats")))
                 .build());
         ButtonWidget all = addDrawableChild(ButtonWidget.builder(allLabel(), b -> {
                     CheatState.setAll(!CheatState.allOn());
                     clearAndInit();
                 })
                 .dimensions(rowLeft + (w + 4), bottom, w, BUTTON_HEIGHT)
-                .tooltip(Tooltip.of(Text.literal("Turn every ON/OFF hack on at once (on every page). Click again to turn them all off. "
-                        + "Noclip, Freecam, Morph, the Nuker, the build tools and the Fun challenges aren't included.")))
+                .tooltip(Tooltip.of(Text.translatable("minemenu.text.turn_every_on_off_hack_on")))
                 .build());
         all.active = singleplayer();
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.done"), b -> close())
                 .dimensions(rowLeft + 2 * (w + 4), bottom, w, BUTTON_HEIGHT).build());
         boolean locked = otherFpsCounterOn != null && otherFpsCounterOn.getAsBoolean() && !CheatState.fpsVisible();
-        ButtonWidget fps = addDrawableChild(ButtonWidget.builder(onOff("Show FPS", CheatState.fpsVisible()), b -> {
+        ButtonWidget fps = addDrawableChild(ButtonWidget.builder(onOff("minemenu.menu.show_fps", CheatState.fpsVisible()), b -> {
                     CheatState.toggleFps();
-                    b.setMessage(onOff("Show FPS", CheatState.fpsVisible()));
+                    b.setMessage(onOff("minemenu.menu.show_fps", CheatState.fpsVisible()));
                 })
                 .dimensions(rowLeft + 3 * (w + 4), bottom, w, BUTTON_HEIGHT)
-                .tooltip(Tooltip.of(Text.literal(locked ? otherFpsCounterReason : "Show your frames per second in the top-left corner.")))
+                .tooltip(Tooltip.of(locked ? Text.translatable(otherFpsCounterReason) : Text.translatable("minemenu.text.show_your_frames_per_second_in")))
                 .build());
         fps.active = !locked;
     }
 
     private static Text allLabel() {
-        return CheatState.allOn() ? Text.literal("Disable All").formatted(Formatting.RED) : Text.literal("Enable All").formatted(Formatting.GREEN);
+        return CheatState.allOn() ? Text.translatable("minemenu.text.disable_all").formatted(Formatting.RED) : Text.translatable("minemenu.text.enable_all").formatted(Formatting.GREEN);
     }
 
     private int addCenteredRow(List<ButtonWidget> buttons, int y) {
@@ -292,12 +291,12 @@ public class MineMenuScreen extends Screen {
 
     private static Text sizeLabel() {
         CheatState.Size size = CheatState.size();
-        return Text.literal("Size: ").append(Text.literal(size.displayName())
+        return Text.translatable("minemenu.text.size").append(Text.literal(size.displayName())
                 .formatted(size == CheatState.Size.NORMAL ? Formatting.GRAY : Formatting.AQUA));
     }
 
     private static Text onOff(String name, boolean on) {
-        return Text.literal(name + ": ").append(Text.literal(on ? "ON" : "OFF").formatted(on ? Formatting.GREEN : Formatting.RED));
+        return Text.translatable(name).append(": ").append((on ? Text.translatable("minemenu.text.on") : Text.translatable("minemenu.text.off")).formatted(on ? Formatting.GREEN : Formatting.RED));
     }
 
     @Override
@@ -337,11 +336,11 @@ public class MineMenuScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.getMatrices().pop();
         if (!hasTabs) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("MineMenu").formatted(Formatting.BOLD),
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.minemenu").formatted(Formatting.BOLD),
                     this.width / 2, titleY, Theme.accent());
         }
         if (!singleplayer()) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Cheats only work in singleplayer. Info HUD, Minimap and Chunk Borders still work here.")
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minemenu.text.cheats_only_work_in_singleplayer_info")
                     .formatted(Formatting.RED), this.width / 2, gridBottom - 10, 0xFFFFFF);
         }
         if (contentHeight > gridBottom - gridTop) {

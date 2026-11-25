@@ -80,7 +80,7 @@ public final class Actions {
                 player.setVelocity(player.getVelocity().x, 3.0, player.getVelocity().z);
                 player.velocityModified = true;
                 if (!CheatState.isOn(Feature.GOD_MODE) && !CheatState.isOn(Feature.SUPER_JUMP)) {
-                    player.sendMessage(Text.literal("Tip: turn on God Mode, Fly or Super Jump before you land!")
+                    player.sendMessage(Text.translatable("minemenu.text.tip_turn_on_god_mode_fly")
                             .formatted(Formatting.YELLOW), true);
                 }
             }
@@ -122,7 +122,7 @@ public final class Actions {
         }
         HitResult hit = player.raycast(ServerCheats.CROSSHAIR_RANGE, 1.0f, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            player.sendMessage(Text.literal("Look at a block to spawn a mob there").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_block_to_spawn").formatted(Formatting.YELLOW), true);
             return;
         }
         ServerWorld world = player.getServerWorld();
@@ -152,15 +152,15 @@ public final class Actions {
 
         String name = type.getName().getString();
         if (spawned == 0) {
-            player.sendMessage(Text.literal("Couldn't spawn " + name + " there").formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("minemenu.text.couldn_t_spawn_s_there", name).formatted(Formatting.RED), true);
             return;
         }
-        Text message = Text.literal("Spawned " + (spawned == 1 ? name : spawned + "x " + name)).formatted(Formatting.GREEN);
+        Text message = Text.translatable("minemenu.text.spawned_s", (spawned == 1 ? name : spawned + "x " + name)).formatted(Formatting.GREEN);
         if (type.getSpawnGroup() == SpawnGroup.MONSTER && world.getDifficulty() == Difficulty.PEACEFUL) {
-            message = Text.literal(name + " disappears right away on Peaceful. Change the difficulty to see it.")
+            message = Text.translatable("minemenu.text.s_disappears_right_away_on_peaceful", name)
                     .formatted(Formatting.YELLOW);
         } else if (type.getSpawnGroup() == SpawnGroup.MONSTER && CheatState.isOn(Feature.MOB_AURA)) {
-            message = Text.literal("Spawned " + name + ", but Mob Aura is on, so it won't last long!")
+            message = Text.translatable("minemenu.text.spawned_s_but_mob_aura_is", name)
                     .formatted(Formatting.YELLOW);
         }
         player.sendMessage(message, true);
@@ -178,7 +178,7 @@ public final class Actions {
             long total = (long) player.experienceLevel + levels;
             player.setExperienceLevel((int) Math.min(total, ServerCheats.MAX_XP_LEVELS));
         }
-        player.sendMessage(Text.literal("You now have " + player.experienceLevel + " levels").formatted(Formatting.GREEN), true);
+        player.sendMessage(Text.translatable("minemenu.text.you_now_have_s_levels", player.experienceLevel).formatted(Formatting.GREEN), true);
     }
 
     static int killAround(ServerPlayerEntity player, double radius, Predicate<LivingEntity> filter) {
@@ -199,8 +199,10 @@ public final class Actions {
     }
 
     private static void report(ServerPlayerEntity player, int count, String noun) {
-        String text = count == 0 ? "No " + noun + "s nearby" : "Killed " + count + " " + noun + (count == 1 ? "" : "s");
-        player.sendMessage(Text.literal(text).formatted(Formatting.RED), true);
+        boolean hostile = noun.startsWith("hostile");
+        Text text = count == 0 ? Text.translatable(hostile ? "minemenu.kill.none_hostile" : "minemenu.kill.none")
+                : Text.translatable(hostile ? "minemenu.kill.hostile" : "minemenu.kill.all", count);
+        player.sendMessage(text.copy().formatted(Formatting.RED), true);
     }
 
     /** The point the player is looking at, up to {@link #ServerCheats.CROSSHAIR_RANGE} blocks away. */
@@ -212,7 +214,7 @@ public final class Actions {
     private static void teleportToCrosshair(ServerPlayerEntity player) {
         HitResult hit = player.raycast(ServerCheats.CROSSHAIR_RANGE, 1.0f, false);
         if (!(hit instanceof BlockHitResult blockHit) || hit.getType() == HitResult.Type.MISS) {
-            player.sendMessage(Text.literal("Look at a block to teleport to it").formatted(Formatting.YELLOW), true);
+            player.sendMessage(Text.translatable("minemenu.text.look_at_a_block_to_teleport").formatted(Formatting.YELLOW), true);
             return;
         }
         BlockPos target = blockHit.getBlockPos().offset(blockHit.getSide());

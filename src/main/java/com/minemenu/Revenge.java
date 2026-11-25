@@ -112,7 +112,7 @@ public final class Revenge {
         newPlayer.fallDistance = 0;
         newPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, PROTECTION_TICKS, 4));
         newPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, PROTECTION_TICKS, 0));
-        newPlayer.sendMessage(Text.literal("⚡ Revenge! The " + spot.killerName() + " that killed you has been destroyed.")
+        newPlayer.sendMessage(Text.translatable("minemenu.text.revenge_the_s_that_killed_you", spot.killerName())
                 .formatted(Formatting.GOLD, Formatting.BOLD), false);
     }
 }

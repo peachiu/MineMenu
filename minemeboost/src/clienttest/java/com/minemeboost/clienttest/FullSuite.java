@@ -52,7 +52,9 @@ class FullSuite extends WorldTests {
 
     private void build35() {
         // ===== 3.5: Render Scale + Sharpen (CAS) =====
-        step(5, c -> { clearMobs(); clearArea(); tp(0, 0, 0, 180, 10);
+        step(5, c -> { if (c.player.isDead()) c.player.requestRespawn(); });
+        step(40, c -> { c.setScreen(null); on(com.minemenu.Feature.GOD_MODE); run(() -> { for (var q : net.minecraft.util.math.BlockPos.iterate(rel(-30, -1, -40), rel(30, -1, 30))) sw().setBlockState(q, net.minecraft.block.Blocks.STONE.getDefaultState()); host().setHealth(20); }); });
+        step(5, c -> { check("3.5 tests start with the player alive", !c.player.isDead()); clearMobs(); clearArea(); tp(0, 0, 0, 180, 10);
             run(() -> { for (int i = 0; i < 12; i++) sw().setBlockState(rel(-6 + i, 0, -6 - (i % 3)), (i % 2 == 0 ? net.minecraft.block.Blocks.BOOKSHELF : net.minecraft.block.Blocks.OAK_LOG).getDefaultState()); }); });
         step(20, c -> { BoostConfig.get().renderScale = 75; BoostConfig.get().renderScaleSharpen = 0; });
         step(20, c -> { num = sharpness(c); shot(c, "cas_75_off.png"); BoostConfig.get().renderScaleSharpen = 100; });

@@ -52,20 +52,18 @@ public final class Hub {
         boolean singleplayer = MineMenuClient.isSingleplayer(client);
 
         ButtonWidget menuTab = ButtonWidget.builder(
-                        Text.literal("MineMenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
+                        Text.translatable("minemeboost.text.minemenu").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD),
                         b -> open(Tab.MINEMENU))
                 .width(TAB_WIDTH)
-                .tooltip(Tooltip.of(Text.literal(singleplayer
-                        ? "Fun cheats: fly, god mode, spawn mobs, XP, revenge mode..."
-                        : "Cheats only work in singleplayer. On servers: Info HUD, Minimap and Chunk Borders.")))
+                .tooltip(Tooltip.of(singleplayer ? Text.translatable("minemeboost.text.fun_cheats_fly_god_mode_spawn") : Text.translatable("minemeboost.text.cheats_only_work_in_singleplayer_on")))
                 .build();
         menuTab.active = current != Tab.MINEMENU;
 
         ButtonWidget boostTab = ButtonWidget.builder(
-                        Text.literal("MineBoost").formatted(Formatting.GREEN, Formatting.BOLD),
+                        Text.translatable("minemeboost.text.mineboost").formatted(Formatting.GREEN, Formatting.BOLD),
                         b -> open(Tab.MINEBOOST))
                 .width(TAB_WIDTH)
-                .tooltip(Tooltip.of(Text.literal("FPS boost: presets, graphics settings and extra boosts.")))
+                .tooltip(Tooltip.of(Text.translatable("minemeboost.text.fps_boost_presets_graphics_settings_and")))
                 .build();
         boostTab.active = current != Tab.MINEBOOST;
 

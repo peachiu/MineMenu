@@ -35,7 +35,7 @@ public class MineBoostClient implements ClientModInitializer {
                 BoostConfig.get().batterySaver = !BoostConfig.get().batterySaver;
                 BoostConfig.save();
                 if (client.player != null) {
-                    client.player.sendMessage(net.minecraft.text.Text.literal("Battery Saver: " + (BoostConfig.get().batterySaver ? "ON" : "OFF"))
+                    client.player.sendMessage(net.minecraft.text.Text.translatable("mineboost.text.battery_saver_s", net.minecraft.text.Text.translatable(BoostConfig.get().batterySaver ? "mineboost.text.on" : "mineboost.text.off"))
                             .formatted(net.minecraft.util.Formatting.GREEN), true);
                 }
             }
