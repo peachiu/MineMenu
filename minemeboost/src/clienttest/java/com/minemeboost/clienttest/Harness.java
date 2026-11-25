@@ -200,7 +200,44 @@ public abstract class Harness {
 
 
 
+    private volatile long lastProgress = System.nanoTime();
+    private volatile String lastScreen = "";
+
+    /** Watchdog (CI must never hang): no step for 8 minutes -> write an ERROR line and stop the game. */
+    void startWatchdog() {
+        Thread watchdog = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(10_000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                if (System.nanoTime() - lastProgress > 480_000_000_000L) {
+                    synchronized (log) {
+                        log.add("ERROR watchdog: no progress for 8 minutes at step " + stepIndex + " (screen: " + lastScreen + ")");
+                    }
+                    writeResults();
+                    Runtime.getRuntime().halt(2);
+                }
+            }
+        }, "clienttest watchdog");
+        watchdog.setDaemon(true);
+        watchdog.start();
+    }
+
     void tick(MinecraftClient client) {
+        lastScreen = client.currentScreen == null ? "none" : client.currentScreen.getClass().getName();
+        int before = stepIndex;
+        try {
+            tickSteps(client);
+        } finally {
+            if (stepIndex != before) {
+                lastProgress = System.nanoTime(); // a step ran (or start-up moved on)
+            }
+        }
+    }
+
+    private void tickSteps(MinecraftClient client) {
         if (client.player != null && !Double.isNaN(maxY)) maxY = Math.max(maxY, client.player.getY());
         if (watchClimb && client.player != null) log.add(String.format("  climb: y %.2f z %.2f hc=%s climbing=%s morph=%s", client.player.getY(), client.player.getZ(), client.player.horizontalCollision, client.player.isClimbing(), Morph.climbs()));
         if (wait > 0) { wait--; return; }

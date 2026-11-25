@@ -139,7 +139,7 @@ class FullSuite extends WorldTests {
             String fly = com.minemenu.Feature.FLY.displayName();
             String scale = net.minecraft.text.Text.translatable("mineboost.option.render_scale").getString();
             log.add("pt_pt: Fly = " + fly + ", Render Scale = " + scale + ", window " + c.getWindow().getWidth() + "x" + c.getWindow().getHeight());
-            check("pt_PT: hacks and options are translated (Voar, Escala de renderização)", fly.equals("Voar") && scale.equals("Escala de renderização"));
+            check("pt_PT: hacks and options are translated (Voar, Escala render)", fly.equals("Voar") && scale.equals("Escala render"));
             check("pt_PT: a menu entry name is translated (Esquemas...)", com.minemenu.ui.MenuEntries.byId("screen:schematics").name().equals("Esquemas..."));
         });
         for (String theme : new String[]{"dark", "light", "glass"}) {

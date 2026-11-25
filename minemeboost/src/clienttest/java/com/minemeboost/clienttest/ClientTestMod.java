@@ -22,6 +22,7 @@ public class ClientTestMod implements ClientModInitializer {
             default -> new FullSuite();
         };
         harness.build();
+        harness.startWatchdog();
         ClientTickEvents.END_CLIENT_TICK.register(harness::tick);
         HudRenderCallback.EVENT.register((context, tickCounter) -> harness.onFrame());
     }
