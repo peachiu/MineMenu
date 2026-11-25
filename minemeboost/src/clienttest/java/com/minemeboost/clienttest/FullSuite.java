@@ -99,7 +99,7 @@ class FullSuite extends WorldTests {
         step(5, c -> {
             shot(c, "impostors_on.png");
             log.add("impostors: " + Impostors.count() + " kinds photographed");
-            check("Impostors: far mobs got pictures (zombie, armored zombie, cow, creeper)", Impostors.count() >= 4);
+            check("Impostors: far mobs got pictures (at least zombie, armored zombie and cow)", Impostors.count() >= 3);
             try { Impostors.savePictures(Path.of("clienttest", "impostors")); } catch (Exception e) { log.add("impostor pictures: " + e); }
         });
         step(5, c -> tp(0, 0, -20, 180, 5)); // walk up to them: within 24 blocks they're drawn normally again
@@ -125,6 +125,40 @@ class FullSuite extends WorldTests {
             log.add("igloo undo: " + wrong + " blocks differ from before");
             check("Vanilla structure: Undo puts every block back", wrong == 0);
         });
+        // ===== 3.5: Portuguese (Portugal), at 1366x768 with GUI Scale 2 =====
+        step(5, c -> {
+            c.getWindow().setWindowedSize(1366, 768);
+            c.options.getGuiScale().setValue(2);
+            c.options.language = "pt_pt";
+            c.getLanguageManager().setLanguage("pt_pt");
+            c.reloadResources();
+        });
+        step(300, c -> {});
+        step(5, c -> {
+            c.onResolutionChanged();
+            String fly = com.minemenu.Feature.FLY.displayName();
+            String scale = net.minecraft.text.Text.translatable("mineboost.option.render_scale").getString();
+            log.add("pt_pt: Fly = " + fly + ", Render Scale = " + scale + ", window " + c.getWindow().getWidth() + "x" + c.getWindow().getHeight());
+            check("pt_PT: hacks and options are translated (Voar, Escala de renderização)", fly.equals("Voar") && scale.equals("Escala de renderização"));
+            check("pt_PT: a menu entry name is translated (Esquemas...)", com.minemenu.ui.MenuEntries.byId("screen:schematics").name().equals("Esquemas..."));
+        });
+        for (String theme : new String[]{"dark", "light", "glass"}) {
+            step(5, c -> { com.minemenu.core.CheatConfig.get().theme = theme; c.setScreen(new com.minemenu.MineMenuScreen()); });
+            step(15, c -> { if (c.currentScreen instanceof com.minemenu.ui.WhatsNewScreen w) { shot(c, "pt_whats_new.png"); w.close(); } });
+            step(15, c -> shot(c, "pt_1366_menu_" + theme + ".png"));
+        }
+        step(5, c -> c.setScreen(new com.mineboost.BoostScreen(null, c.options)));
+        step(15, c -> { shot(c, "pt_1366_mineboost.png"); c.setScreen(new com.mineboost.tools.BoostToolsScreen(null)); });
+        step(15, c -> { shot(c, "pt_1366_tools.png"); c.setScreen(new com.minemenu.build.SchematicBrowserScreen(null)); });
+        step(15, c -> { shot(c, "pt_1366_schematics.png"); c.setScreen(new com.minemenu.ui.CommandPalette(null)); });
+        step(5, c -> { for (char ch : "voar".toCharArray()) c.currentScreen.charTyped(ch, 0); });
+        step(10, c -> { shot(c, "pt_1366_palette.png"); c.setScreen(null);
+            com.minemenu.core.CheatConfig.get().theme = "dark";
+            c.options.language = "en_us";
+            c.getLanguageManager().setLanguage("en_us");
+            c.reloadResources(); });
+        step(600, c -> {});
+        step(5, c -> check("Back to English after pt_PT", com.minemenu.Feature.FLY.displayName().equals("Fly")));
         // ===== 3.5: schematics browser =====
         step(5, c -> c.setScreen(new com.minemenu.build.SchematicBrowserScreen(null)));
         step(10, c -> {

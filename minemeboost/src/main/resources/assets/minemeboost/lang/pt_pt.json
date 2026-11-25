@@ -1,0 +1,16 @@
+{
+  "minemeboost.entry.battery": "Poupança de bateria (ligar/desligar)",
+  "minemeboost.entry.battery.desc": "30 FPS, Escala de renderização mais baixa e menos partículas.",
+  "minemeboost.entry.lag_doctor": "Médico do lag (30 s)",
+  "minemeboost.entry.lag_doctor.desc": "Descobre o que te custa FPS.",
+  "minemeboost.entry.preset": "Predefinição:",
+  "minemeboost.entry.tools": "Ferramentas do MineBoost...",
+  "minemeboost.entry.tools.desc": "Médico do lag, teste A/B, memória, regras de contexto, perfis de FPS.",
+  "minemeboost.fps_lock.mineboost": "O Mostrar FPS do MineMenu está ligado. Desliga-o no separador MineMenu para usares este.",
+  "minemeboost.fps_lock.minemenu": "A Sobreposição de FPS do MineBoost está ligada. Desliga-a no separador MineBoost para usares esta.",
+  "minemeboost.text.cheats_only_work_in_singleplayer_on": "Os cheats só funcionam em um jogador. Nos servidores: HUD de informação, Minimapa e Limites de chunks.",
+  "minemeboost.text.fps_boost_presets_graphics_settings_and": "Aumento de FPS: predefinições, opções gráficas e ganhos extra.",
+  "minemeboost.text.fun_cheats_fly_god_mode_spawn": "Cheats divertidos: voar, modo deus, gerar criaturas, XP, modo vingança...",
+  "minemeboost.text.mineboost": "MineBoost",
+  "minemeboost.text.minemenu": "MineMenu"
+}

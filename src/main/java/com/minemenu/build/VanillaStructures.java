@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Vanilla structures (villages, temples, igloos...) placed the same way as {@code /place structure}, but first the
- * structure's bounding box is worked out and every block in it is remembered, so Undo can put the area back.
- * Only blocks that really changed are kept. Mobs that come with a structure (villagers...) stay after Undo.
+ * Vanilla structures (villages, temples, igloos...) placed the same way as {@code /place structure}, while
+ * {@link BlockRecorder} remembers every block they change, so Undo can put the area back exactly. Mobs that come
+ * with a structure (villagers...) stay after Undo.
  */
 public final class VanillaStructures {
-    /** Bigger boxes are placed without Undo (it would need too much memory). */
-    private static final long MAX_UNDO_BLOCKS = 3_000_000;
+    /** Bigger changes are kept without Undo (it would need too much memory). */
+    private static final int MAX_UNDO_BLOCKS = 3_000_000;
 
     private VanillaStructures() {
     }
@@ -62,37 +62,19 @@ public final class VanillaStructures {
                 }
             }
         }
-        long volume = (long) box.getBlockCountX() * box.getBlockCountY() * box.getBlockCountZ();
-        boolean undo = volume <= MAX_UNDO_BLOCKS;
-        List<BlockState> beforeStates = new ArrayList<>(undo ? (int) volume : 0);
-        List<NbtCompound> beforeData = new ArrayList<>(undo ? (int) volume : 0);
-        if (undo) {
-            for (BlockPos pos : BlockPos.iterate(box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ())) {
-                beforeStates.add(world.getBlockState(pos));
-                beforeData.add(data(world, pos));
-            }
-        }
-        ChunkPos.stream(from, to).forEach(chunk -> start.place(world, world.getStructureAccessor(), generator, world.getRandom(),
-                new BlockBox(chunk.getStartX(), world.getBottomY(), chunk.getStartZ(), chunk.getEndX(), world.getTopY(), chunk.getEndZ()),
-                chunk));
         String name = id.substring(id.indexOf(':') + 1).replace('_', ' ');
-        if (!undo) {
+        // Record every block the structure changes while it's placed (it picks its final height only then).
+        List<BlockChange> before = BlockRecorder.record(world, () -> ChunkPos.stream(from, to).forEach(chunk ->
+                start.place(world, world.getStructureAccessor(), generator, world.getRandom(),
+                        new BlockBox(chunk.getStartX(), world.getBottomY(), chunk.getStartZ(), chunk.getEndX(), world.getTopY(), chunk.getEndZ()),
+                        chunk)));
+        if (before.size() > MAX_UNDO_BLOCKS) {
             player.sendMessage(Text.translatable("minemenu.structures.placed_no_undo", name).formatted(Formatting.YELLOW), true);
             return;
         }
-        List<BlockChange> before = new ArrayList<>();
-        List<BlockChange> after = new ArrayList<>();
-        int i = 0;
-        for (BlockPos pos : BlockPos.iterate(box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ())) {
-            BlockState old = beforeStates.get(i);
-            BlockState now = world.getBlockState(pos);
-            NbtCompound nowData = data(world, pos);
-            if (old != now || beforeData.get(i) != null || nowData != null) {
-                BlockPos fixed = pos.toImmutable();
-                before.add(new BlockChange(fixed, old, beforeData.get(i)));
-                after.add(new BlockChange(fixed, now, nowData));
-            }
-            i++;
+        List<BlockChange> after = new ArrayList<>(before.size());
+        for (BlockChange change : before) {
+            after.add(new BlockChange(change.pos(), world.getBlockState(change.pos()), data(world, change.pos())));
         }
         UndoStack.push(new UndoStack.Entry(name, world, before, after));
         player.sendMessage(Text.translatable("minemenu.structures.placed", name, before.size()).formatted(Formatting.GREEN), true);

@@ -1,0 +1,72 @@
+name: In-game tests
+
+# Starts the real MineMeBoost jar in a Minecraft client (software rendering under Xvfb) with the test mod from
+# minemeboost/src/clienttest, and runs a suite:
+#   full - every hack, tool and screen once (about 10 minutes)
+#   soak - Chaos Mode, Minimap, ESP, Impostors and heavy actions for N minutes; fails on errors or memory growth
+# Run it from the Actions tab (In-game tests > Run workflow). Every Monday it also runs the full suite and a
+# 60-minute soak test. Results, screenshots and the game log are attached to the run as artifacts.
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Suite to run'
+        type: choice
+        options: [full, soak, both]
+        default: both
+      minutes:
+        description: 'Soak test length in minutes (15 to 60)'
+        type: choice
+        options: ['15', '30', '60']
+        default: '15'
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  ingame:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: minemeboost
+    env:
+      SUITE: ${{ github.event_name == 'schedule' && 'both' || inputs.suite }}
+      MINUTES: ${{ github.event_name == 'schedule' && '60' || inputs.minutes }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: minemeboost
+
+      - name: Install Xvfb and software OpenGL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils
+
+      - name: Full suite
+        if: env.SUITE == 'full' || env.SUITE == 'both'
+        run: ./gradlew runClientTests -Psuite=full
+
+      - name: Soak test (${{ env.MINUTES }} min)
+        if: always() && (env.SUITE == 'soak' || env.SUITE == 'both')
+        run: ./gradlew runClientTests -Psuite=soak -Pminutes=${{ env.MINUTES }}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingame-test-results
+          path: |
+            minemeboost/build/clienttest-run-*/clienttest/
+            minemeboost/build/clienttest-run-*/screenshots/
+            minemeboost/build/clienttest-run-*/logs/latest.log
+          if-no-files-found: warn

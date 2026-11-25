@@ -175,7 +175,7 @@ abstract class WorldTests extends PlayerTests {
         step(40, c -> { clearArea(); tp(0, 0, 0, 180, 0); });
         // ===== Fun =====
         step(5, c -> { set(rel(0, 0, -2), Blocks.SPONGE.getDefaultState()); on(Feature.LUCKY_BLOCKS); run(() -> host().interactionManager.tryBreakBlock(rel(0, 0, -2))); });
-        step(10, c -> { check("Lucky Blocks: something happened (sponge gone)", srv(() -> sw().getBlockState(rel(0, 0, -2)).isAir())); off(Feature.LUCKY_BLOCKS); clearMobs(); });
+        step(10, c -> { check("Lucky Blocks: the sponge broke and something happened", srv(() -> !sw().getBlockState(rel(0, 0, -2)).isOf(Blocks.SPONGE))); off(Feature.LUCKY_BLOCKS); clearMobs(); });
         step(5, c -> { set(rel(0, 0, -2), Blocks.STONE.getDefaultState()); on(Feature.RANDOM_DROPS); run(() -> host().interactionManager.tryBreakBlock(rel(0, 0, -2))); });
         step(10, c -> { check("Random Drops: a random item instead of cobblestone", srv(() -> sw().getEntitiesByClass(ItemEntity.class, host().getBoundingBox().expand(6), e -> !e.getStack().isOf(Items.COBBLESTONE)).size() >= 1)); off(Feature.RANDOM_DROPS); clearMobs(); });
         step(5, c -> { on(Feature.FLOOR_IS_LAVA); on(Feature.GOD_MODE); });

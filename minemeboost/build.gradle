@@ -110,7 +110,7 @@ sourceSets {
 }
 
 def clientTestSuite = (project.findProperty("suite") ?: "full").toString()
-def clientTestRunDir = file("build/clienttest-run")
+def clientTestRunDir = file("build/clienttest-run-" + clientTestSuite) // one folder per suite, so CI keeps both
 
 tasks.register("clienttestJar", Jar) {
     from sourceSets.clienttest.output

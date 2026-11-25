@@ -11,7 +11,8 @@
     "PlayerEntityMixin",
     "ProjectileAccessor",
     "ProjectileEntityMixin",
-    "StructureTemplateAccessor"
+    "StructureTemplateAccessor",
+    "WorldBlockRecorderMixin"
   ],
   "client": [
     "ClientBlockUpdateMixin",
