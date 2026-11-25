@@ -4,6 +4,9 @@ An **FPS boost menu** for **Minecraft Java 1.21.1** (Fabric). Press **`.`** (per
 
 ![The MineBoost menu](docs/menu.png)
 
+- **Render Scale** *(2.4)*: draws the world at 50-99% of your screen's resolution and scales it up, while the HUD, chat and menus stay sharp. **+15% FPS at 50%** on our test PC; most useful on integrated graphics. **Dynamic Render Scale** lowers it only when you're below your FPS target. (Off with Iris, which has its own resolution settings.)
+- **Lag Doctor** *(2.4, Tools...)*: measures 10, 30 or 60 seconds and tells you what costs you FPS ("Drawing terrain 56%, Clouds 1%..."), with a one-click fix next to each finding. Frames over 50 ms are written to `config/minemeboost/spikes.log` with what was happening.
+- **Tools...** *(2.4)*: **A/B test of every boost** (each one off/on twice, results in chat and in `config/minemeboost/benchmark-results.md`), **Memory panel** with a JVM Advisor (how much RAM to give Minecraft on your PC and the flags to copy), **context rules** (switch preset in the Nether, underground, while flying with an elytra...), **FPS profiles** you can share as a code, a **frame-time graph** and **Battery Saver** (30 FPS and Render Scale 70%, one key).
 - **One-click presets:** Toaster, Potato, Low, **Intel iGPU**, Balanced, High and Ultra, plus **Auto Preset**, which tests them and picks the best one for your PC.
 - **Simple Far Mobs** *(2.3)*: armor, held items and other extra layers aren't drawn on far-away mobs. **+31% FPS** with 98 armored mobs in view.
 - **Idle Mode** *(2.3)*: lower FPS after you stop touching the keyboard and mouse (15 s to 5 min), full FPS the moment you press something.
@@ -23,7 +26,7 @@ Works in singleplayer and on servers. It only changes what your own game draws.
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `mineboost-2.3.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `mineboost-2.4.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. Start Minecraft with the Fabric 1.21.1 profile, join a world and press **`.`**.
 
 You can change the key in **Options → Controls → Key Binds → MineBoost**.
@@ -80,6 +83,14 @@ The active preset gets a ✔. Change any setting afterwards and the ✔ goes awa
 
 | Setting | What it does |
 |---|---|
+| **Render Scale** *(2.4)* | Draws the world at 50% to 99% of your window's resolution, then scales it up to the full window; the HUD, chat and menus are drawn at full resolution on top, so text stays sharp. **Upscale Filter** picks smooth or sharp pixels. Not available with Iris (shaders have their own setting) or with Fabulous graphics. |
+| **Dynamic Render Scale** *(2.4)* | Once a second: below 90% of your FPS Target (60 if off) the scale goes down 5% (10% when far below), down to **Dynamic Scale Minimum**; after 3 s above the target it goes back up, never above Render Scale. |
+| **Section Culling** *(2.4)* | Skips entities in chunk sections that aren't drawn this frame. Measured: no gain on top of Smart Culling, so off by default. Not available with Sodium (it does this itself). |
+| **Far Entity Ticks (beta)** *(2.4)* | Mobs more than 48 blocks away and behind you are updated on your side every 4th tick. Measured: no gain, off by default. |
+| **Smooth Fog Edge** *(2.4)* | Fog starts earlier, so chunks fade in instead of popping. Looks only, no FPS cost. |
+| **Max Sounds** *(2.4)* | Most sounds playing at once (16, 32 or 64). For huge farms. Not measured (no sound card on the test PC). |
+| **Battery Saver** *(2.4)* | 30 FPS and Render Scale at most 70%. Has a key (not bound by default). |
+| **Frame-time Graph** *(2.4)* | A small graph of the last frames under the FPS overlay; tall bars are stutters. |
 | FPS Target (Smart Render Distance) | Pick 30, 45, 60, 75, 90, 120 or 144 FPS. Once a second MineBoost checks your average FPS over the last 3 seconds: below 90% of the target it lowers the render distance (by 2 if you're far below), and well above it raises it again, but never above the distance you chose and never below 4. It waits 5 seconds after each change for the chunks to reload, and only adjusts while you're playing (not in menus or alt-tabbed). With it on, the FPS overlay also shows the current render distance. |
 | Smart Culling | Mobs, animals, items, chests and signs that are completely hidden behind solid blocks aren't drawn. Biggest help in caves, villages and bases. Glass, leaves, slabs and other see-through blocks never hide anything; things within 6 blocks, players, bosses, glowing mobs (Mob Glow) and Ore Vision markers are always drawn. Each answer is re-checked 10 times a second, so things pop back as soon as they come into view. |
 | Max Entities | Draw only this many of the closest mobs, animals and items (25 to 400, or All). For farms and mob grinders. Players, bosses and glowing mobs are always drawn. |
@@ -127,9 +138,13 @@ When the game starts, MineBoost checks for **Sodium, Lithium, FerriteCore, Immed
 
 MineBoost's mixin plugin (`MineBoostMixinPlugin`) can also skip a whole mixin when a given mod is present, so a future conflict is turned off instead of crashing the game.
 
+With **Iris** installed, Render Scale is switched off (shaders have their own resolution settings); with **Sodium**, Section Culling is (Sodium already does it). Tested with all of them plus Mod Menu at once *(2.4)*.
+
 ## How each setting was measured
 
-See [docs/fps-measurements.md](docs/fps-measurements.md): the scene, the method (each option off/on three times) and every result, including the ones that showed **no** gain and were left out (Smooth Chunk Loading, Animation LOD, Fog off).
+See [docs/fps-measurements.md](docs/fps-measurements.md): the scene, the method (each option off/on two or three times) and every result, including the ones that showed **no** gain (2.4: Section Culling, Far Entity Ticks; 2.3: Smooth Chunk Loading, Animation LOD, Fog off). Options with no measured gain are off by default.
+
+Your config from 2.2 or 2.3 loads as before; new options get their defaults (`configVersion` in `config/mineboost.json`).
 
 ## Building
 
@@ -140,7 +155,7 @@ cd mineboost
 ./gradlew build
 ```
 
-The jar ends up in `mineboost/build/libs/mineboost-2.3.0.jar`.
+The jar ends up in `mineboost/build/libs/mineboost-2.4.0.jar`.
 
 ### Making a release
 

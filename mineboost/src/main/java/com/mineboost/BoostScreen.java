@@ -266,9 +266,9 @@ public class BoostScreen extends GameOptionsScreen {
          * stacks), each option on/off 3 times. See docs/fps-measurements.md. Options that don't change FPS
          * while you play say so honestly.
          */
-        static final String IMPACT_RENDER_SCALE = "Very high when the graphics card is the limit (integrated graphics): see the A/B test.";
-        static final String IMPACT_SECTION_CULLING = "High when mobs are hidden in caves or behind hills; none in the open.";
-        static final String IMPACT_FAR_TICKS = "Small; experimental.";
+        static final String IMPACT_RENDER_SCALE = "High when the graphics card is the limit (integrated graphics): +15% at 50% and +17% at 75% on our test PC. Run the A/B test to see yours.";
+        static final String IMPACT_SECTION_CULLING = "None measured (−7%, within noise): Smart Culling already hides the same mobs. Off by default.";
+        static final String IMPACT_FAR_TICKS = "None measured (−2%) with 300 mobs behind you; experimental. Off by default.";
 
         private static final java.util.Map<String, String> IMPACT = java.util.Map.ofEntries(
                 java.util.Map.entry("mineboost.option.fps_target", "High when you're below the target: render distance is the biggest FPS cost in Minecraft."),

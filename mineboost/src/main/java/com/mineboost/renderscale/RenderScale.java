@@ -142,7 +142,7 @@ public final class RenderScale {
         worldSizedForScale = true; // restore on the next frame
     }
 
-    /** Dynamic Render Scale: once a second, a step down below the target, a step up after 3 s well above it. */
+    /** Dynamic Render Scale: once a second, a step down below the target (5%, or 10% when far below), a step up after 3 s well above it. */
     public static void tick(MinecraftClient client) {
         BoostConfig c = BoostConfig.get();
         if (!c.dynamicRenderScale || client.world == null || ++ticks % 20 != 0) {
@@ -157,7 +157,8 @@ public final class RenderScale {
             return;
         }
         if (avg < target * 0.9) {
-            dynamicScale = Math.max(c.renderScaleMin, currentScale() - 5);
+            // Far below the target: bigger steps, so it gets there in a few seconds.
+            dynamicScale = Math.max(c.renderScaleMin, currentScale() - (avg < target * 0.7 ? 10 : 5));
             aboveTargetChecks = 0;
         } else if (avg > target * 1.15) {
             if (++aboveTargetChecks >= 3) {

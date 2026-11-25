@@ -8,8 +8,21 @@ Press **Right Shift** and the menu has two tabs at the top:
 |---|---|
 | ![The MineMenu tab](docs/minemenu-tab.png) | ![The MineBoost tab](docs/mineboost-tab.png) |
 
-- **MineMenu:** singleplayer hacks on four pages (Player, Combat, World, Items), with an **Enable All / Disable All** button. New in 3.3: Noclip, Zoom (hold Z), Step-Up, Fast Swim, Elytra Boost, Auto-Eat, Auto-Tool, Auto-Totem, Tame Anything, Always Crit, Chest ESP, Growth Aura, Fast Breed, Infinite Durability, Auto-Fish, Instant Build, 5 named **Waypoints** with a direction/distance HUD, **Time & Weather** (exact time, day speed, sun/rain/thunder) and **Find Structure**. Also: fly, god mode, Ore Vision, Vein Miner, Water Walk, Spider Climb, No Fall Damage, Jetpack, Feather Fall, Ride Mob, Set/Go Home, Stun Hits, Mob Rain, Resize Mob, Auto Replant, Peace Mode, Grow Plants, Thor Mode, Explosive Arrows, Auto Smelt, Wolf Army, Item Magnet, Mob Glow, Mega Knockback, Infinite Items, Keep Inventory, Always Day, fireballs, arrow rain, Give Item (any item, to your inventory or the ground, with category search like "comida" or "armadura"), Super Enchant, Netherite Kit, Clear Junk (with Undo), Delete Items (right-click items in your inventory to delete them), spawn any mob, give XP, Revenge Mode and more.
-- **MineBoost:** FPS boost. New in 3.3: an **Intel iGPU** preset, **Simple Far Mobs** (+31% FPS with armored mobs in view), **Idle Mode**, nearest-first particle limit, a **Benchmark that compares with your last run**, an **Impact:** line in every tooltip with the measured gain, and detection of Sodium, Lithium, FerriteCore, ImmediatelyFast and EntityCulling. Also: Toaster/Potato/Low/Balanced/High/Ultra presets, Auto Preset (picks the best one for your PC), Smart Culling (skips things hidden behind walls), Max Entities, Particle Range, Item Distance, Simple Items, Menu FPS, Hide Sky / Beacon Beams / Decorations / Name Tags / Vignette, Smart Render Distance (holds an FPS target by itself), Max Particles, a 10-second benchmark, the graphics settings that matter, extra boosts and an FPS overlay.
+- **MineMenu:** hacks for your own worlds on a Favorites page and seven pages (Player, Combat, World, Items, **Build**, **Fun**, **Utility**), with search, right-click settings for every hack, a key for any hack, profiles you can share, a **Command Palette (Ctrl+K)** and themes. New in 3.4: Freecam, Morph, Phase, Double Jump, Dash, Scaffold, Lava Swim, Gravity Control, Full Bright, Remote Chest, Bow Aimbot, Lifesteal, Force Field, Thorns Aura, Mind Control, Trident Storm, Mob War, Boss Arena, Armor Loadouts, Item/Potion/Mob Creator, Inventory Snapshots, Death Chest, copy/paste with preview, schematics, instant structures, terrain brush, biome painter, gravity gun, Chaos Mode, Lucky Blocks, challenges, meteors, a tornado, a minimap with a big map, Info HUD, light levels, chunk borders, slime chunks, mob health bars and macros. Plus everything from 3.3 (fly, god mode, noclip, zoom, Ore Vision, Chest ESP, waypoints, time & weather, give item...).
+- **MineBoost:** FPS boost. New in 2.4 (in 3.4): **Render Scale** (sharp HUD, +15% FPS at 50% on our test PC) and Dynamic Render Scale, the **Lag Doctor**, a spike log, an **A/B test of every boost**, a Memory panel with JVM Advisor, context rules, shareable FPS profiles, a frame-time graph and Battery Saver. Plus presets, Auto Preset, Simple Far Mobs, Smart Culling, Smart Render Distance, Max Particles, the benchmark and more.
+- **Safe Mode:** a hack that throws an error is switched off with a message in the corner instead of crashing the game; if the game fails to start twice in a row, the next start keeps every hack off.
+
+| The menu (3.4) | Lag Doctor |
+|---|---|
+| ![The MineMenu tab](docs/v34-menu.png) | ![Lag Doctor](docs/v34-lag-doctor.png) |
+
+| Command Palette (Ctrl+K) | Minimap, Info HUD, chunk borders, slime chunks, light levels |
+|---|---|
+| ![Command Palette](docs/v34-command-palette.png) | ![Utility](docs/v34-minimap-utility.png) |
+
+| Morph (blaze) | Boss Arena |
+|---|---|
+| ![Morph](docs/v34-morph-blaze.png) | ![Boss Arena](docs/v34-boss-arena.png) |
 
 | Ore Vision | Benchmark result |
 |---|---|
@@ -25,16 +38,16 @@ MineMenu's **Show FPS** and MineBoost's **FPS Overlay** can't both be on. While 
 |---|---|
 | ![FPS Overlay greyed out](docs/fps-lock-mineboost.png) | ![Show FPS greyed out](docs/fps-lock-minemenu.png) |
 
-MineMenu only works in your own singleplayer worlds. On a server, Right Shift opens MineBoost and the MineMenu tab is greyed out. MineBoost works everywhere.
+MineMenu's hacks work in your own worlds: singleplayer, and a world you open to LAN (only for you, the host). On a multiplayer server the MineMenu tab opens but says "Cheats only work in singleplayer": only the Minimap (without mobs), Info HUD and Chunk Borders work there, and nothing is ever sent to the server. MineBoost works everywhere. With **Mod Menu** installed, MineMeBoost's config button opens this menu.
 
 ## Install
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemeboost-3.3.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `minemeboost-3.4.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoost already contains both, and Fabric will refuse to start with both installed.
 
-Your MineBoost settings (`config/mineboost.json`) carry over.
+Your MineBoost settings (`config/mineboost.json`) carry over from 3.2 and 3.3. MineMenu's settings, favorites, keys and profiles are saved in `config/minemeboost/cheats.json`; **⚙ → Reset everything** makes a backup first.
 
 ## Features
 
@@ -49,7 +62,13 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/minemeboost-3.3.0.jar`.
+The jar ends up in `minemeboost/build/libs/minemeboost-3.4.0.jar`.
+
+In-game tests (Fabric GameTest, run on a server with the mod loaded):
+
+```bash
+./gradlew runGametest
+```
 
 ### Making a release
 
