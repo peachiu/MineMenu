@@ -171,6 +171,30 @@ public final class Waypoints {
     // Changes (server thread)
     // ------------------------------------------------------------------
 
+    /**
+     * 3.6: saves a position (for example an ore vein from MineXray's scanner) in the first free slot.
+     * Returns the slot, or -1 when all {@link #MAX} slots are taken.
+     */
+    public static int addAt(String name, String dimension, double x, double y, double z) {
+        Waypoint[] copy = slots.clone();
+        for (int i = 0; i < MAX; i++) {
+            if (copy[i] == null) {
+                Waypoint w = new Waypoint();
+                w.name = name;
+                w.hud = true;
+                w.dimension = dimension;
+                w.x = x;
+                w.y = y;
+                w.z = z;
+                copy[i] = w;
+                slots = copy;
+                changed();
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /** Saves where you're standing in {@code slot}, keeping its name (or giving it one). */
     public static void setHere(ServerPlayerEntity player, int slot, String name) {
         Waypoint[] copy = slots.clone();

@@ -25,12 +25,23 @@ import java.util.function.Consumer;
  * config/minemeboost/benchmark-results.md as a table; your settings are put back at the end.
  */
 public final class BoostAB {
-    private record Test(String name, Consumer<MinecraftClient> on) {
+    /**
+     * One A/B test. {@code off} is null for MineBoost's own boosts (applyOff knows them); other mods' tests
+     * (MineXray's cost tests) bring their own.
+     */
+    public record Test(String name, Consumer<MinecraftClient> on, Consumer<MinecraftClient> off) {
+        public Test(String name, Consumer<MinecraftClient> on) {
+            this(name, on, null);
+        }
     }
 
     private static final long SETTLE = 1_500_000_000L;
     private static final long MEASURE = 4_000_000_000L;
     private static List<Test> tests;
+    /** Where the results table goes; null = a normal boost run (results also tune the presets). */
+    private static String costFile;
+    /** Run when a cost run ends or is cancelled (puts the other mod's settings back). */
+    private static Runnable afterCost;
     private static PresetState baseline;
     private static boolean running;
     private static int index;
@@ -73,7 +84,21 @@ public final class BoostAB {
     }
 
     public static void start(MinecraftClient client) {
-        tests = buildTests();
+        start(client, buildTests(), null);
+    }
+
+    /**
+     * Runs only {@code only} (3.6: MineXray's cost per mode). Results go to config/minemeboost/{@code resultFile}
+     * and don't change what the presets choose.
+     */
+    public static void start(MinecraftClient client, List<Test> only, String resultFile) {
+        start(client, only, resultFile, null);
+    }
+
+    public static void start(MinecraftClient client, List<Test> only, String resultFile, Runnable after) {
+        tests = only;
+        costFile = resultFile;
+        afterCost = after;
         baseline = PresetState.capture(client);
         results = new double[tests.size()][4];
         index = 0;
@@ -109,6 +134,9 @@ public final class BoostAB {
             case "Entity Shadows off" -> client.options.getEntityShadows().setValue(true);
             case "Smooth Lighting off" -> client.options.getAo().setValue(true);
             default -> {
+                if (tests.get(index).off() != null) {
+                    tests.get(index).off().accept(client);
+                }
             }
         }
     }
@@ -186,6 +214,10 @@ public final class BoostAB {
 
     private static void finish(MinecraftClient client, boolean complete) {
         running = false;
+        if (afterCost != null) {
+            afterCost.run();
+            afterCost = null;
+        }
         if (baseline != null) {
             baseline.restore(client);
         }
@@ -201,11 +233,15 @@ public final class BoostAB {
             double gain = r[0] > 0 ? (r[2] - r[0]) * 100 / r[0] : 0;
             md.append(String.format("| %s | %.1f | %.1f | %+.0f%% | %.1f | %.1f |\n", tests.get(i).name(), r[0], r[2], gain, r[1], r[3]));
             best.add(String.format("%+.0f%% %s", gain, Tr.auto("mineboost.ab.test.", tests.get(i).name())));
-            BoostConfig.get().abGains.put(tests.get(i).name(), (int) Math.round(gain)); // presets read the Render Scale ones
+            if (costFile == null) {
+                BoostConfig.get().abGains.put(tests.get(i).name(), (int) Math.round(gain)); // presets read the Render Scale ones
+            }
         }
-        BoostConfig.save();
+        if (costFile == null) {
+            BoostConfig.save();
+        }
         best.sort((a, b) -> Double.compare(Double.parseDouble(b.substring(0, b.indexOf('%'))), Double.parseDouble(a.substring(0, a.indexOf('%')))));
-        Path file = FabricLoader.getInstance().getConfigDir().resolve("minemeboost").resolve("benchmark-results.md");
+        Path file = FabricLoader.getInstance().getConfigDir().resolve("minemeboost").resolve(costFile != null ? costFile : "benchmark-results.md");
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, md.toString());

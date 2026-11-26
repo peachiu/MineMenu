@@ -43,7 +43,12 @@ public final class SectionScanner {
     private SectionScanner() {
     }
 
+    /** 3.6: anyone else who wants to hear about block changes on the client (MineXray's scanner). */
+    public static volatile java.util.function.Consumer<BlockPos> blockChanged = pos -> {
+    };
+
     public static void markDirty(BlockPos pos) {
+        blockChanged.accept(pos);
         if (!results.isEmpty()) {
             dirty.add(ChunkSectionPos.asLong(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
         }

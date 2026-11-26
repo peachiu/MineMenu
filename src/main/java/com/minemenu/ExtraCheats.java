@@ -63,6 +63,8 @@ import java.util.Set;
 public final class ExtraCheats {
     private static final double MAGNET_RADIUS = 12.0;
     private static final double MOB_GLOW_RADIUS = 64.0;
+    /** Set by MineMeBoostXray: Mob Glow is drawn by MineXray's Entity ESP instead of the Glowing effect. */
+    public static volatile boolean mobGlowDelegated;
     private static final int MAX_VEIN_LOGS = 256;
     private static final int MAX_VEIN_ORES = 64;
     /** Game rule values from before Keep Inventory / Always Day, restored when they're turned off. */
@@ -142,7 +144,7 @@ public final class ExtraCheats {
             refill(player.getMainHandStack());
             refill(player.getOffHandStack());
         }
-        if (applied.contains(Feature.MOB_GLOW) && tickCounter % 10 == 0) {
+        if (applied.contains(Feature.MOB_GLOW) && !mobGlowDelegated && tickCounter % 10 == 0) {
             for (LivingEntity mob : mobsAround(player, MOB_GLOW_RADIUS)) {
                 mob.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 40, 0, true, false, false));
             }

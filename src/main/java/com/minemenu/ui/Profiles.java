@@ -26,6 +26,11 @@ public final class Profiles {
         Map<String, Double> settings = new HashMap<>();
     }
 
+    /** 3.6: other mods' on/off state saved in profiles too (MineXray's modes, as "xray:<mode>"). */
+    public static java.util.function.Supplier<List<String>> extraEnabled = List::of;
+    public static java.util.function.Consumer<List<String>> extraLoad = list -> {
+    };
+
     private Profiles() {
     }
 
@@ -34,6 +39,7 @@ public final class Profiles {
         for (Feature feature : CheatState.enabled()) {
             enabled.add(feature.name());
         }
+        enabled.addAll(extraEnabled.get());
         CheatConfig.get().profiles.put(name, enabled);
         CheatConfig.markDirty();
     }
@@ -50,6 +56,7 @@ public final class Profiles {
                 CheatState.toggle(feature);
             }
         }
+        extraLoad.accept(enabled);
     }
 
     public static void delete(String name) {
@@ -85,7 +92,7 @@ public final class Profiles {
             }
             List<String> known = new ArrayList<>();
             for (String id : shared.enabled) {
-                if (CheatConfig.feature(id) != null) {
+                if (CheatConfig.feature(id) != null || (id != null && id.startsWith("xray:"))) {
                     known.add(id);
                 }
             }

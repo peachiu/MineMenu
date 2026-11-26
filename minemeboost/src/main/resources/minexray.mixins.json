@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.minexray.mixin",
+  "plugin": "com.minexray.compat.MixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AmbientOcclusionMixin",
+    "BlockRenderManagerMixin",
+    "BlockSideMixin",
+    "RenderLayersMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

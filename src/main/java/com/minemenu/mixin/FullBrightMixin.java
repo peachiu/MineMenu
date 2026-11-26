@@ -14,6 +14,6 @@ public class FullBrightMixin {
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;getGamma()Lnet/minecraft/client/option/SimpleOption;")),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/SimpleOption;getValue()Ljava/lang/Object;", ordinal = 0))
     private Object minemenu$fullBright(Object gamma) {
-        return PlayerModules.fullBrightOn ? (Object) 16.0 : gamma;
+        return PlayerModules.fullBrightOn || PlayerModules.forceFullBright ? (Object) 16.0 : gamma;
     }
 }

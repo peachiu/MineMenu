@@ -27,6 +27,8 @@ public final class PlayerModules {
     /** Read in the collision hot path (PhaseMixin), so a plain volatile flag instead of the synchronized state. */
     public static volatile boolean phaseOn;
     public static volatile boolean fullBrightOn;
+    /** 3.6: set by MineXray's Classic X-Ray while it's on (full brightness without the Full Bright hack). */
+    public static volatile boolean forceFullBright;
     public static volatile boolean lavaSwimOn;
 
     private PlayerModules() {

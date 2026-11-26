@@ -11,9 +11,9 @@ import net.minecraft.util.Formatting;
 
 import java.util.List;
 
-/** The two tabs at the top of the menu, and which one Right Shift opens. */
+/** The three tabs at the top of the menu (MineMenu, MineBoost, MineXray), and which one Right Shift opens. */
 public final class Hub {
-    public enum Tab { MINEMENU, MINEBOOST }
+    public enum Tab { MINEMENU, MINEBOOST, MINEXRAY }
 
     private static final int TAB_WIDTH = 110;
 
@@ -29,11 +29,7 @@ public final class Hub {
         if (client.currentScreen != null) {
             return;
         }
-        if (lastTab == Tab.MINEMENU) {
-            open(Tab.MINEMENU);
-        } else {
-            open(Tab.MINEBOOST);
-        }
+        open(lastTab);
     }
 
     public static void open(Tab tab) {
@@ -43,7 +39,11 @@ public final class Hub {
             boostScreen.applyPendingValues();
         }
         lastTab = tab;
-        client.setScreen(tab == Tab.MINEMENU ? new MineMenuScreen() : new BoostScreen(null, client.options));
+        client.setScreen(switch (tab) {
+            case MINEMENU -> new MineMenuScreen();
+            case MINEBOOST -> new BoostScreen(null, client.options);
+            case MINEXRAY -> new com.minexray.screen.XrayScreen(null);
+        });
     }
 
     /** Builds the tab row. The open tab is shown pressed (disabled). */
@@ -67,6 +67,14 @@ public final class Hub {
                 .build();
         boostTab.active = current != Tab.MINEBOOST;
 
-        return List.of(menuTab, boostTab);
+        ButtonWidget xrayTab = ButtonWidget.builder(
+                        Text.translatable("minemeboost.text.minexray").formatted(Formatting.AQUA, Formatting.BOLD),
+                        b -> open(Tab.MINEXRAY))
+                .width(TAB_WIDTH)
+                .tooltip(Tooltip.of(singleplayer ? Text.translatable("minemeboost.text.minexray.tooltip") : Text.translatable("minexray.singleplayer_only")))
+                .build();
+        xrayTab.active = current != Tab.MINEXRAY;
+
+        return List.of(menuTab, boostTab, xrayTab);
     }
 }

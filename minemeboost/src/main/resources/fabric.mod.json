@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "minemeboost",
   "version": "${version}",
-  "name": "MineMeBoost",
-  "description": "MineMenu and MineBoost in one mod. Right Shift opens a menu with MineMenu (80+ singleplayer cheats on 7 pages: build tools, fun events, utility HUD, creators, morph...) and MineBoost (FPS boost: Render Scale, Lag Doctor, Intel iGPU preset, Idle Mode, A/B test; works alongside Sodium and friends). Ctrl+K opens the Command Palette, . opens MineBoost directly. In English and Portuguese (Portugal).",
+  "name": "MineMeBoostXray",
+  "description": "MineMenu, MineBoost and MineXray in one mod. Right Shift opens a menu with three tabs: MineMenu (80+ singleplayer cheats on 7 pages: build tools, fun events, utility HUD, creators, morph...), MineBoost (FPS boost: Render Scale, Lag Doctor, Intel iGPU preset, Idle Mode, A/B test; works alongside Sodium and friends) and MineXray (singleplayer X-ray: Classic X-Ray, Ore ESP with fused veins, Cave Finder, Fluid View, Lava Warning, Block ESP, Entity ESP, block editor, presets and a vein scanner). Ctrl+K opens the Command Palette. In English and Portuguese (Portugal).",
   "authors": [
     "peachiu"
   ],
@@ -21,7 +21,8 @@
   },
   "mixins": [
     "mineboost.mixins.json",
-    "minemenu.mixins.json"
+    "minemenu.mixins.json",
+    "minexray.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",

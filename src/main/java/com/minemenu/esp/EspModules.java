@@ -21,6 +21,8 @@ public final class EspModules {
     /** Chest positions and colours, as pairs (pos, colour). Replaced as a whole, read by the render thread. */
     private static volatile long[] chests = new long[0];
     private static int ticks;
+    /** Set by MineMeBoostXray: Ore Vision and Chest ESP are shortcuts to MineXray, which draws them instead. */
+    public static volatile boolean delegated;
 
     private EspModules() {
     }
@@ -29,7 +31,7 @@ public final class EspModules {
         Modules.register(Feature.ORE_VISION, new CheatModule() {
             @Override
             public void clientTick(MinecraftClient client) {
-                if (++ticks % 5 == 0) {
+                if (!delegated && ++ticks % 5 == 0) {
                     SectionScanner.tick(client, (int) FeatureSettings.get(Feature.ORE_VISION, "radius"));
                 }
             }
@@ -42,7 +44,7 @@ public final class EspModules {
         Modules.register(Feature.CHEST_ESP, new CheatModule() {
             @Override
             public void clientTick(MinecraftClient client) {
-                if (++ticks % 20 == 0) {
+                if (!delegated && ++ticks % 20 == 0) {
                     scanChests(client, (int) FeatureSettings.get(Feature.CHEST_ESP, "radius"));
                 }
             }
@@ -60,7 +62,7 @@ public final class EspModules {
         });
         LineRenderer.register((sink, camera) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            if (!MineMenuClient.isSingleplayer(client)) {
+            if (delegated || !MineMenuClient.isSingleplayer(client)) {
                 return;
             }
             BlockPos center = BlockPos.ofFloored(camera);

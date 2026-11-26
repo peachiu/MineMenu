@@ -8,7 +8,7 @@ import com.minemenu.MineMenuClient;
 import com.minemenu.MineMenuScreen;
 import net.fabricmc.api.ClientModInitializer;
 
-/** Starts both mods, then joins their menus with the MineMenu / MineBoost tabs. */
+/** Starts both mods and MineXray, then joins their menus with the MineMenu / MineBoost / MineXray tabs. */
 public class MineMeBoostClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
@@ -18,6 +18,7 @@ public class MineMeBoostClient implements ClientModInitializer {
         MineMenuClient.openMenuOverride = Hub::openLastTab;
         MineMenuScreen.tabs = screen -> Hub.tabButtons(Hub.Tab.MINEMENU);
         BoostScreen.tabs = screen -> Hub.tabButtons(Hub.Tab.MINEBOOST);
+        com.minexray.screen.XrayScreen.tabs = screen -> Hub.tabButtons(Hub.Tab.MINEXRAY);
 
         // Only one FPS counter at a time: whichever is on greys out the other.
         MineMenuScreen.otherFpsCounterOn = () -> BoostConfig.get().fpsOverlay;
@@ -32,6 +33,11 @@ public class MineMeBoostClient implements ClientModInitializer {
                 || com.mineboost.Preset.POTATO.isActive(net.minecraft.client.MinecraftClient.getInstance());
         // "Reset everything" in MineMenu's settings resets MineBoost's settings too (after the backup).
         com.minemenu.ui.MenuSettingsScreen.resetBoost = () -> com.mineboost.BoostConfig.replaceKeepingHistory(new com.mineboost.BoostConfig());
+        // 3.6: MineXray (X-ray and ESP), after the Command Palette entries above so it adds its own to them.
+        com.minexray.MineXrayClient.init();
+        com.minemenu.ui.WhatsNewScreen.VERSION = "3.6.0";
+        com.minemenu.ui.WhatsNewScreen.LINES = java.util.List.of("minexray.whats_new.title", "", "minexray.whats_new.xray", "",
+                "minexray.whats_new.esp", "", "minexray.whats_new.tools", "", "minexray.whats_new.moved");
     }
 
     private static java.util.List<com.minemenu.ui.MenuEntry> boostEntries() {

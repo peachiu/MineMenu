@@ -32,6 +32,14 @@ public final class Minimap {
     private static boolean dirty = true;
     private static boolean caveMode;
 
+    /** 3.6: extra dots drawn on the minimap (MineXray's ore veins). */
+    public interface Layer {
+        /** {@code scale}: minimap pixels per block; (cx, cy) is you; keep dots within {@code size / 2} of it. */
+        void draw(DrawContext context, MinecraftClient client, int cx, int cy, double scale, int size);
+    }
+
+    public static final java.util.List<Layer> layers = new java.util.concurrent.CopyOnWriteArrayList<>();
+
     private Minimap() {
     }
 
@@ -133,6 +141,9 @@ public final class Minimap {
                     context.fill(cx + (int) dx - 1, cy + (int) dz - 1, cx + (int) dx + 1, cy + (int) dz + 1, color);
                 }
             }
+        }
+        for (Layer layer : layers) {
+            com.minemenu.core.Guard.run("minimap layer", () -> layer.draw(context, client, cx, cy, scale, size));
         }
         for (int i = 0; i < Waypoints.MAX; i++) {
             Waypoints.Waypoint w = Waypoints.get(i);
