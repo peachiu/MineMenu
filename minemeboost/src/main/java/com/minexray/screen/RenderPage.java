@@ -117,6 +117,27 @@ final class RenderPage implements XrayPage {
                 next();
                 screen.add(Widgets.toggle("minexray.render.entity_items", () -> c.entityItems, v -> c.entityItems = v, nx(), ny(), column, null));
                 next();
+                if (index % 2 == 1) {
+                    next();
+                }
+                // Filter by mob type: ids separated by commas ("zombie, creeper"); empty = every type above.
+                net.minecraft.client.gui.widget.TextFieldWidget only = new net.minecraft.client.gui.widget.TextFieldWidget(screen.font(), nx(), ny() + 1,
+                        column * 2 + 6, 18, Text.translatable("minexray.render.entity_only"));
+                only.setMaxLength(512);
+                only.setPlaceholder(Text.translatable("minexray.render.entity_only").formatted(net.minecraft.util.Formatting.DARK_GRAY));
+                only.setText(String.join(", ", c.entityOnly.stream().map(id -> id.startsWith("minecraft:") ? id.substring(10) : id).toList()));
+                only.setChangedListener(text -> {
+                    c.entityOnly.clear();
+                    for (String part : text.split(",")) {
+                        String id = part.trim().toLowerCase(java.util.Locale.ROOT);
+                        if (!id.isEmpty()) {
+                            c.entityOnly.add(id.contains(":") ? id : "minecraft:" + id);
+                        }
+                    }
+                    XrayConfig.markDirty();
+                });
+                screen.add(only);
+                next();
             }
         }
     }

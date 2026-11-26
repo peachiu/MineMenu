@@ -48,7 +48,7 @@ public final class XrayConfig {
     public String style = EspStyle.OUTLINE_FILL.name();
     public float lineWidth = 2.0f;
     public int lineOpacity = 90;
-    public int fillOpacity = 22;
+    public int fillOpacity = 20;
     public boolean fade = true;
     public boolean tracers = true;
     public int tracerCount = 10;

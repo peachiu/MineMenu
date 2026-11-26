@@ -226,30 +226,40 @@ abstract class XrayTests extends WorldTests {
             off(Feature.CHEST_ESP);
             clearMobs();
         });
-        // ----- Classic X-Ray -----
-        step(5, c -> { num = stoneShare(c); cullingBefore = c.chunkCullingEnabled; press(XrayKeys.of(XrayMode.CLASSIC)); });
-        step(80, c -> {
-            check("Classic X-Ray: on, full bright, chunk culling off", ClassicXray.active() && com.minemenu.player.PlayerModules.forceFullBright && !c.chunkCullingEnabled);
-            check("Classic X-Ray: stone is hidden, diamond is not", ClassicXray.skip(Blocks.STONE.getDefaultState()) && !ClassicXray.skip(Blocks.DIAMOND_ORE.getDefaultState()));
-        });
-        step(100, c -> {
-            shot(c, "xray_classic.png");
-            double now = stoneShare(c);
-            check(String.format("Classic X-Ray: the stone floor is gone on screen (stone-grey %.0f%% -> %.0f%%)", num * 100, now * 100), num > 0.5 && now < num / 3);
-        });
-        step(5, c -> XrayConfig.get().classicOpacity = 30);
-        step(120, c -> {
-            check("Classic X-Ray: opacity 30% draws stone see-through", ClassicXray.seeThrough(Blocks.STONE.getDefaultState()));
-            shot(c, "xray_classic_30.png");
-            XrayConfig.get().classicOpacity = 0;
-            press(XrayKeys.of(XrayMode.CLASSIC));
-        });
-        step(120, c -> {
-            check("Classic X-Ray: off puts culling and brightness back", !ClassicXray.active() && c.chunkCullingEnabled == cullingBefore
-                    && !com.minemenu.player.PlayerModules.forceFullBright);
-            check("Classic X-Ray: chunks rebuilt (no rebuild left hanging)", !ClassicXray.rebuilding());
-            shot(c, "xray_classic_off.png");
-        });
+        // ----- Classic X-Ray (with Sodium: unavailable, with a message) -----
+        if (com.minexray.compat.SodiumCompat.present()) {
+            step(10, c -> press(XrayKeys.of(XrayMode.CLASSIC)));
+            step(40, c -> {
+                check("Classic X-Ray with Sodium: refused (\"use Ore ESP\"), nothing changed", !ClassicXray.active() && !XrayConfig.get().classic
+                        && c.chunkCullingEnabled && !com.minemenu.player.PlayerModules.forceFullBright);
+                shot(c, "xray_classic_sodium.png");
+            });
+        } else {
+            step(5, c -> { num = stoneShare(c); cullingBefore = c.chunkCullingEnabled; press(XrayKeys.of(XrayMode.CLASSIC)); });
+            step(80, c -> {
+                check("Classic X-Ray: on, full bright, chunk culling off", ClassicXray.active() && com.minemenu.player.PlayerModules.forceFullBright && !c.chunkCullingEnabled);
+                check("Classic X-Ray: stone is hidden, diamond is not", ClassicXray.skip(Blocks.STONE.getDefaultState()) && !ClassicXray.skip(Blocks.DIAMOND_ORE.getDefaultState()));
+            });
+            step(100, c -> {
+                shot(c, "xray_classic.png");
+                double now = stoneShare(c);
+                check(String.format("Classic X-Ray: the stone floor is gone on screen (stone-grey %.0f%% -> %.0f%%)", num * 100, now * 100), num > 0.5 && now < num / 3);
+            });
+            step(5, c -> XrayConfig.get().classicOpacity = 30);
+            step(120, c -> {
+                check("Classic X-Ray: opacity 30% draws stone see-through", ClassicXray.seeThrough(Blocks.STONE.getDefaultState()));
+                shot(c, "xray_classic_30.png");
+                XrayConfig.get().classicOpacity = 0;
+                press(XrayKeys.of(XrayMode.CLASSIC));
+            });
+            step(120, c -> {
+                check("Classic X-Ray: off puts culling and brightness back", !ClassicXray.active() && c.chunkCullingEnabled == cullingBefore
+                        && !com.minemenu.player.PlayerModules.forceFullBright);
+                check("Classic X-Ray: chunks rebuilt (no rebuild left hanging)", !ClassicXray.rebuilding());
+                check(String.format("Classic X-Ray: the stone floor is back on screen (%.0f%%)", stoneShare(c) * 100), stoneShare(c) > 0.5);
+                shot(c, "xray_classic_off.png");
+            });
+        }
         // ----- Presets: Diamonds Only drops gold; export/import -----
         step(60, c -> PresetManager.apply("Diamonds Only", true));
         step(5, c -> {

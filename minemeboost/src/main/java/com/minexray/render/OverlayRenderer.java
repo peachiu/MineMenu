@@ -46,6 +46,8 @@ public final class OverlayRenderer {
     }
 
     private static final List<Highlight> highlights = new ArrayList<>();
+    /** Labels get their own buffer: mods like ImmediatelyFast take over the game's shared text batching. */
+    private static net.minecraft.client.util.BufferAllocator labelBuffer;
     /** For tests. */
     public static int drawnEntities;
 
@@ -178,7 +180,10 @@ public final class OverlayRenderer {
     private static void drawLabels(WorldRenderContext context, List<VeinMerger.Vein> veins) {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer text = client.textRenderer;
-        VertexConsumerProvider.Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
+        if (labelBuffer == null) {
+            labelBuffer = new net.minecraft.client.util.BufferAllocator(1 << 16);
+        }
+        VertexConsumerProvider.Immediate consumers = VertexConsumerProvider.immediate(labelBuffer);
         Camera camera = context.camera();
         Vec3d cam = camera.getPos();
         int shown = 0;

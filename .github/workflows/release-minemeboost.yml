@@ -47,7 +47,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.name }}
           target_commitish: ${{ github.sha }}
-          name: MineMeBoost v${{ steps.tag.outputs.version }} (Minecraft 1.21.1)
+          name: MineMeBoostXray v${{ steps.tag.outputs.version }} (Minecraft 1.21.1)
           body_path: minemeboost/release-notes/v${{ steps.tag.outputs.version }}.md
           files: minemeboost/dist/*.jar
           fail_on_unmatched_files: true

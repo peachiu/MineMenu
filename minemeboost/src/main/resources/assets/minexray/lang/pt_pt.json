@@ -218,5 +218,6 @@
   "minexray.whats_new.xray": "§bNovo separador, MineXray: §fRaio-X Clássico (X), Ore ESP com veios inteiros, etiquetas e linhas-guia (G), Detetor de Grutas, Ver Fluidos e Aviso de Lava. Só em modo de um jogador.",
   "minexray.whats_new.esp": "§eBlock ESP e Entity ESP: §fbaús, geradores, cofres, portais, sculk... cada um com uma cor; mobs por tipo.",
   "minexray.whats_new.tools": "§aFerramentas: §fum editor com todos os blocos (também de mods), 9 presets que mudam por dimensão, um scanner de veios (waypoint, ver, teletransportar, minerar) e um HUD.",
-  "minexray.whats_new.moved": "§7O Ore Vision, Chest ESP e Mob Glow do MineMenu agora ligam os modos do MineXray; as tuas teclas e definições vieram junto."
+  "minexray.whats_new.moved": "§7O Ore Vision, Chest ESP e Mob Glow do MineMenu agora ligam os modos do MineXray; as tuas teclas e definições vieram junto.",
+  "minexray.render.entity_only": "Só estes mobs (ids, vírgulas; vazio = todos)"
 }

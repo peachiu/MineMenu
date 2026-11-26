@@ -218,5 +218,6 @@
   "minexray.whats_new.xray": "§bNew tab, MineXray: §fClassic X-Ray (X), Ore ESP with whole veins, labels and tracers (G), Cave Finder, Fluid View and Lava Warning. Singleplayer only.",
   "minexray.whats_new.esp": "§eBlock ESP and Entity ESP: §fchests, spawners, vaults, portals, sculk... each with a colour; mobs by type.",
   "minexray.whats_new.tools": "§aTools: §fa block editor for every block (modded too), 9 presets that switch per dimension, a vein scanner (waypoint, show, teleport, mine), and a HUD.",
-  "minexray.whats_new.moved": "§7Ore Vision, Chest ESP and Mob Glow in MineMenu now switch the MineXray modes; your keys and settings came along."
+  "minexray.whats_new.moved": "§7Ore Vision, Chest ESP and Mob Glow in MineMenu now switch the MineXray modes; your keys and settings came along.",
+  "minexray.render.entity_only": "Only these mobs (ids, commas; empty = all)"
 }

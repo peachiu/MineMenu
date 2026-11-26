@@ -1,8 +1,9 @@
-# MineMeBoost
+# MineMeBoostXray
 
-**[MineMenu](../README.md) and [MineBoost](../mineboost/README.md) in one mod**, for **Minecraft Java 1.21.1** (Fabric).
+**[MineMenu](../README.md), [MineBoost](../mineboost/README.md) and MineXray in one mod**, for **Minecraft Java 1.21.1** (Fabric).
+(Until 3.5 it was called MineMeBoost; the mod id is still `minemeboost`, so your settings, worlds and keys stay.)
 
-Press **Right Shift** and the menu has two tabs at the top:
+Press **Right Shift** and the menu has three tabs at the top: MineMenu, MineBoost and **MineXray** (new in 3.6, see [below](#minexray-new-in-36)).
 
 | MineMenu tab | MineBoost tab |
 |---|---|
@@ -29,6 +30,42 @@ Press **Right Shift** and the menu has two tabs at the top:
 |---|---|
 | ![Ores glowing through the stone](docs/ore-vision.png) | ![Benchmark result in chat](docs/benchmark.png) |
 
+## MineXray *(new in 3.6)*
+
+X-ray and ESP for **singleplayer** (and LAN worlds you host). On a multiplayer server every MineXray mode is off, the tab says "MineXray only works in singleplayer", and nothing is scanned, drawn or sent.
+
+| Ore ESP: whole veins, labels, tracers | Classic X-Ray |
+|---|---|
+| ![Ore ESP](docs/v36-ore-esp.png) | ![Classic X-Ray](docs/v36-classic-xray.png) |
+
+| Block ESP + Entity ESP | The MineXray tab (block editor) |
+|---|---|
+| ![Block and Entity ESP](docs/v36-entity-esp.png) | ![Block editor](docs/v36-tab-blocks.png) |
+
+**Modes** (several at once, each with its own key in Options > Controls > Key Binds > MineXray):
+
+- **Classic X-Ray** (key **X**): hides everything except the preset's *Visible* blocks (ores, lava...), with full brightness and no smooth-lighting shadows while on. Hidden blocks can be drawn see-through (opacity 0-100%). Chunks are rebuilt once when you switch it or change the list ("Rebuilding chunks..." shows meanwhile); everything is put back when you switch it off. *Not available with Sodium* (it replaces the chunk builder this mode changes): you get the message "Classic X-Ray isn't available with Sodium, use Ore ESP".
+- **Ore ESP** (key **G**): the preset's blocks through walls, without rebuilding chunks. Touching blocks of the same kind are drawn as **one vein** (no lines inside). Styles: outline, filled box, outline + fill, corners only. Colour per block, line thickness, opacity, fade with distance, **tracers** to the 10 nearest veins, **labels** ("Diamond Ore ×6 · 14m"), radius 8-128 (32 by default), a block limit (2000, nearest first).
+- **Cave Finder**: caves and ravines below a height you choose (cave air), as dots or an outline; optionally only large caves. *Dungeons are made of normal air, so they show through Block ESP's spawner category instead.*
+- **Fluid View**: lava in orange (and water in blue, if you want), with its own radius.
+- **Lava Warning**: a warning and a low note when there's lava up to 3 blocks behind or under the block you're mining. Works with the other modes off.
+- **Block ESP**: storage, spawners and trial spawners, vaults, portals, budding amethyst, suspicious sand/gravel, sculk sensors/shriekers, redstone (off by default), infested blocks; each category with a switch and a colour.
+- **Entity ESP**: boxes around mobs through walls (hostile red, passive green, players blue, items yellow), its own radius, outline or box. It replaces Mob Glow.
+
+**Block editor:** every block in the game (modded too) with search, icon, name and id; per block: kept in Classic, shown by ESP, colour, category. Add by search, by the block you're looking at (there's a key), by the item in your hand, or a tag (`#minecraft:diamond_ores`). Deepslate ores share the normal ore's line.
+
+**Presets:** All Ores, Diamonds Only, Netherite Hunt, Gold & Emerald, Redstone & Lapis, Caves, Structures, Ancient City, Clean Classic. Save, rename, duplicate, delete, share as a text code, restore the built-in ones. **Auto per dimension**: the Nether switches to Netherite Hunt, back home to All Ores (your choice per dimension).
+
+**Scanner:** *Scan now* lists every vein within up to 128 blocks (scanned in the background, the game keeps running): block, size, coordinates, distance, direction; sort and filter; a summary per kind. Per vein: **Mark as waypoint**, **Show** (30 s highlight), **Teleport** (to safe air next to it), **Mine** (the whole vein, drops to you).
+
+**HUD:** Ore Counter, Nearest Ore Arrow, Y-Level Guide (where each ore generates in 1.21), Session Stats, and a small line with the modes that are on. Veins also show on the minimap.
+
+**Also:** works from Freecam (it follows the camera), Command Palette lines ("xray diamonds", "xray ore esp", "xray scan"), favourites and keys on any of them, MineXray modes saved in cheat profiles. MineMenu's **Ore Vision, Chest ESP and Mob Glow** are now shortcuts that switch the matching MineXray mode; your keys and settings came along.
+
+**Performance:** blocks are found by a low-priority background thread, one 16×16×16 section at a time, on a copy of the section; a quick look at each section's palette skips the ones without anything to find (most of them) without copying. Results are kept per section and updated only when a block changes. Geometry is grouped into 64-block regions on the GPU, so a frame is a handful of draw calls. Near sections and the ones in front of you go first. **Adaptive range** shrinks the radius and tracers (down to half) while FPS are below your FPS Target. The cache is capped (64 MB by default) and freed when you leave the world or change dimension. **With every mode off, MineXray costs nothing.** Settings > *Measure the cost (A/B)* measures every mode on your PC with MineBoost's A/B tool.
+
+Files: `config/minemeboost/minexray.json` and `config/minemeboost/xray-presets/`.
+
 Right Shift reopens the tab you used last. **`.`** still opens MineBoost directly.
 
 ### One FPS counter at a time
@@ -45,8 +82,8 @@ MineMenu's hacks work in your own worlds: singleplayer, and a world you open to 
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `minemeboost-3.5.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
-4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoost already contains both, and Fabric will refuse to start with both installed.
+3. Download `minemeboost-3.6.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+4. **Remove `minemenu-*.jar` and `mineboost-*.jar`** if you have them. MineMeBoostXray already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over from 3.2 and 3.3. MineMenu's settings, favorites, keys and profiles are saved in `config/minemeboost/cheats.json`; **⚙ → Reset everything** makes a backup first.
 
@@ -63,7 +100,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/minemeboost-3.5.0.jar`.
+The jar ends up in `minemeboost/build/libs/minemeboost-3.6.0.jar`.
 
 In-game tests (Fabric GameTest, run on a server with the mod loaded):
 
@@ -77,7 +114,9 @@ In-game tests (Fabric GameTest, run on a server with the mod loaded):
 
 ```bash
 ./gradlew runClientTests -Psuite=full            # everything once, about 10 minutes
-./gradlew runClientTests -Psuite=soak -Pminutes=60   # Chaos Mode, Minimap, ESP, Impostors... for an hour
+./gradlew runClientTests -Psuite=soak -Pminutes=60   # Chaos Mode, Minimap, MineXray, Impostors... for an hour
+./gradlew runClientTests -Psuite=xray            # only MineXray's checks (3.6)
+./gradlew runClientTests -Psuite=xraym           # MineXray's FPS cost per mode
 ./gradlew runClientTests -Psuite=full -PextraMods=/path/to/sodium-and-friends   # with other mods
 ```
 
