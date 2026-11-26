@@ -73,6 +73,7 @@ public final class MineXrayClient {
                 Guard.run("MineXray drawing", () -> {
                     EspRenderer.render(context);
                     OverlayRenderer.render(context);
+                    com.minexray.render.LabelRenderer.capture(context);
                 });
             }
         });

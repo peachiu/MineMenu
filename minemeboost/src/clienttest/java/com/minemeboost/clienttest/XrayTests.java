@@ -79,6 +79,22 @@ abstract class XrayTests extends WorldTests {
         }
     }
 
+    /** Share of the lower-middle of the screen that is sky blue (seen through where blocks are hidden). */
+    static double skyShare(net.minecraft.client.MinecraftClient c) {
+        try (net.minecraft.client.texture.NativeImage image = net.minecraft.client.util.ScreenshotRecorder.takeScreenshot(c.getFramebuffer())) {
+            int w = image.getWidth(), h = image.getHeight(), sky = 0, n = 0;
+            for (int y = h * 3 / 5; y < h * 4 / 5; y += 2) {
+                for (int x = w / 4; x < w * 3 / 4; x += 2) {
+                    int p = image.getColor(x, y);
+                    int r = p & 0xFF, b = (p >> 16) & 0xFF;
+                    if (b > 150 && b > r + 25) sky++;
+                    n++;
+                }
+            }
+            return sky / (double) n;
+        }
+    }
+
     private void allModesOff() {
         for (XrayMode mode : XrayMode.values()) {
             XrayConfig.get().set(mode, false);
@@ -142,7 +158,13 @@ abstract class XrayTests extends WorldTests {
             check("Ore ESP: drawn with a few draw calls (" + EspRenderer.drawCalls + ")", EspRenderer.drawCalls > 0 && EspRenderer.drawCalls < 40);
             if (diamond != null) {
                 SectionData data = ScanCache.get(ChunkSectionPos.asLong(diamond.nearest().getX() >> 4, diamond.nearest().getY() >> 4, diamond.nearest().getZ() >> 4));
-                boolean onlyDiamond = data != null && data.espIdx.length == 8 && data.mesh() != null;
+                int ores = 0; // only ores are drawn now (Block ESP is off), so count those
+                if (data != null) {
+                    for (int state : data.espState) {
+                        if (com.minexray.BlockFilter.get().category(state) == com.minexray.EspCategory.ORE) ores++;
+                    }
+                }
+                boolean onlyDiamond = data != null && ores == 8 && data.mesh() != null;
                 if (onlyDiamond) {
                     // 12 cube edges of 2 blocks = 24 unit segments; 8 separate boxes would be 96.
                     int segments = data.mesh().layers[MeshData.ESP_LINES].length / 8;
@@ -152,6 +174,7 @@ abstract class XrayTests extends WorldTests {
                 }
             }
             shot(c, "xray_ore_esp.png");
+            check("Ore ESP: labels on screen (" + com.minexray.render.LabelRenderer.drawn + ")", com.minexray.render.LabelRenderer.drawn > 0);
             run(() -> sw().setBlockState(rel(dx + 1, -8, dz + 1), Blocks.STONE.getDefaultState())); // break one
         });
         step(20, c -> {
@@ -242,8 +265,9 @@ abstract class XrayTests extends WorldTests {
             });
             step(100, c -> {
                 shot(c, "xray_classic.png");
-                double now = stoneShare(c);
-                check(String.format("Classic X-Ray: the stone floor is gone on screen (stone-grey %.0f%% -> %.0f%%)", num * 100, now * 100), num > 0.5 && now < num / 3);
+                double now = stoneShare(c), sky = skyShare(c);
+                check(String.format("Classic X-Ray: the stone floor is gone on screen (stone-grey %.0f%% -> %.0f%%, see-through %.0f%%)", num * 100, now * 100, sky * 100),
+                        num > 0.5 && now < num * 0.7 && sky > 0.15);
             });
             step(5, c -> XrayConfig.get().classicOpacity = 30);
             step(120, c -> {

@@ -1,7 +1,6 @@
 package com.minexray.render;
 
 import com.minexray.MineXrayClient;
-import com.minexray.XrayActions;
 import com.minexray.XrayConfig;
 import com.minexray.XrayMode;
 import com.minexray.mode.LavaWarning;
@@ -9,18 +8,14 @@ import com.minexray.scan.VeinMerger;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -36,18 +31,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * What's drawn fresh every frame (it moves or is short-lived): tracers to the nearest veins, vein labels,
+ * What's drawn fresh every frame (it moves or is short-lived): tracers to the nearest veins (labels: LabelRenderer),
  * Entity ESP boxes, the 30-second "Show" highlights from the scanner and the Lava Warning box.
  */
 public final class OverlayRenderer {
     private static final int MAX_ENTITIES = 300;
-    private static final int MAX_LABELS = 24;
     private record Highlight(BlockPos pos, int color, long until) {
     }
 
     private static final List<Highlight> highlights = new ArrayList<>();
-    /** Labels get their own buffer: mods like ImmediatelyFast take over the game's shared text batching. */
-    private static net.minecraft.client.util.BufferAllocator labelBuffer;
     /** For tests. */
     public static int drawnEntities;
 
@@ -121,9 +113,6 @@ public final class OverlayRenderer {
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
         }
-        if (esp && config.labels && !veins.isEmpty()) {
-            drawLabels(context, veins);
-        }
     }
 
     private static void drawEntities(BufferBuilder buffer, Matrix4f matrix, Vec3d cam, XrayConfig config, float tickDelta) {
@@ -175,33 +164,6 @@ public final class OverlayRenderer {
             return config.entityPassive ? 0x40FF40 : -1;
         }
         return -1;
-    }
-
-    private static void drawLabels(WorldRenderContext context, List<VeinMerger.Vein> veins) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        TextRenderer text = client.textRenderer;
-        if (labelBuffer == null) {
-            labelBuffer = new net.minecraft.client.util.BufferAllocator(1 << 16);
-        }
-        VertexConsumerProvider.Immediate consumers = VertexConsumerProvider.immediate(labelBuffer);
-        Camera camera = context.camera();
-        Vec3d cam = camera.getPos();
-        int shown = 0;
-        for (VeinMerger.Vein vein : veins) {
-            if (shown++ >= MAX_LABELS) {
-                break;
-            }
-            String label = com.minemenu.core.Tr.format("minexray.label", "%s ×%d · %dm", XrayActions.name(vein), vein.count(), Math.round(vein.distance()));
-            MatrixStack matrices = new MatrixStack();
-            matrices.translate(vein.cx() - cam.x, vein.cy() + 0.9 - cam.y, vein.cz() - cam.z);
-            matrices.multiply(camera.getRotation());
-            float scale = 0.025f * (float) Math.max(1.0, vein.distance() / 10.0);
-            matrices.scale(scale, -scale, scale);
-            float x = -text.getWidth(label) / 2f;
-            text.draw(label, x, 0, 0xFF000000 | vein.color(), false, matrices.peek().getPositionMatrix(), consumers,
-                    TextRenderer.TextLayerType.SEE_THROUGH, 0x60000000, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-        }
-        consumers.draw();
     }
 
     private static void line(BufferBuilder buffer, Matrix4f matrix, Vec3d cam, double x1, double y1, double z1, double x2, double y2, double z2,

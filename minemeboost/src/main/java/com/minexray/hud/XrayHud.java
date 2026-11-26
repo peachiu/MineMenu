@@ -42,6 +42,7 @@ public final class XrayHud {
         if (!MineXrayClient.allowed()) {
             return;
         }
+        com.minexray.render.LabelRenderer.render(context);
         if (MineXrayClient.active(XrayMode.LAVA_WARNING) && LavaWarning.showing()) {
             boolean blink = (System.currentTimeMillis() / 250) % 2 == 0;
             context.drawCenteredTextWithShadow(client.textRenderer, Text.translatable("minexray.lava_warning.text")

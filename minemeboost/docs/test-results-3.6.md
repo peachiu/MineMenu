@@ -5,26 +5,27 @@ Run with the in-game test suite (`./gradlew runClientTests`, see the README): th
 
 | Run | Mods | Result |
 |---|---|---|
-| MineXray suite (`-Psuite=xray`) | Fabric API only | RESULT_XRAY |
-| MineXray suite | + Sodium, Lithium, ImmediatelyFast, EntityCulling | RESULT_XRAY_COMPAT |
-| Multiplayer suite (`-Psuite=mp`) | vanilla 1.21.1 dedicated server | RESULT_MP |
-| Full suite (`-Psuite=full`, 3.4 + 3.5 + 3.6 checks) | Fabric API only | RESULT_FULL |
+| MineXray suite (`-Psuite=xray`) | Fabric API only | 57/57 |
+| MineXray suite | + Sodium, Lithium, ImmediatelyFast, EntityCulling | 51/51 (Classic X-Ray is refused with the Sodium message, as designed), no mixin errors |
+| Multiplayer suite (`-Psuite=mp`) | vanilla 1.21.1 dedicated server | 13/13 (8 earlier checks + 5 new: MineXray not allowed, modes inactive even when switched on, nothing scanned, nothing drawn, Classic off) |
+| Full suite (`-Psuite=full`, 3.4 + 3.5 + 3.6 checks) | Fabric API only | 142/142 (before the last label/check tweaks, which the MineXray suite runs re-checked) |
+| Soak (`-Psuite=soak -Pminutes=15`) with Ore ESP, Block ESP, Entity ESP, Fluid View, Cave Finder on | Fabric API only | 3/3; heap after GC 431 → 449 MB over 15 min, MineXray cache flat (~30 KB) |
 | MineXray cost (`-Psuite=xraym`) | Fabric API only | table below |
 
 ## What the MineXray suite checks
 
 - **Base:** `config/minemeboost/minexray.json` is written; 9 built-in presets; keys X (Classic) and G (Ore ESP); the Command Palette finds "xray diamonds".
 - **Migration:** MineMenu's Ore Vision switches Ore ESP on, and switching Ore ESP off in MineXray switches Ore Vision off. The same goes for Chest ESP / Block ESP and Mob Glow / Entity ESP. Mob Glow no longer puts the Glowing effect on mobs.
-- **Ore ESP:** turned on with its key; a 2x2x2 diamond cube is found as **one vein of 8**, and its outline is 24 segments (12 edges of 2 blocks) instead of 96. Breaking one block updates it to 7 within 1 s, placing it back to 8. Few draw calls (2 in the test scene).
+- **Ore ESP:** turned on with its key; a 2x2x2 diamond cube is found as **one vein of 8**, and its outline is 24 segments (12 edges of 2 blocks) instead of 96. Labels are on screen (also with Sodium + ImmediatelyFast). Breaking one block updates it to 7 within 1 s, placing it back to 8. Few draw calls (2 in the test scene).
 - **Block ESP:** chest and spawner found. **Fluid View:** lava found and drawn. **Cave Finder:** cave air found and drawn.
 - **Lava Warning:** fires while "mining" a block with lava under it.
 - **Entity ESP:** zombie and cow drawn.
-- **Classic X-Ray** (without Sodium): on means full bright and chunk culling off. On screen, the stone floor goes from 98% stone-grey pixels to 15%; at 30% opacity stone is see-through; switching it off brings culling, brightness and the floor back, and no rebuild is left hanging. **With Sodium:** the key is refused with "Classic X-Ray isn't available with Sodium, use Ore ESP", and nothing changes.
+- **Classic X-Ray** (without Sodium): on means full bright and chunk culling off. On screen, the stone floor goes from 98% stone-grey pixels to 15-26% (the rest is ores below and the sky showing through); at 30% opacity stone is see-through; switching it off brings culling, brightness and the floor back, and no rebuild is left hanging. **With Sodium:** the key is refused with "Classic X-Ray isn't available with Sodium, use Ore ESP", and nothing changes.
 - **Presets:** Diamonds Only drops gold; a share code exports and imports; a broken code is refused.
 - **Block editor:** the looked-at block is added; `#minecraft:diamond_ores` resolves to 2 blocks; iron ore brings deepslate iron ore.
 - **Tab:** all 7 sub-pages open at 1366x768, GUI Scale 2 (screenshots in the run folder).
 - **Scanner:** a 128-block scan finishes while the game keeps running (1% low 10 FPS on the software renderer). It lists the diamond vein. Mark as waypoint saves it, Show highlights it, Teleport lands in safe air at the vein, and Mine gives the 8 diamonds.
-- **Dimension:** going to the Nether switches to Netherite Hunt; back home it's All Ores again (and the cache is cleared each time).
+- **Dimension:** going to the Nether switches to Netherite Hunt; back home it's All Ores again. (The scan cache is cleared on every dimension change too; the test doesn't check that part separately.)
 - **Safe Mode:** a forced error in Fluid View turns only that mode off. **Profiles** save and load MineXray modes.
 - **All off:** no scan data and no GPU buffers are kept.
 
