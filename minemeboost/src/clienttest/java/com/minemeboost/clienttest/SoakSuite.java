@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Soak test: N minutes (15 by default, 60 in the weekly CI run) of Chaos Mode, Minimap, Ore Vision, Chest ESP,
+ * Soak test: N minutes (15 by default, 60 in the weekly CI run) of Chaos Mode, Minimap, MineXray (Ore ESP, Block ESP,
+ * Entity ESP, Fluid View, Cave Finder),
  * Health Bars and Impostors, with a round of heavier things every 2 minutes (mob war, a 32x32x32 fill and undo,
  * morphs, meteor, tornado, freecam, Render Scale changes). Fails if anything was caught by Safe Mode, if memory
  * after a GC keeps growing, or if the game stops ticking.
@@ -52,6 +53,9 @@ class SoakSuite extends Harness {
             on(Feature.INFO_HUD);
             on(Feature.ORE_VISION);
             on(Feature.CHEST_ESP);
+            on(Feature.MOB_GLOW); // 3.6: MineXray Entity ESP
+            com.minexray.XrayConfig.get().set(com.minexray.XrayMode.FLUID_VIEW, true);
+            com.minexray.XrayConfig.get().set(com.minexray.XrayMode.CAVE_FINDER, true);
             on(Feature.MOB_HEALTH_BARS);
             on(Feature.CHAOS_MODE);
             FeatureSettings.set(Feature.CHAOS_MODE, FeatureSettings.of(Feature.CHAOS_MODE).get(0), 1); // an event every minute
@@ -85,7 +89,8 @@ class SoakSuite extends Harness {
             step(400, c -> {
                 long used = usedAfterGc();
                 memory.add(used);
-                log.add(String.format("soak round %d: memory after GC %d MB, FPS %d, chaos %s", round + 1, used, c.getCurrentFps(), CheatState.isOn(Feature.CHAOS_MODE)));
+                log.add(String.format("soak round %d: memory after GC %d MB, FPS %d, chaos %s, MineXray: %s", round + 1, used, c.getCurrentFps(),
+                        CheatState.isOn(Feature.CHAOS_MODE), com.minexray.MineXrayClient.debugLine()));
             });
         }
         step(5, c -> {

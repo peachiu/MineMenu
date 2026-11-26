@@ -85,7 +85,9 @@ public final class LineRenderer {
             return;
         }
         sink.buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        sink.matrix = context.positionMatrix();
+        // 3.6 fix: at WorldRenderEvents.LAST the model-view matrix already holds the camera rotation, so the
+        // vertices must not be rotated again (boxes drifted away from their blocks when looking up or down).
+        sink.matrix = new Matrix4f();
         sink.camera = context.camera().getPos();
         sink.count = 0;
         for (Provider provider : providers) {

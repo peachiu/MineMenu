@@ -98,8 +98,15 @@ class MpSuite extends Harness {
             on(Feature.FREECAM);
             on(Feature.FULL_BRIGHT);
             on(Feature.MOB_HEALTH_BARS);
+            for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, true);
+            com.minexray.XrayKeys.toggle(c, com.minexray.XrayMode.ORE_ESP);
         });
         step(60, c -> {
+            check("Multiplayer: MineXray not allowed", !com.minexray.MineXrayClient.allowed());
+            check("Multiplayer: MineXray modes inactive even when switched on", java.util.Arrays.stream(com.minexray.XrayMode.values()).noneMatch(com.minexray.MineXrayClient::active));
+            check("Multiplayer: MineXray scans nothing", com.minexray.scan.ScanCache.size() == 0 && com.minexray.scan.SectionScanner.needs() == null);
+            check("Multiplayer: MineXray draws nothing", com.minexray.render.EspRenderer.drawCalls == 0 && com.minexray.render.OverlayRenderer.drawnEntities == 0);
+            check("Multiplayer: Classic X-Ray not active", !com.minexray.mode.ClassicXray.active() && c.chunkCullingEnabled);
             check("Multiplayer: Fly not granted", !c.player.getAbilities().allowFlying);
             check("Multiplayer: Freecam not active", !Freecam.active() && c.getCameraEntity() == c.player);
             check("Multiplayer: Full Bright not active", !PlayerModules.fullBrightOn);
@@ -109,7 +116,9 @@ class MpSuite extends Harness {
             shot(c, "mp_hud.png");
             c.setScreen(new MineMenuScreen());
         });
-        step(10, c -> { shot(c, "mp_menu.png"); c.setScreen(new BoostScreen(null, c.options)); });
+        step(10, c -> { shot(c, "mp_menu.png"); c.setScreen(new com.minexray.screen.XrayScreen(null, com.minexray.screen.XrayScreen.Page.OVERVIEW, false)); });
+        step(10, c -> { shot(c, "mp_xray_tab.png"); for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, false);
+            c.setScreen(new BoostScreen(null, c.options)); });
         step(10, c -> { shot(c, "mp_boost.png"); c.setScreen(null); BoostConfig.get().renderScale = 75; });
         step(20, c -> { shot(c, "mp_renderscale75.png"); check("Multiplayer: Render Scale works", com.mineboost.renderscale.RenderScale.active(c)); BoostConfig.get().renderScale = 100; });
         step(5, c -> { for (Feature f : Feature.values()) off(f); });

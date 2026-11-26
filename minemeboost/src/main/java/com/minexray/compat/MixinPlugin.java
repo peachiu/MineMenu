@@ -13,7 +13,8 @@ public final class MixinPlugin implements IMixinConfigPlugin {
             "com.minexray.mixin.BlockRenderManagerMixin",
             "com.minexray.mixin.BlockSideMixin",
             "com.minexray.mixin.RenderLayersMixin",
-            "com.minexray.mixin.AmbientOcclusionMixin");
+            "com.minexray.mixin.AmbientOcclusionMixin",
+            "com.minexray.mixin.SectionBuilderMixin");
 
     @Override
     public void onLoad(String mixinPackage) {

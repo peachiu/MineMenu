@@ -66,6 +66,7 @@ public final class MineXrayClient {
             SessionStats.blockChanged(pos);
         };
         EspRenderer.registerShader();
+        com.minexray.compat.XrayModels.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> Guard.run("MineXray", () -> tick(client)));
         WorldRenderEvents.LAST.register(context -> {
             if (allowed) {

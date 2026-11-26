@@ -117,13 +117,15 @@ public final class XrayActions {
         }).accept(MinecraftClient.getInstance(), null);
     }
 
-    /** Two blocks of air (no lava near) with something solid under, as close to {@code target} as possible. */
+    /**
+     * Two blocks of air (no lava near) with something solid under: the closest one within 6 blocks of
+     * {@code target}, else the first one straight above it (ores are usually buried in solid stone).
+     */
     public static BlockPos safeSpot(ServerWorld world, BlockPos target) {
         BlockPos best = null;
         double bestDistance = Double.MAX_VALUE;
-        for (BlockPos p : BlockPos.iterate(target.add(-4, -4, -4), target.add(4, 4, 4))) {
-            if (!free(world, p) || !free(world, p.up()) || !world.getBlockState(p.down()).isSideSolidFullSquare(world, p.down(), Direction.UP)
-                    || nearLava(world, p)) {
+        for (BlockPos p : BlockPos.iterate(target.add(-6, -6, -6), target.add(6, 6, 6))) {
+            if (!safe(world, p)) {
                 continue;
             }
             double d = p.getSquaredDistance(target);
@@ -132,7 +134,21 @@ public final class XrayActions {
                 best = p.toImmutable();
             }
         }
-        return best;
+        if (best != null) {
+            return best;
+        }
+        for (int y = target.getY() + 1; y < world.getTopY() - 2; y++) {
+            BlockPos p = new BlockPos(target.getX(), y, target.getZ());
+            if (safe(world, p)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private static boolean safe(ServerWorld world, BlockPos p) {
+        return free(world, p) && free(world, p.up()) && world.getBlockState(p.down()).isSideSolidFullSquare(world, p.down(), Direction.UP)
+                && !nearLava(world, p);
     }
 
     private static boolean free(ServerWorld world, BlockPos pos) {

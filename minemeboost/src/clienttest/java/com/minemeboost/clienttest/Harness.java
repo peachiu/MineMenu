@@ -114,6 +114,8 @@ public abstract class Harness {
     }
 
     protected void pause(int ticks) { step(ticks, c -> {}); }
+    /** Ends the current step's wait early (for loops of "wait until" steps). */
+    protected void skipWait() { wait = 0; }
     protected void check(String name, boolean ok) { log.add((ok ? "PASS " : "FAIL ") + name); }
     protected double maxY = Double.NaN;
     protected boolean watchClimb;

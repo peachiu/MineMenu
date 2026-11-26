@@ -254,7 +254,8 @@ public final class EspRenderer {
         }
         GlUniform fade = program != null ? program.getUniform("FadeRange") : null;
         Matrix4f projection = RenderSystem.getProjectionMatrix();
-        Matrix4f view = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(context.positionMatrix());
+        // At WorldRenderEvents.LAST the model-view matrix already holds the camera rotation: don't apply it twice.
+        Matrix4f view = new Matrix4f(RenderSystem.getModelViewMatrix());
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();

@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /** The full suite: everything from 3.4 (PlayerTests, WorldTests) plus the 3.5 features. */
-class FullSuite extends WorldTests {
+class FullSuite extends XrayTests {
     private com.minemenu.build.UndoStack.Entry igloo;
 
     FullSuite() {
@@ -30,6 +30,7 @@ class FullSuite extends WorldTests {
         buildPlayer();
         buildWorld();
         build35();
+        build36();
         step(5, c -> {});
     }
 

@@ -79,7 +79,7 @@ public final class OverlayRenderer {
         }
         Camera camera = context.camera();
         Vec3d cam = camera.getPos();
-        Matrix4f matrix = context.positionMatrix();
+        Matrix4f matrix = new Matrix4f(); // the model-view matrix already holds the camera rotation at this point
         List<VeinMerger.Vein> veins = esp ? VeinMerger.veins() : List.of();
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         if (esp && config.tracers) {
@@ -188,7 +188,6 @@ public final class OverlayRenderer {
             }
             String label = com.minemenu.core.Tr.format("minexray.label", "%s ×%d · %dm", XrayActions.name(vein), vein.count(), Math.round(vein.distance()));
             MatrixStack matrices = new MatrixStack();
-            matrices.multiplyPositionMatrix(context.positionMatrix());
             matrices.translate(vein.cx() - cam.x, vein.cy() + 0.9 - cam.y, vein.cz() - cam.z);
             matrices.multiply(camera.getRotation());
             float scale = 0.025f * (float) Math.max(1.0, vein.distance() / 10.0);
