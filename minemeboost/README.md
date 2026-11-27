@@ -78,13 +78,13 @@ MineMenu's **Show FPS** and MineBoost's **FPS Overlay** can't both be on. While 
 |---|---|
 | ![FPS Overlay greyed out](docs/fps-lock-mineboost.png) | ![Show FPS greyed out](docs/fps-lock-minemenu.png) |
 
-MineMenu's hacks work in your own worlds: singleplayer, and a world you open to LAN (only for you, the host). On a multiplayer server the MineMenu tab opens but says "Cheats only work in singleplayer": only the Minimap (without mobs), Info HUD and Chunk Borders work there, and nothing is ever sent to the server. MineBoost works everywhere. With **Mod Menu** installed, MineMeBoost's config button opens this menu.
+MineMenu's hacks work in your own worlds: singleplayer, and a world you open to LAN (only for you, the host). **New in 5.0:** on servers where you're OP (your own server, a server with friends) many hacks and actions work through Minecraft's own commands, and on any server the ones that only change your screen work (minimap, zoom, full bright, light levels, waypoints kept on your computer). Details, and how to play with friends on your own server, in the [MineMenu README](../README.md#on-servers-50). MineBoost works everywhere. With **Mod Menu** installed, MineMeBoost's config button opens this menu.
 
 ## Install
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `MineMeBoostXray-4.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `MineMeBoostXray-5.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar`, `mineboost-*.jar` and older `minemeboost-*.jar`** if you have them. MineMeBoostXray already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over from 3.2 and 3.3. MineMenu's settings, favorites, keys and profiles are saved in `config/minemeboost/cheats.json`; **⚙ → Reset everything** makes a backup first.
@@ -102,7 +102,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/MineMeBoostXray-4.0.0.jar`.
+The jar ends up in `minemeboost/build/libs/MineMeBoostXray-5.0.0.jar`.
 
 In-game tests (Fabric GameTest, run on a server with the mod loaded):
 

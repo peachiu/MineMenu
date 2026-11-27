@@ -12,10 +12,11 @@ import net.minecraft.text.OrderedText;
 /** Shown once after updating: the highlights of this version. */
 public class WhatsNewScreen extends Screen {
     /** The version this screen describes (MineMeBoostXray sets its own). */
-    public static String VERSION = "3.5.0";
+    public static String VERSION = "5.0.0";
     /** Lang keys, shown in order ("" = empty line). */
     public static List<String> LINES = List.of(
             "minemenu.whats_new.title", "",
+            "minemenu.whats_new.servers", "",
             "minemenu.whats_new.fps", "",
             "minemenu.whats_new.build", "",
             "minemenu.whats_new.language", "",

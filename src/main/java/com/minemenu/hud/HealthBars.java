@@ -26,7 +26,7 @@ public final class HealthBars {
     }
 
     public static void refresh(MinecraftClient client) {
-        on = CheatState.isOn(Feature.MOB_HEALTH_BARS) && MineMenuClient.isSingleplayer(client);
+        on = CheatState.isOn(Feature.MOB_HEALTH_BARS) && (MineMenuClient.isSingleplayer(client) || Feature.MOB_HEALTH_BARS.allowedInMultiplayer());
         double range = on ? FeatureSettings.get(Feature.MOB_HEALTH_BARS, "range") : 0;
         rangeSq = range * range;
     }

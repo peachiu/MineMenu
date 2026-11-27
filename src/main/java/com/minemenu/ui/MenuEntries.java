@@ -35,12 +35,17 @@ public final class MenuEntries {
     }
 
     public static void screen(String id, Category category, String name, String description, Function<Screen, Screen> open) {
+        screen(id, category, name, description, open, false);
+    }
+
+    /** {@code multiplayer}: also opens on any server (5.0: Waypoints, kept on your computer there). */
+    public static void screen(String id, Category category, String name, String description, Function<Screen, Screen> open, boolean multiplayer) {
         screens.add(new MenuEntry("screen:" + id, name, description, category, MenuEntry.Kind.SCREEN, null,
-                (client, parent) -> client.setScreen(open.apply(parent)), false));
+                (client, parent) -> client.setScreen(open.apply(parent)), multiplayer));
     }
 
     static {
-        screen("waypoints", Category.PLAYER, "Waypoints...", "Up to 10 named waypoints for this world: save, teleport, and see their direction and distance on screen.", WaypointScreen::new);
+        screen("waypoints", Category.PLAYER, "Waypoints...", "Up to 10 named waypoints for this world: save, teleport, and see their direction and distance on screen.", WaypointScreen::new, true);
         screen("time_weather", Category.WORLD, "Time & Weather...", "Set the exact time, how fast days go by (or stop time), and sun, rain or thunder.", TimeWeatherScreen::new);
         screen("find_structure", Category.WORLD, "Find Structure...", "Find the nearest village, stronghold, ancient city, temple... Its direction and distance show on screen.", StructureScreen::new);
         screen("spawn_mob", Category.WORLD, "Spawn Mob...", "Pick any mob and spawn it where you're looking, or customize it first.", MobSpawnScreen::new);
@@ -129,7 +134,14 @@ public final class MenuEntries {
 
     /** Runs an entry, refusing cheats on multiplayer servers with the usual message. */
     public static void run(MinecraftClient client, Screen parent, MenuEntry entry) {
-        if (!entry.multiplayer() && !MineMenuClient.requireSingleplayer(client)) {
+        if (!entry.multiplayer() && !MineMenuClient.isSingleplayer(client)) {
+            // 5.0: on a server where you're OP, hacks and actions with a command version use the command.
+            if (com.minemenu.op.OpCommands.active(client) && com.minemenu.op.OpCommands.supports(entry)) {
+                com.minemenu.hud.Macros.record(entry.id());
+                com.minemenu.core.Guard.run(entry.name(), () -> com.minemenu.op.OpCommands.run(client, entry));
+                return;
+            }
+            MineMenuClient.requireSingleplayer(client);
             return;
         }
         com.minemenu.hud.Macros.record(entry.id());

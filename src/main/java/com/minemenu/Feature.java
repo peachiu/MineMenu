@@ -132,7 +132,9 @@ public enum Feature {
 
     /** Whether this is still allowed on a multiplayer server (only things that give no unfair advantage). */
     public boolean allowedInMultiplayer() {
-        return this == INFO_HUD || this == MINIMAP || this == CHUNK_BORDERS;
+        // 5.0: also the ones that only change what you see on your own screen.
+        return this == INFO_HUD || this == MINIMAP || this == CHUNK_BORDERS || this == ZOOM || this == AUTO_SPRINT
+                || this == LIGHT_OVERLAY || this == FULL_BRIGHT || this == MOB_HEALTH_BARS;
     }
 
     /** Remembered between game sessions (not the ones that would be surprising when you start the game). */

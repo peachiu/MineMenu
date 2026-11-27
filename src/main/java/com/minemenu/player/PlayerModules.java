@@ -126,7 +126,7 @@ public final class PlayerModules {
     public static void refreshFlags(MinecraftClient client) {
         boolean singleplayer = com.minemenu.MineMenuClient.isSingleplayer(client);
         phaseOn = singleplayer && CheatState.isOn(Feature.PHASE);
-        fullBrightOn = singleplayer && CheatState.isOn(Feature.FULL_BRIGHT);
+        fullBrightOn = (singleplayer || Feature.FULL_BRIGHT.allowedInMultiplayer()) && CheatState.isOn(Feature.FULL_BRIGHT);
         lavaSwimOn = singleplayer && CheatState.isOn(Feature.LAVA_SWIM);
         Freecam.checkOff(client);
     }

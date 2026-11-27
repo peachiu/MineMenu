@@ -48,24 +48,34 @@ public class WaypointScreen extends Screen {
 
             int x = left + 114;
             addDrawableChild(ButtonWidget.builder((w == null ? Text.translatable("minemenu.text.set_here") : Text.translatable("minemenu.text.move_here")),
-                            b -> onServer(player -> Waypoints.setHere(player, slot, names[slot].getText())))
+                            b -> {
+                                if (own()) {
+                                    onServer(player -> Waypoints.setHere(player, slot, names[slot].getText()));
+                                } else {
+                                    Waypoints.setHereClient(this.client, slot, names[slot].getText());
+                                }
+                            })
                     .dimensions(x, y, 66, 20)
                     .tooltip(Tooltip.of(Text.translatable("minemenu.text.save_where_you_re_standing_and")))
                     .build());
             x += 70;
             ButtonWidget go = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.go").formatted(Formatting.GREEN), b -> {
-                        onServer(player -> Waypoints.go(player, slot));
+                        if (own()) {
+                            onServer(player -> Waypoints.go(player, slot));
+                        } else {
+                            tp(Waypoints.get(slot));
+                        }
                         this.client.setScreen(null);
                     })
                     .dimensions(x, y, 40, 20)
                     .tooltip(Tooltip.of(w == null ? Text.translatable("minemenu.text.nothing_saved_here_yet") : Text.translatable("minemenu.text.teleport_to_s", Waypoints.describe(w))))
                     .build());
-            go.active = w != null;
+            go.active = w != null && (own() || com.minemenu.op.OpCommands.active(this.client));
             x += 44;
             ButtonWidget hud = addDrawableChild(ButtonWidget.builder(
                             Text.translatable("minemenu.text.hud").append(w != null && w.hud ? Text.translatable("minemenu.text.on").formatted(Formatting.GREEN)
                                     : Text.translatable("minemenu.text.off").formatted(Formatting.RED)),
-                            b -> onServer(player -> Waypoints.toggleHud(slot)))
+                            b -> local(() -> Waypoints.toggleHud(slot)))
                     .dimensions(x, y, 60, 20)
                     .tooltip(Tooltip.of(Text.translatable("minemenu.text.show_the_direction_and_distance_to")))
                     .build());
@@ -74,7 +84,7 @@ public class WaypointScreen extends Screen {
             ButtonWidget delete = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.delete").formatted(Formatting.RED),
                             b -> {
                                 names[slot].setText("");
-                                onServer(player -> Waypoints.delete(slot));
+                                local(() -> Waypoints.delete(slot));
                             })
                     .dimensions(x, y, 50, 20)
                     .build());
@@ -84,14 +94,18 @@ public class WaypointScreen extends Screen {
         // Last Death (set automatically when you die)
         Waypoints.Waypoint death = Waypoints.lastDeath();
         ButtonWidget goDeath = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.go_to_last_death").formatted(Formatting.RED), b -> {
-                    onServer(Waypoints::goLastDeath);
+                    if (own()) {
+                        onServer(Waypoints::goLastDeath);
+                    } else {
+                        tp(Waypoints.lastDeath());
+                    }
                     this.client.setScreen(null);
                 })
                 .dimensions(left, y + 2, 180, 20)
                 .tooltip(Tooltip.of(death == null ? Text.translatable("minemenu.text.you_haven_t_died_in_this_2") : Text.translatable("minemenu.text.teleport_to_s", Waypoints.describe(death))))
                 .build());
-        goDeath.active = death != null;
-        ButtonWidget deleteDeath = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.forget_it"), b -> onServer(p -> Waypoints.deleteLastDeath()))
+        goDeath.active = death != null && (own() || com.minemenu.op.OpCommands.active(this.client));
+        ButtonWidget deleteDeath = addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.forget_it"), b -> local(Waypoints::deleteLastDeath))
                 .dimensions(left + 184, y + 2, 70, 20).build());
         deleteDeath.active = death != null;
         y += 28;
@@ -113,6 +127,29 @@ public class WaypointScreen extends Screen {
         next.active = page < pages - 1;
     }
 
+    /** Your own world (waypoints live on its server thread); on servers they're kept on your computer (5.0). */
+    private boolean own() {
+        return this.client != null && MineMenuClient.isSingleplayer(this.client);
+    }
+
+    /** Runs a waypoint change where the waypoints live. */
+    private void local(Runnable change) {
+        IntegratedServer server = this.client != null ? this.client.getServer() : null;
+        if (own() && server != null) {
+            server.execute(change);
+        } else {
+            change.run();
+        }
+    }
+
+    /** On a server where you're OP: Go uses /tp. */
+    private void tp(Waypoints.Waypoint w) {
+        if (w != null && com.minemenu.op.OpCommands.active(this.client)) {
+            com.minemenu.op.OpCommands.send(this.client, java.util.List.of(String.format(java.util.Locale.ROOT, "execute in %s run tp @s %.2f %.2f %.2f",
+                    w.dimension, w.x, w.y, w.z)));
+        }
+    }
+
     private void onServer(Consumer<ServerPlayerEntity> action) {
         IntegratedServer server = this.client != null ? this.client.getServer() : null;
         if (server != null) {
@@ -127,26 +164,18 @@ public class WaypointScreen extends Screen {
 
     /** Saves typed names (on the server thread, like every other change). */
     private void saveNames() {
-        IntegratedServer server = this.client != null ? this.client.getServer() : null;
-        if (server == null) {
-            return;
-        }
         for (int i = 0; i < Waypoints.MAX; i++) {
             int slot = i;
             if (names[slot] == null) {
                 continue;
             }
             String text = names[slot].getText();
-            server.execute(() -> Waypoints.rename(slot, text));
+            local(() -> Waypoints.rename(slot, text));
         }
     }
 
     @Override
     public void tick() {
-        if (this.client != null && !MineMenuClient.isSingleplayer(this.client)) {
-            this.client.setScreen(null);
-            return;
-        }
         if (Waypoints.version() != seenVersion) {
             clearAndInit(); // something changed on the server: show it
         }

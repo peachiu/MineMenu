@@ -778,5 +778,9 @@
   "minemenu.whats_new.fps": "§aFPS: §fRender Scale now sharpens the picture (CAS), so 75% looks almost like 100%. Impostors: far mobs as a flat picture (A/B-tested). The low presets pick the Render Scale your own A/B test measured.",
   "minemenu.whats_new.language": "§bLanguage: §fevery text can be translated; Portuguese (Portugal) is included. Pick it in Options → Language.",
   "minemenu.whats_new.tests": "§7Behind the scenes: an in-game test suite and a long soak test that run automatically.",
-  "minemenu.whats_new.title": "§dMineMeBoost 3.5.0"
+  "minemenu.whats_new.title": "§dMineMenu 5.0.0",
+  "minemenu.op.by_command": " (by command, you are OP)",
+  "minemenu.op.tooltip": "On this server it's done with Minecraft's own commands (you're OP here).",
+  "minemenu.op.needs_op": "On servers this needs OP (operator rights) on that server; in your own worlds it always works.",
+  "minemenu.whats_new.servers": "§aServers: §fminimap, zoom, full bright, light levels and waypoints on any server; on servers where you're OP, God Mode, Fly, give items, spawn mobs, time and more work through commands."
 }

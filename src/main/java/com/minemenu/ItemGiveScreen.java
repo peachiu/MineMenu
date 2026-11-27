@@ -153,6 +153,11 @@ public class ItemGiveScreen extends Screen {
     private void giveSelected() {
         ItemEntry entry = list.getSelectedOrNull();
         IntegratedServer server = this.client != null ? this.client.getServer() : null;
+        if (entry != null && server == null && com.minemenu.op.OpCommands.active(this.client)) {
+            com.minemenu.op.OpCommands.giveItem(this.client, entry.data.id(), CheatState.giveAmount()); // 5.0: on a server where you're OP
+            status = Text.translatable("minemenu.give.gave", effectiveAmount(), entry.data.name()).formatted(Formatting.GREEN);
+            return;
+        }
         if (entry == null || server == null) {
             return;
         }
@@ -180,7 +185,7 @@ public class ItemGiveScreen extends Screen {
 
     @Override
     public void tick() {
-        if (this.client != null && !MineMenuClient.isSingleplayer(this.client)) {
+        if (this.client != null && !com.minemenu.op.OpCommands.screensAllowed(this.client)) {
             this.client.setScreen(null);
         }
     }

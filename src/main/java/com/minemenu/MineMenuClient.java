@@ -55,6 +55,14 @@ public class MineMenuClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(MineMenuClient::onClientTick);
         com.minemenu.core.Bootstrap.init();
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
+        // 5.0: on a multiplayer server, that server's waypoints come from a file on your computer.
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            if (!client.isIntegratedServerRunning()) {
+                var entry = client.getCurrentServerEntry();
+                String address = entry != null ? entry.address : "server";
+                client.execute(() -> Waypoints.onJoinServer(address));
+            }
+        });
 
         // These fire for the integrated (singleplayer) server, which runs inside the client.
         ServerLifecycleEvents.SERVER_STARTED.register(ServerCheats::onServerStarted);
@@ -123,24 +131,21 @@ public class MineMenuClient implements ClientModInitializer {
                 client.setScreen(new MineMenuScreen()); // on servers it only offers the fair Utility hacks
             }
         }
+        // These go through the menu entries, so on a server where you're OP they use commands (5.0).
         while (toggleFlyKey.wasPressed()) {
-            if (requireSingleplayer(client)) {
-                toggleWithMessage(client, Feature.FLY);
-            }
+            com.minemenu.ui.MenuEntries.run(client, null, com.minemenu.ui.MenuEntries.hack(Feature.FLY));
         }
         while (toggleGodKey.wasPressed()) {
-            if (requireSingleplayer(client)) {
-                toggleWithMessage(client, Feature.GOD_MODE);
-            }
+            com.minemenu.ui.MenuEntries.run(client, null, com.minemenu.ui.MenuEntries.hack(Feature.GOD_MODE));
         }
         while (killHostileKey.wasPressed()) {
-            if (requireSingleplayer(client)) {
-                runAction(client, ServerCheats.Action.KILL_HOSTILE);
-            }
+            com.minemenu.ui.MenuEntries.run(client, null, com.minemenu.ui.MenuEntries.action(ServerCheats.Action.KILL_HOSTILE));
         }
         while (spawnMobKey.wasPressed()) {
-            if (requireSingleplayer(client)) {
+            if (isSingleplayer(client) || com.minemenu.op.OpCommands.active(client)) {
                 MobSpawnScreen.spawnSelectedMob(client);
+            } else {
+                requireSingleplayer(client);
             }
         }
     }
@@ -195,9 +200,7 @@ public class MineMenuClient implements ClientModInitializer {
             y += 12;
         }
 
-        if (!isSingleplayer(client)) {
-            return;
-        }
+        // 5.0: on servers too (waypoints are kept on your computer there; the list shows what's on).
         // Waypoints and the Structure Finder target: always shown (each waypoint has its own HUD switch).
         List<Text> waypointLines = Waypoints.hudLines(client);
         for (Text line : waypointLines) {
@@ -210,7 +213,11 @@ public class MineMenuClient implements ClientModInitializer {
         if (!waypointLines.isEmpty()) {
             y += 3;
         }
-        List<Feature> enabled = CheatState.enabled();
+        List<Feature> enabled = new java.util.ArrayList<>(CheatState.enabled());
+        if (!isSingleplayer(client)) {
+            boolean op = com.minemenu.op.OpCommands.active(client);
+            enabled.removeIf(f -> !f.allowedInMultiplayer() && !(op && com.minemenu.op.OpCommands.supports(f)));
+        }
         CheatState.Size size = CheatState.size();
         if (enabled.isEmpty() && size == CheatState.Size.NORMAL) {
             return;

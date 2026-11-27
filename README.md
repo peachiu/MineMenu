@@ -4,7 +4,7 @@ A **singleplayer-only** fun menu for **Minecraft Java 1.21.1** (Fabric), in **En
 
 ![The MineMenu menu](docs/menu.png)
 
-> MineMenu's hacks only work in your own worlds: singleplayer, or a world you opened to LAN (only for you, the host). On a multiplayer server they stay off and nothing is sent to the server; only the Minimap (without mobs), Info HUD and Chunk Borders work there.
+> MineMenu's hacks work in your own worlds: singleplayer, or a world you opened to LAN (only for you, the host). **New in 5.0:** on servers where you're OP they work through Minecraft's own commands, and on any server the ones that only change your screen work (minimap, zoom, full bright, light levels, waypoints...). See [On servers](#on-servers-50).
 
 > **Also in this repo:**
 > - **[MineBoost](mineboost/README.md)**: an FPS boost menu (press `.` in game) with one-click presets and extra boosts.
@@ -283,6 +283,25 @@ Change these in **Options → Controls → Key Binds → MineMenu**.
 | Command Palette *(3.4)* | Ctrl+K |
 
 Any hack or action can get its own key: right-click its button in the menu. MineMenu warns you if the key is already used.
+
+## On servers *(5.0)*
+
+- **Any server:** Minimap (without mobs), Info HUD, Chunk Borders, Zoom, Full Bright, Light Levels, Auto Sprint, mob health bars, and **waypoints** (kept on your computer, one list per server). These only change what you see; nothing is sent to the server.
+- **Servers where you're OP** (operator: your own server, a server with friends, your Realm): hacks and actions that have a command version use Minecraft's own commands, which the server accepts because you have the rights:
+  - **Player:** God Mode, Fly (creative), Speed, Super Jump, Night Vision, Fast Swim, Lava Swim, Insta-Mine (Haste), No Fall Damage, Step-Up, Long Reach, Gravity Control;
+  - **World:** Always Day, Keep Inventory, Peace Mode, Freeze World;
+  - **Actions:** Heal, Launch, Teleport, Day/Night/Sun/Thunder, Kill Hostile/All, Smite, Explode, TNT/Arrow/Mob Rain, Wolf Army, Netherite Kit, Clear Ground Items, Set/Go Home;
+  - **Pickers:** Give Item, Spawn Mob, Give XP, Time & Weather, and Go on waypoints.
+
+  The menu shows them active and says "by command". On a server where you aren't OP they stay greyed out.
+- **What still only works in your own worlds:** everything that needs your world's own server (Morph, Freecam, Noclip, build tools with Undo, structures, Chaos Mode, combat hacks like Force Field or Bow Aimbot...). MineMenu doesn't fake anything to a server.
+
+### Playing with friends on your own server
+
+1. Start a vanilla 1.21.1 server on your computer (`server.jar` from Mojang, `java -Xmx2G -jar server.jar nogui`, accept `eula.txt`), and make yourself OP by typing `op YOUR_NAME` in its window.
+2. **Same Wi-Fi/home network:** your friends join your computer's local address. On a Mac: `ipconfig getifaddr en0`, e.g. `192.168.1.20`; on Windows: `ipconfig`, "IPv4 Address".
+3. **From their own homes:** either forward port **25565** on your router to your computer and give friends your public IP (search "what is my IP"), or use a free tunnel like **playit.gg**, which gives you an address to share without touching the router.
+4. Keep `online-mode=true` in `server.properties` (the default) when real friends join, so only real accounts get in. Add `white-list=true` and `whitelist add NAME` to choose who can enter.
 
 ## Notes
 

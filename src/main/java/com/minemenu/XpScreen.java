@@ -90,6 +90,11 @@ public class XpScreen extends Screen {
     private void give(boolean set) {
         int levels = typedLevels();
         IntegratedServer server = this.client != null ? this.client.getServer() : null;
+        if (levels >= 0 && server == null && com.minemenu.op.OpCommands.active(this.client)) {
+            com.minemenu.op.OpCommands.giveXp(this.client, levels, set); // 5.0: OP on a server
+            this.client.setScreen(null);
+            return;
+        }
         if (levels < 0 || server == null) {
             return;
         }
@@ -108,7 +113,7 @@ public class XpScreen extends Screen {
 
     @Override
     public void tick() {
-        if (this.client != null && !MineMenuClient.isSingleplayer(this.client)) {
+        if (this.client != null && !com.minemenu.op.OpCommands.screensAllowed(this.client)) {
             this.client.setScreen(null);
         }
     }

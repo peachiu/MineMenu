@@ -85,6 +85,15 @@ class MpSuite extends Harness {
         buildMultiplayer();
     }
 
+    /** Tells the test script which player to op (it watches this file and types "op NAME" in the server console). */
+    private static void writeOpRequest(String name) {
+        try {
+            java.nio.file.Files.createDirectories(java.nio.file.Path.of("clienttest"));
+            java.nio.file.Files.writeString(java.nio.file.Path.of("clienttest", "op-request.txt"), name);
+        } catch (Exception ignored) {
+        }
+    }
+
     private void buildMultiplayer() {
         step(100, c -> {});
         step(60, c -> {
@@ -109,10 +118,12 @@ class MpSuite extends Harness {
             check("Multiplayer: Classic X-Ray not active", !com.minexray.mode.ClassicXray.active() && c.chunkCullingEnabled);
             check("Multiplayer: Fly not granted", !c.player.getAbilities().allowFlying);
             check("Multiplayer: Freecam not active", !Freecam.active() && c.getCameraEntity() == c.player);
-            check("Multiplayer: Full Bright not active", !PlayerModules.fullBrightOn);
+            check("Multiplayer (5.0): Full Bright works on servers (only your screen)", PlayerModules.fullBrightOn);
             check("Multiplayer: Ore Vision doesn't scan", SectionScanner.cachedSections() == 0);
             check("Multiplayer: Chest ESP doesn't scan", EspModules.chestCount() == 0);
-            check("Multiplayer: Health bars off", !com.minemenu.hud.HealthBars.on);
+            check("Multiplayer (5.0): health bars work on servers (only your screen)", com.minemenu.hud.HealthBars.on);
+            check("Multiplayer: not OP yet, so no command versions", !com.minemenu.op.OpCommands.active(c));
+            com.minemenu.Waypoints.setHereClient(c, 0, "MP test");
             shot(c, "mp_hud.png");
             c.setScreen(new MineMenuScreen());
         });
@@ -144,6 +155,40 @@ class MpSuite extends Harness {
         step(40, c -> {
             check("Multiplayer: switching it off again stops it and frees everything", !com.minexray.MineXrayClient.allowed() && com.minexray.scan.ScanCache.size() == 0);
             for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, false);
+            c.setScreen(new BoostScreen(null, c.options));
+            check("Multiplayer (5.0): waypoints saved on your computer for this server", com.minemenu.Waypoints.get(0) != null
+                    && java.nio.file.Files.exists(com.minemenu.core.CheatConfig.DIR.resolve("server-waypoints/localhost_25599.json")));
+            log.add("OPME " + c.player.getGameProfile().getName()); // the test script ops this player from the server console
+            writeOpRequest(c.player.getGameProfile().getName());
+        });
+        for (int i = 0; i < 60; i++) {
+            step(20, c -> { if (c.player.hasPermissionLevel(2)) skipWait(); });
+        }
+        step(5, c -> {
+            c.setScreen(null);
+            check("Multiplayer OP (5.0): commands available once you're OP", com.minemenu.op.OpCommands.active(c));
+            if (CheatState.isOn(Feature.GOD_MODE)) CheatState.toggle(Feature.GOD_MODE);
+            if (CheatState.isOn(Feature.FLY)) CheatState.toggle(Feature.FLY);
+            com.minemenu.ui.MenuEntries.run(c, null, com.minemenu.ui.MenuEntries.hack(Feature.GOD_MODE));
+            com.minemenu.ui.MenuEntries.run(c, null, com.minemenu.ui.MenuEntries.hack(Feature.FLY));
+            com.minemenu.ui.MenuEntries.run(c, null, com.minemenu.ui.MenuEntries.action(com.minemenu.ServerCheats.Action.NIGHT));
+            com.minemenu.op.OpCommands.giveItem(c, net.minecraft.util.Identifier.ofVanilla("diamond"), 5);
+        });
+        step(100, c -> {
+            check("Multiplayer OP: God Mode by command (resistance effect)", c.player.hasStatusEffect(net.minecraft.entity.effect.StatusEffects.RESISTANCE));
+            check("Multiplayer OP: Fly by command (creative)", c.player.getAbilities().allowFlying);
+            long time = c.world.getTimeOfDay() % 24000;
+            check("Multiplayer OP: Night by command (time " + time + ")", time >= 12000);
+            int diamonds = 0;
+            for (int i = 0; i < c.player.getInventory().size(); i++) if (c.player.getInventory().getStack(i).isOf(net.minecraft.item.Items.DIAMOND)) diamonds += c.player.getInventory().getStack(i).getCount();
+            check("Multiplayer OP: Give Item by command (" + diamonds + " diamonds)", diamonds >= 5);
+            shot(c, "mp_op.png");
+            com.minemenu.ui.MenuEntries.run(c, null, com.minemenu.ui.MenuEntries.hack(Feature.GOD_MODE));
+            com.minemenu.ui.MenuEntries.run(c, null, com.minemenu.ui.MenuEntries.hack(Feature.FLY));
+        });
+        step(40, c -> {
+            check("Multiplayer OP: switching them off undoes them", !c.player.hasStatusEffect(net.minecraft.entity.effect.StatusEffects.RESISTANCE)
+                    && !c.player.getAbilities().allowFlying);
             c.setScreen(new BoostScreen(null, c.options));
         });
         step(10, c -> { shot(c, "mp_boost.png"); c.setScreen(null); BoostConfig.get().renderScale = 75; });

@@ -214,7 +214,7 @@
   "minexray.settings.reset_confirm": "Click again to reset",
   "minexray.settings.safe_mode": "Safe Mode: if a mode hits an error, only that mode turns off.",
   "minexray.settings.files": "Files: config/minemeboost/minexray.json and xray-presets/",
-  "minexray.whats_new.title": "§bMineMeBoostXray 4.0.0",
+  "minexray.whats_new.title": "§bMineMeBoostXray 5.0.0",
   "minexray.whats_new.xray": "§bNew tab, MineXray: §fClassic X-Ray (X), Ore ESP with whole veins, labels and tracers (G), Cave Finder, Fluid View and Lava Warning. Singleplayer only.",
   "minexray.whats_new.esp": "§eBlock ESP and Entity ESP: §fchests, spawners, vaults, portals, sculk... each with a colour; mobs by type.",
   "minexray.whats_new.tools": "§aTools: §fa block editor for every block (modded too), 9 presets that switch per dimension, a vein scanner (waypoint, show, teleport, mine), and a HUD.",
@@ -232,5 +232,6 @@
   "minexray.settings.servers.info": "On servers: use it only where X-ray is allowed. Servers with anti-xray send fake or hidden ores, so ESP may show nothing or wrong blocks. Teleport, Mine and waypoints only work in your own worlds. MineXray never sends anything to the server.",
   "minexray.scanner.own_world_only": "Only in your own worlds (singleplayer or a LAN world you host)",
   "minemeboost.text.minexray.servers": "MineXray is off on this server (it can be allowed in MineXray > Settings).",
-  "minexray.whats_new.servers": "§6New in 4.0: §fMineXray can also run on multiplayer servers. It stays off until you switch on MineXray > Settings > Allow on servers. Many servers forbid X-ray and hide ores, so use it only where it's allowed. MineMenu's cheats stay singleplayer-only."
+  "minexray.whats_new.servers": "§6New in 4.0: §fMineXray can also run on multiplayer servers. It stays off until you switch on MineXray > Settings > Allow on servers. Many servers forbid X-ray and hide ores, so use it only where it's allowed. MineMenu's cheats stay singleplayer-only.",
+  "minexray.whats_new.menu_servers": "§aNew in 5.0: §fMineMenu on servers. On any server: minimap, zoom, full bright, light levels and waypoints. On servers where you're OP, God Mode, Fly, give items, spawn mobs, time and more work through commands."
 }

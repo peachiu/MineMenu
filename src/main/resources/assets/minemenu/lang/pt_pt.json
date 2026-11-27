@@ -778,5 +778,9 @@
   "minemenu.whats_new.fps": "§aFPS: §fa Escala de renderização agora torna a imagem mais nítida (CAS), por isso 75% parece quase 100%. Impostores: criaturas distantes como uma imagem plana (testado com A/B). As predefinições baixas escolhem a Escala de renderização que o teu próprio teste A/B mediu.",
   "minemenu.whats_new.language": "§bIdioma: §ftodos os textos podem ser traduzidos; o Português (Portugal) está incluído. Escolhe-o em Opções → Idioma.",
   "minemenu.whats_new.tests": "§7Nos bastidores: um conjunto de testes dentro do jogo e um teste longo que correm automaticamente.",
-  "minemenu.whats_new.title": "§dMineMeBoost 3.5.0"
+  "minemenu.whats_new.title": "§dMineMenu 5.0.0",
+  "minemenu.op.by_command": " (por comando, és OP)",
+  "minemenu.op.tooltip": "Neste servidor é feito com os comandos do próprio Minecraft (aqui és OP).",
+  "minemenu.op.needs_op": "Em servidores isto precisa de OP (permissões de administrador) nesse servidor; nos teus mundos funciona sempre.",
+  "minemenu.whats_new.servers": "§aServidores: §fminimapa, zoom, brilho total, níveis de luz e waypoints em qualquer servidor; em servidores onde és OP, God Mode, Voar, dar itens, criar mobs, tempo e mais funcionam por comandos."
 }

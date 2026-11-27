@@ -106,6 +106,9 @@ public class MobSpawnScreen extends Screen {
     public static void spawnSelectedMob(MinecraftClient client) {
         IntegratedServer server = client.getServer();
         if (server == null) {
+            if (com.minemenu.op.OpCommands.active(client)) {
+                com.minemenu.op.OpCommands.spawnMob(client, CheatState.selectedMob(), CheatState.spawnAmount()); // 5.0: OP on a server
+            }
             return;
         }
         Identifier id = CheatState.selectedMob();
@@ -125,7 +128,7 @@ public class MobSpawnScreen extends Screen {
 
     @Override
     public void tick() {
-        if (this.client != null && !MineMenuClient.isSingleplayer(this.client)) {
+        if (this.client != null && !com.minemenu.op.OpCommands.screensAllowed(this.client)) {
             this.client.setScreen(null);
         }
     }

@@ -84,7 +84,8 @@ public final class HudModules {
         });
         LineRenderer.register((sink, camera) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            if (client.world == null || !MineMenuClient.isSingleplayer(client)) {
+            // 5.0: light levels also on servers (read from the world you see); slime chunks need the seed (your world only).
+            if (client.world == null || !(MineMenuClient.isSingleplayer(client) || Feature.LIGHT_OVERLAY.allowedInMultiplayer())) {
                 return;
             }
             if (CheatState.isOn(Feature.LIGHT_OVERLAY)) {

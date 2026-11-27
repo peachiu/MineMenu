@@ -58,7 +58,7 @@ public class TimeWeatherScreen extends Screen {
             @Override
             protected void applyValue() {
                 int t = ticks();
-                onServer(server -> WorldCheats.setTime(server, t));
+                onServer(server -> WorldCheats.setTime(server, t), () -> com.minemenu.op.OpCommands.setTime(client, t));
             }
         }).setTooltip(Tooltip.of(Text.translatable("minemenu.text.drag_to_set_the_exact_time")));
         y += 24;
@@ -68,7 +68,7 @@ public class TimeWeatherScreen extends Screen {
         for (int i = 0; i < 4; i++) {
             int t = times[i];
             addDrawableChild(ButtonWidget.builder(Text.translatable(names[i]), b -> {
-                        onServer(server -> WorldCheats.setTime(server, t));
+                        onServer(server -> WorldCheats.setTime(server, t), () -> com.minemenu.op.OpCommands.setTime(client, t));
                         this.client.setScreen(new TimeWeatherScreen(parent)); // move the slider too
                     })
                     .dimensions(left + i * (quarter + 4), y, quarter, 20)
@@ -100,36 +100,39 @@ public class TimeWeatherScreen extends Screen {
             @Override
             protected void applyValue() {
                 int s = speed();
-                onServer(server -> WorldCheats.setDaySpeed(server, s));
+                onServer(server -> WorldCheats.setDaySpeed(server, s), () -> com.minemenu.op.OpCommands.setDaySpeed(client, s));
             }
         }).setTooltip(Tooltip.of(Text.translatable("minemenu.text.how_fast_the_sun_moves_normal")));
         y += 30;
 
         int third = (WIDTH - 8) / 3;
         addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.sun").formatted(Formatting.YELLOW),
-                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.CLEAR)))
+                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.CLEAR), () -> com.minemenu.op.OpCommands.setWeather(client, "clear")))
                 .dimensions(left, y, third, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.rain").formatted(Formatting.AQUA),
-                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.RAIN)))
+                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.RAIN), () -> com.minemenu.op.OpCommands.setWeather(client, "rain")))
                 .dimensions(left + third + 4, y, third, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.thunder").formatted(Formatting.GOLD),
-                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.THUNDER)))
+                        b -> onServer(server -> WorldCheats.setWeather(server, WorldCheats.Weather.THUNDER), () -> com.minemenu.op.OpCommands.setWeather(client, "thunder")))
                 .dimensions(left + 2 * (third + 4), y, third, 20).build());
         y += 34;
         addDrawableChild(ButtonWidget.builder(Text.translatable("minemenu.text.done"), b -> close())
                 .dimensions((this.width - 150) / 2, y, 150, 20).build());
     }
 
-    private void onServer(Consumer<MinecraftServer> action) {
+    /** Your world: on its server thread. A server where you're OP (5.0): {@code byCommand}. */
+    private void onServer(Consumer<MinecraftServer> action, Runnable byCommand) {
         IntegratedServer server = this.client != null ? this.client.getServer() : null;
         if (server != null) {
             server.execute(() -> action.accept(server));
+        } else if (com.minemenu.op.OpCommands.active(this.client)) {
+            byCommand.run();
         }
     }
 
     @Override
     public void tick() {
-        if (this.client != null && !MineMenuClient.isSingleplayer(this.client)) {
+        if (this.client != null && !com.minemenu.op.OpCommands.screensAllowed(this.client)) {
             this.client.setScreen(null);
         }
     }

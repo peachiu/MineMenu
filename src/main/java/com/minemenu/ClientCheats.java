@@ -59,7 +59,7 @@ public final class ClientCheats {
     public static boolean isZooming() {
         MinecraftClient client = MinecraftClient.getInstance();
         return CheatState.isOn(Feature.ZOOM) && MineMenuClient.zoomKey != null && MineMenuClient.zoomKey.isPressed()
-                && client.currentScreen == null && MineMenuClient.isSingleplayer(client);
+                && client.currentScreen == null && (MineMenuClient.isSingleplayer(client) || Feature.ZOOM.allowedInMultiplayer());
     }
 
     /** How many times closer things look (4x by default). */

@@ -202,10 +202,15 @@ public class MineMenuScreen extends Screen {
     }
 
     private ButtonWidget entryButton(MenuEntry entry, int x, int y) {
-        boolean allowed = singleplayer() || entry.multiplayer();
+        boolean byCommand = !singleplayer() && !entry.multiplayer() && com.minemenu.op.OpCommands.active(this.client)
+                && com.minemenu.op.OpCommands.supports(entry);
+        boolean allowed = singleplayer() || entry.multiplayer() || byCommand;
         String tooltip = entry.description() + "\n\n" + com.minemenu.core.Tr.get("minemenu.menu.right_click_hint", "Right-click: settings, key, favorite.");
-        if (!allowed) {
-            tooltip = com.minemenu.core.Tr.get("minemenu.menu.singleplayer_only", "Cheats only work in singleplayer.");
+        if (byCommand) {
+            tooltip = entry.description() + "\n\n" + com.minemenu.core.Tr.get("minemenu.op.tooltip", "On this server it's done with commands (you're OP).");
+        } else if (!allowed) {
+            tooltip = com.minemenu.core.Tr.get(com.minemenu.op.OpCommands.supports(entry) ? "minemenu.op.needs_op" : "minemenu.menu.singleplayer_only",
+                    "Cheats only work in singleplayer.");
         }
         EntryButton button = new EntryButton(x, y, entry, Tooltip.of(Text.literal(tooltip)));
         button.active = allowed;

@@ -87,7 +87,28 @@ public final class Waypoints {
     public static void onServerStarted(MinecraftServer server) {
         found = null;
         Path root = server.getSavePath(WorldSavePath.ROOT);
-        file = root.resolve("minemenu_waypoints.json");
+        load(root.resolve("minemenu_waypoints.json"), root);
+    }
+
+    /**
+     * 5.0: joined a multiplayer server: its waypoints are kept on your computer, one file per server
+     * (config/minemeboost/server-waypoints/), and shown on the HUD and minimap like in your own worlds.
+     */
+    public static void onJoinServer(String address) {
+        found = null;
+        String name = address == null || address.isBlank() ? "server" : address.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9._-]", "_");
+        Path dir = com.minemenu.core.CheatConfig.DIR.resolve("server-waypoints");
+        try {
+            Files.createDirectories(dir);
+        } catch (Exception ignored) {
+        }
+        load(dir.resolve(name + ".json"), null);
+    }
+
+    /** Waypoints of this world/server ({@code legacyRoot}: a world folder that may hold the 3.2 Home file). */
+    private static void load(Path waypointFile, Path legacyRoot) {
+        Path root = legacyRoot;
+        file = waypointFile;
         Waypoint[] loaded = new Waypoint[MAX];
         Waypoint death = null;
         try {
@@ -104,7 +125,7 @@ public final class Waypoints {
                 for (int i = 0; read != null && i < Math.min(MAX, read.length); i++) {
                     loaded[i] = valid(read[i]) ? read[i] : null;
                 }
-            } else {
+            } else if (root != null) {
                 // MineMenu 3.2 had one Home in minemenu_home.txt: "dimension x y z yaw pitch".
                 Path home = root.resolve("minemenu_home.txt");
                 if (Files.exists(home)) {
@@ -126,7 +147,7 @@ public final class Waypoints {
         slots = loaded;
         lastDeath = death;
         version++;
-        if (Files.exists(root.resolve("minemenu_home.txt")) && !Files.exists(file)) {
+        if (root != null && Files.exists(root.resolve("minemenu_home.txt")) && !Files.exists(file)) {
             save(); // finish the move to the new file
         }
     }
@@ -143,7 +164,7 @@ public final class Waypoints {
             // Keep the 3.2 Home file up to date too, so an older MineMenu still finds your Home.
             int homeSlot = indexOf(HOME);
             Waypoint home = homeSlot >= 0 ? slots[homeSlot] : null;
-            if (home != null) {
+            if (home != null && file.getFileName().toString().equals("minemenu_waypoints.json")) {
                 Files.writeString(file.resolveSibling("minemenu_home.txt"), home.dimension + " " + home.x + " " + home.y
                         + " " + home.z + " " + home.yaw + " " + home.pitch);
             }
@@ -193,6 +214,28 @@ public final class Waypoints {
             }
         }
         return -1;
+    }
+
+    /** 5.0, on servers: saves where you're standing (client side; the server isn't asked). */
+    public static void setHereClient(net.minecraft.client.MinecraftClient client, int slot, String name) {
+        if (client.player == null || client.world == null) {
+            return;
+        }
+        Waypoint[] copy = slots.clone();
+        Waypoint w = new Waypoint();
+        Waypoint old = copy[slot];
+        w.name = name != null && !name.isBlank() ? name.trim() : old != null ? old.name : com.minemenu.core.Tr.get("minemenu.waypoint.default_name", "Waypoint") + " " + (slot + 1);
+        w.hud = old == null || old.hud;
+        w.dimension = client.world.getRegistryKey().getValue().toString();
+        w.x = client.player.getX();
+        w.y = client.player.getY();
+        w.z = client.player.getZ();
+        w.yaw = client.player.getYaw();
+        w.pitch = client.player.getPitch();
+        copy[slot] = w;
+        slots = copy;
+        changed();
+        client.player.sendMessage(Text.translatable("minemenu.text.waypoint_s_set_here", w.name).formatted(Formatting.GREEN), true);
     }
 
     /** Saves where you're standing in {@code slot}, keeping its name (or giving it one). */
