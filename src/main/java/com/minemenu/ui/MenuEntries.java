@@ -53,6 +53,8 @@ public final class MenuEntries {
         screens.add(new MenuEntry("screen:delete_items", "Delete Items...", "Opens your inventory in delete mode: right-click any item to delete it.",
                 Category.ITEMS, MenuEntry.Kind.SCREEN, null, (client, parent) -> DeleteMode.open(client), false));
         screen("give_xp", Category.ITEMS, "Give XP...", "Type a number of levels and get that much XP, e.g. 64.", XpScreen::new);
+        screen("server_admin", Category.UTILITY, "Server Admin...", "Players (teleport, game mode, kick, ban, OP), unban and whitelist, game rules, difficulty, time, weather, world border and messages. Your own world, or servers where you're OP.",
+                com.minemenu.op.ServerAdminScreen::new, true);
     }
 
     public static MenuEntry hack(Feature feature) {

@@ -366,6 +366,19 @@ abstract class XrayTests extends WorldTests {
             run(() -> host().teleport(server.getOverworld(), base.getX() + 0.5, base.getY(), base.getZ() + 0.5, Set.of(), 180, 30));
         });
         step(120, c -> check("Dimension: back in the Overworld, All Ores again", "All Ores".equals(XrayConfig.get().activePreset)));
+        // ----- 6.0: Server Admin panel (your own world: commands go straight to its server) -----
+        step(10, c -> c.setScreen(new com.minemenu.op.ServerAdminScreen(null)));
+        step(10, c -> {
+            check("Server Admin: opens in your own world", c.currentScreen instanceof com.minemenu.op.ServerAdminScreen && com.minemenu.op.Cmd.available(c));
+            shot(c, "admin_players.png");
+            com.minemenu.op.Cmd.run(c, "gamerule doInsomnia false", "difficulty hard");
+        });
+        step(20, c -> {
+            check("Server Admin: game rule and difficulty changed", srv(() -> !server.getGameRules().getBoolean(net.minecraft.world.GameRules.DO_INSOMNIA)
+                    && server.getSaveProperties().getDifficulty() == net.minecraft.world.Difficulty.HARD));
+            com.minemenu.op.Cmd.run(c, "gamerule doInsomnia true", "difficulty normal");
+            c.setScreen(null);
+        });
         // ----- Safe Mode per mode, profiles, all off = nothing kept -----
         step(5, c -> {
             XrayConfig.get().set(XrayMode.FLUID_VIEW, true);

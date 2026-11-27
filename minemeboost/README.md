@@ -84,7 +84,7 @@ MineMenu's hacks work in your own worlds: singleplayer, and a world you open to 
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.1 and put it in your `.minecraft/mods` folder.
-3. Download `MineMeBoostXray-5.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
+3. Download `MineMeBoostXray-6.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) and put it in the same `mods` folder.
 4. **Remove `minemenu-*.jar`, `mineboost-*.jar` and older `minemeboost-*.jar`** if you have them. MineMeBoostXray already contains both, and Fabric will refuse to start with both installed.
 
 Your MineBoost settings (`config/mineboost.json`) carry over from 3.2 and 3.3. MineMenu's settings, favorites, keys and profiles are saved in `config/minemeboost/cheats.json`; **⚙ → Reset everything** makes a backup first.
@@ -102,7 +102,7 @@ cd minemeboost
 ./gradlew build
 ```
 
-The jar ends up in `minemeboost/build/libs/MineMeBoostXray-5.0.0.jar`.
+The jar ends up in `minemeboost/build/libs/MineMeBoostXray-6.0.0.jar`.
 
 In-game tests (Fabric GameTest, run on a server with the mod loaded):
 

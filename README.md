@@ -296,6 +296,15 @@ Any hack or action can get its own key: right-click its button in the menu. Mine
   The menu shows them active and says "by command". On a server where you aren't OP they stay greyed out.
 - **What still only works in your own worlds:** everything that needs your world's own server (Morph, Freecam, Noclip, build tools with Undo, structures, Chaos Mode, combat hacks like Force Field or Bow Aimbot...). MineMenu doesn't fake anything to a server.
 
+### Server Admin *(6.0)*
+
+**Utility > Server Admin...** manages your own server without typing commands. It works in your own world and on servers where you're OP:
+
+- **Players:** go to, bring, game mode, heal, OP, kick, ban.
+- **By name:** unban, unban IP, whitelist, OP/deop, ban list.
+- **Game rules:** keep inventory, mob spawning, fire spread, phantoms, sleep percentage...
+- **World:** difficulty, time, weather, save, world spawn, world border, messages to everyone.
+
 ### Playing with friends on your own server
 
 1. Start a vanilla 1.21.1 server on your computer (`server.jar` from Mojang, `java -Xmx2G -jar server.jar nogui`, accept `eula.txt`), and make yourself OP by typing `op YOUR_NAME` in its window.

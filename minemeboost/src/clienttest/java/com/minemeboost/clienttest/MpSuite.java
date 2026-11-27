@@ -189,6 +189,12 @@ class MpSuite extends Harness {
         step(40, c -> {
             check("Multiplayer OP: switching them off undoes them", !c.player.hasStatusEffect(net.minecraft.entity.effect.StatusEffects.RESISTANCE)
                     && !c.player.getAbilities().allowFlying);
+            c.setScreen(new com.minemenu.op.ServerAdminScreen(null));
+        });
+        step(20, c -> {
+            check("Multiplayer OP (6.0): Server Admin works with OP", com.minemenu.op.Cmd.available(c));
+            shot(c, "mp_admin.png");
+            com.minemenu.op.Cmd.run(c, "gamerule doInsomnia false"); // the test script checks the server log for it
             c.setScreen(new BoostScreen(null, c.options));
         });
         step(10, c -> { shot(c, "mp_boost.png"); c.setScreen(null); BoostConfig.get().renderScale = 75; });
