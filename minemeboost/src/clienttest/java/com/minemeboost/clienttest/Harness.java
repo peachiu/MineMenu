@@ -161,6 +161,12 @@ public abstract class Harness {
     protected void startRec() { n = 0; lastFrame = 0; recording = true; }
     protected double[] stopRec(String name) {
         recording = false;
+        if (n == 0) {
+            log.add("MEASURE " + name + ": no frame finished while measuring");
+            double[] none = {0, 0};
+            stats.add(none);
+            return none;
+        }
         long[] s = Arrays.copyOf(times, n);
         long total = 0;
         for (long t : s) total += t;

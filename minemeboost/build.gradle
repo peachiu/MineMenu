@@ -20,12 +20,12 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
-// MineMeBoost is MineMenu + MineBoost in one jar. It builds straight from both mods' code
-// (no copies), plus the small glue in this folder that adds the tabs.
+// MineMeBoostXray is MineMenu + MineBoost + MineXray in one jar. It builds straight from the three mods' code
+// (no copies), plus the small glue in this folder that adds the tabs and joins them.
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', '../src/main/java', '../mineboost/src/main/java']
+            srcDirs = ['src/main/java', '../src/main/java', '../mineboost/src/main/java', '../minexray/src/main/java']
         }
     }
     // A compile-only copy of Mod Menu's API: lets the optional Mod Menu button compile without downloading
@@ -49,9 +49,10 @@ processResources {
     // Assets (lang files, icons) and MineBoost's mixin config, without the two mods' own fabric.mod.json.
     from('../src/main/resources') { exclude 'fabric.mod.json' }
     from('../mineboost/src/main/resources') { exclude 'fabric.mod.json' }
+    from('../minexray/src/main/resources') { exclude 'fabric.mod.json' }
     // Loom only adds the refmap to mixin configs in this project's own resources, so point
     // both mods' mixin configs at this jar's refmap. Without it the mixins fail in a normal install.
-    filesMatching(['mineboost.mixins.json', 'minemenu.mixins.json']) {
+    filesMatching(['mineboost.mixins.json', 'minemenu.mixins.json', 'minexray.mixins.json']) {
         filter { String line ->
             line.contains('"required"') ? line + '\n  "refmap": "minemeboost-refmap.json",' : line
         }

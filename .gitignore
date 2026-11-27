@@ -33,3 +33,4 @@ replay_*.log
 # production test runs
 run-prod/
 !minemeboost/src/clienttest/run/
+!minexray/src/clienttest/run/

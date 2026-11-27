@@ -21,6 +21,7 @@ public class ClientTestMod implements ClientModInitializer {
             case "quick" -> new QuickSuite();
             case "xray" -> new XraySuite();
             case "xraym" -> new XrayMeasureSuite();
+            case "fill" -> new FillSuite();
             default -> new FullSuite();
         };
         harness.build();

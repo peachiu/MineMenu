@@ -133,7 +133,7 @@ abstract class XrayTests extends WorldTests {
         });
         // ----- Base: config file, keys, Command Palette, migration of the old toggles -----
         step(5, c -> {
-            check("MineXray: config file written (config/minemeboost/minexray.json)", java.nio.file.Files.exists(XrayConfig.FILE));
+            check("MineXray: config file written (config/minemeboost/minexray.json)", java.nio.file.Files.exists(XrayConfig.file()));
             check("MineXray: 9 built-in presets", PresetManager.all().stream().filter(p -> p.builtIn).count() >= 9);
             check("MineXray: Classic X-Ray key X, Ore ESP key G", XrayKeys.of(XrayMode.CLASSIC).getDefaultKey().getCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_X
                     && XrayKeys.of(XrayMode.ORE_ESP).getDefaultKey().getCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_G);
@@ -254,13 +254,13 @@ abstract class XrayTests extends WorldTests {
             step(10, c -> press(XrayKeys.of(XrayMode.CLASSIC)));
             step(40, c -> {
                 check("Classic X-Ray with Sodium: refused (\"use Ore ESP\"), nothing changed", !ClassicXray.active() && !XrayConfig.get().classic
-                        && c.chunkCullingEnabled && !com.minemenu.player.PlayerModules.forceFullBright);
+                        && c.chunkCullingEnabled && !ClassicXray.fullBright());
                 shot(c, "xray_classic_sodium.png");
             });
         } else {
             step(5, c -> { num = stoneShare(c); cullingBefore = c.chunkCullingEnabled; press(XrayKeys.of(XrayMode.CLASSIC)); });
             step(80, c -> {
-                check("Classic X-Ray: on, full bright, chunk culling off", ClassicXray.active() && com.minemenu.player.PlayerModules.forceFullBright && !c.chunkCullingEnabled);
+                check("Classic X-Ray: on, full bright, chunk culling off", ClassicXray.active() && ClassicXray.fullBright() && !c.chunkCullingEnabled);
                 check("Classic X-Ray: stone is hidden, diamond is not", ClassicXray.skip(Blocks.STONE.getDefaultState()) && !ClassicXray.skip(Blocks.DIAMOND_ORE.getDefaultState()));
             });
             step(100, c -> {
@@ -278,7 +278,7 @@ abstract class XrayTests extends WorldTests {
             });
             step(120, c -> {
                 check("Classic X-Ray: off puts culling and brightness back", !ClassicXray.active() && c.chunkCullingEnabled == cullingBefore
-                        && !com.minemenu.player.PlayerModules.forceFullBright);
+                        && !ClassicXray.fullBright());
                 check("Classic X-Ray: chunks rebuilt (no rebuild left hanging)", !ClassicXray.rebuilding());
                 check(String.format("Classic X-Ray: the stone floor is back on screen (%.0f%%)", stoneShare(c) * 100), stoneShare(c) > 0.5);
                 shot(c, "xray_classic_off.png");

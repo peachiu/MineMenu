@@ -1,0 +1,132 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+// MineXray on its own. The same code is also built into MineMeBoostXray (see ../minemeboost/build.gradle).
+sourceSets {
+    // A compile-only copy of Mod Menu's API (shared with MineMeBoostXray): the optional Mod Menu button compiles
+    // without downloading Mod Menu. Not packaged; at runtime the real Mod Menu (if installed) provides it.
+    modmenuStub {
+        java {
+            srcDirs = ['../minemeboost/src/modmenuStub/java']
+        }
+        compileClasspath += configurations.compileClasspath
+    }
+}
+
+sourceSets.main.compileClasspath += sourceSets.modmenuStub.output
+
+loom {
+    mixin {
+        defaultRefmapName = "minexray-refmap.json"
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+// In-game test: the real (remapped) MineXray jar on its own plus a small test mod (src/clienttest, never shipped)
+// in a production client under Xvfb. ./gradlew runClientTests
+sourceSets {
+    clienttest {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+def clientTestRunDir = file("build/clienttest-run")
+
+tasks.register("clienttestJar", Jar) {
+    from sourceSets.clienttest.output
+    archiveClassifier = "clienttest-dev"
+    destinationDirectory = layout.buildDirectory.dir("clienttest")
+}
+
+tasks.register("remapClienttestJar", net.fabricmc.loom.task.RemapJarTask) {
+    dependsOn tasks.clienttestJar
+    inputFile = tasks.clienttestJar.archiveFile
+    archiveClassifier = "clienttest"
+    destinationDirectory = layout.buildDirectory.dir("clienttest")
+    addNestedDependencies = false
+}
+
+tasks.register("runClientTests", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    dependsOn remapJar, tasks.remapClienttestJar
+    mods.from(remapJar.archiveFile)
+    mods.from(tasks.remapClienttestJar.archiveFile)
+    mods.from(configurations.detachedConfiguration(dependencies.create("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")).setTransitive(false))
+    if (project.hasProperty("extraMods")) {
+        mods.from(fileTree(project.property("extraMods")) { include "*.jar" })
+    }
+    jvmArgs.add("-Xmx2G")
+    runDir = clientTestRunDir
+    useXVFB = (project.findProperty("xvfb") ?: "true") != "false"
+    doFirst {
+        delete fileTree(clientTestRunDir) { include "saves/**", "screenshots/**", "clienttest/**", "config/**" }
+        copy {
+            from "src/clienttest/run"
+            into clientTestRunDir
+        }
+    }
+    finalizedBy "checkClientTests"
+}
+
+tasks.register("checkClientTests") {
+    doLast {
+        def results = new File(clientTestRunDir, "clienttest/results-standalone.txt")
+        if (!results.exists()) {
+            throw new GradleException("No results: the game didn't finish the test (see ${clientTestRunDir}/logs/latest.log)")
+        }
+        def lines = results.readLines()
+        def failed = lines.findAll { it.startsWith("FAIL") || it.startsWith("ERROR") }
+        println "In-game tests (MineXray on its own): ${lines.count { it.startsWith('PASS') }} passed, ${failed.size()} failed"
+        failed.each { println "  " + it }
+        if (!failed.isEmpty()) {
+            throw new GradleException("${failed.size()} in-game check(s) failed, see ${results}")
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "minexray-clienttest",
+  "version": "1.0.0",
+  "name": "MineXray in-game tests",
+  "description": "Test driver for MineXray's runClientTests Gradle task. Not part of any release.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.minexray.clienttest.StandaloneTest"]
+  },
+  "depends": {
+    "minexray": "*",
+    "fabric-api": "*"
+  }
+}

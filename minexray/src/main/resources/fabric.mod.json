@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "minexray",
+  "version": "${version}",
+  "name": "MineXray",
+  "description": "X-ray and ESP for singleplayer. Right Shift opens it: Classic X-Ray (X), Ore ESP with whole veins, labels and tracers (G), Cave Finder, Fluid View, Lava Warning, Block ESP (chests, spawners, portals...), Entity ESP, a block editor for every block, presets that switch per dimension, a vein scanner and a HUD. Off on multiplayer servers. Also part of MineMeBoostXray. In English and Portuguese (Portugal).",
+  "authors": [
+    "peachiu"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/minexray/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.minexray.standalone.MineXrayMod"
+    ],
+    "modmenu": [
+      "com.minexray.standalone.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "minexray.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "breaks": {
+    "minemeboost": "*"
+  }
+}

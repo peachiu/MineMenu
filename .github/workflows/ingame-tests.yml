@@ -2,7 +2,7 @@ name: In-game tests
 
 # Starts the real MineMeBoost jar in a Minecraft client (software rendering under Xvfb) with the test mod from
 # minemeboost/src/clienttest, and runs a suite:
-#   full - every hack, tool and screen once (about 10 minutes)
+#   full - every hack, tool and screen once (about 15 minutes), then the MineXray jar on its own
 #   soak - Chaos Mode, Minimap, ESP, Impostors and heavy actions for N minutes; fails on errors or memory growth
 # Run it from the Actions tab (In-game tests > Run workflow). Every Monday it also runs the full suite and a
 # 60-minute soak test. Results, screenshots and the game log are attached to the run as artifacts.
@@ -60,6 +60,11 @@ jobs:
         if: always() && (env.SUITE == 'soak' || env.SUITE == 'both')
         run: ./gradlew runClientTests -Psuite=soak -Pminutes=${{ env.MINUTES }}
 
+      - name: MineXray on its own
+        if: always() && (env.SUITE == 'full' || env.SUITE == 'both')
+        working-directory: minexray
+        run: ./gradlew runClientTests
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,4 +74,6 @@ jobs:
             minemeboost/build/clienttest-run-*/clienttest/
             minemeboost/build/clienttest-run-*/screenshots/
             minemeboost/build/clienttest-run-*/logs/latest.log
+            minexray/build/clienttest-run/clienttest/
+            minexray/build/clienttest-run/screenshots/
           if-no-files-found: warn

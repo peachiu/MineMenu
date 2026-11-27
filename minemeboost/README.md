@@ -32,7 +32,7 @@ Press **Right Shift** and the menu has three tabs at the top: MineMenu, MineBoos
 
 ## MineXray *(new in 3.6)*
 
-X-ray and ESP for **singleplayer** (and LAN worlds you host). On a multiplayer server every MineXray mode is off, the tab says "MineXray only works in singleplayer", and nothing is scanned, drawn or sent.
+X-ray and ESP for **singleplayer** (and LAN worlds you host). Also available as its own mod: [MineXray](../minexray/README.md). On a multiplayer server every MineXray mode is off, the tab says "MineXray only works in singleplayer", and nothing is scanned, drawn or sent.
 
 | Ore ESP: whole veins, labels, tracers | Classic X-Ray |
 |---|---|
