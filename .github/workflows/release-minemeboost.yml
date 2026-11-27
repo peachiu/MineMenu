@@ -1,8 +1,8 @@
-name: Release MineMeBoost
+name: Release MineMeBoostXray
 
-# Builds the MineMeBoost mod (in minemeboost/) and publishes a GitHub release with the jar attached.
-# Run it from the Actions tab (Release MineMeBoost > Run workflow). It creates the tag
-# minemeboost-v<mod_version> from minemeboost/gradle.properties.
+# Builds the MineMeBoostXray mod (in minemeboost/; called MineMeBoost until 3.5) and publishes a GitHub release with the jar attached.
+# Run it from the Actions tab (Release MineMeBoostXray > Run workflow). It creates the tag
+# minemeboostxray-v<mod_version> from minemeboost/gradle.properties (minemeboost-v<version> up to 3.6.0).
 on:
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
         run: |
           version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "name=minemeboost-v$version" >> "$GITHUB_OUTPUT"
+          echo "name=minemeboostxray-v$version" >> "$GITHUB_OUTPUT"
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
