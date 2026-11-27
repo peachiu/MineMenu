@@ -37,6 +37,14 @@ sourceSets {
 
 sourceSets.main.compileClasspath += sourceSets.modmenuStub.output
 
+// Keep the refmap name fixed (the jar's name changed to MineMeBoostXray in 3.6.1): MineMenu's and MineBoost's
+// mixin configs point at "minemeboost-refmap.json" (see processResources below).
+loom {
+    mixin {
+        defaultRefmapName = "minemeboost-refmap.json"
+    }
+}
+
 processResources {
     // Assets (lang files, icons) and MineBoost's mixin config, without the two mods' own fabric.mod.json.
     from('../src/main/resources') { exclude 'fabric.mod.json' }
