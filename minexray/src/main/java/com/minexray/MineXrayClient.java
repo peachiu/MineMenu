@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MineXray: X-ray and ESP modes for singleplayer (and LAN worlds you host). On a multiplayer server every mode is
- * off and nothing is scanned, drawn or sent. Every mode runs inside its own Safe Mode: an error turns just that
+ * off and nothing is scanned or drawn, unless you switch on "Allow on servers" (4.0); MineXray never sends anything. Every mode runs inside its own Safe Mode: an error turns just that
  * mode off. With every mode off, MineXray costs nothing: no scanning, no drawing, no memory kept.
  */
 public final class MineXrayClient {
@@ -101,9 +101,14 @@ public final class MineXrayClient {
         }
     }
 
-    /** True if MineXray may run at all right now (singleplayer or a LAN world you host). */
+    /** True if MineXray may run at all right now (singleplayer, a LAN world you host, or a server if you allowed it). */
     public static boolean allowed() {
         return allowed;
+    }
+
+    /** Your own world (the integrated server is here): scanner actions that change the world (teleport, mine) work. */
+    public static boolean ownWorld() {
+        return XrayHost.singleplayer(MinecraftClient.getInstance());
     }
 
     /** A mode is in effect: switched on, allowed here, and (for Classic) supported. */
@@ -130,7 +135,8 @@ public final class MineXrayClient {
     private static void tick(MinecraftClient client) {
         ticks++;
         XrayConfig.tick(ticks);
-        boolean nowAllowed = client.world != null && client.player != null && XrayHost.singleplayer(client);
+        boolean nowAllowed = client.world != null && client.player != null
+                && (XrayHost.singleplayer(client) || XrayConfig.get().allowMultiplayer);
         if (nowAllowed != allowed) {
             allowed = nowAllowed;
             if (!allowed) {

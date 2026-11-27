@@ -126,7 +126,7 @@ public class XrayScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawTextWithShadow(this.textRenderer, this.title.copy().formatted(Formatting.BOLD), SIDE + 8, top - 11, XrayHost.theme.accent());
         if (!MineXrayClient.allowed() && page != Page.SETTINGS) {
-            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minexray.singleplayer_only").formatted(Formatting.RED),
+            context.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("minexray.servers_off").formatted(Formatting.RED),
                     SIDE + (this.width - SIDE) / 2, this.height / 2, 0xFFFFFF);
             return;
         }

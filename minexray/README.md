@@ -2,7 +2,7 @@
 
 **X-ray and ESP for singleplayer**, for **Minecraft Java 1.21.1** (Fabric). Also part of [MineMeBoostXray](../minemeboost/README.md), where it's the third tab next to MineMenu and MineBoost.
 
-Press **Right Shift** to open it. Like the MineMenu cheats, it only works in your own worlds (singleplayer, or a LAN world you host). On a multiplayer server every mode is off, the tab says "MineXray only works in singleplayer", and nothing is scanned, drawn or sent.
+Press **Right Shift** to open it. It works in your own worlds (singleplayer, or a LAN world you host). On a multiplayer server it stays off until you switch on **Settings > Allow on servers** (new in 2.0). Many servers forbid X-ray and use anti-xray, so use it only where it's allowed. On servers, Teleport and Mine stay off. MineXray never sends anything to the server.
 
 | Ore ESP: whole veins, labels, tracers | Classic X-Ray |
 |---|---|
@@ -24,7 +24,7 @@ On its own, MineXray has no waypoints and no A/B cost test; those come from Mine
 ## Install
 
 1. Install the [Fabric Loader](https://fabricmc.net/use/installer/) for Minecraft **1.21.1**, and put [Fabric API](https://modrinth.com/mod/fabric-api) in `.minecraft/mods`.
-2. Download `MineXray-1.0.1.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) into the same `mods` folder.
+2. Download `MineXray-2.0.0.jar` from the [Releases page](https://github.com/peachiu/MineMenu/releases) into the same `mods` folder.
 3. **Not together with MineMeBoostXray** (it already contains MineXray). It works next to MineMenu or MineBoost on their own.
 
 Settings are in `config/minexray/minexray.json` and `config/minexray/xray-presets/`.
@@ -35,7 +35,7 @@ You need **Java 21**.
 
 ```bash
 cd minexray
-./gradlew build            # build/libs/MineXray-1.0.1.jar
+./gradlew build            # build/libs/MineXray-2.0.0.jar
 ./gradlew runClientTests   # starts the real jar in a client (needs Xvfb on Linux) and checks it
 ```
 

@@ -93,6 +93,9 @@ final class XrayBridge {
     }
 
     private static void tick() {
+        if (!com.minemenu.MineMenuClient.isSingleplayer(net.minecraft.client.MinecraftClient.getInstance())) {
+            return; // on servers MineMenu's cheats stay off; MineXray's modes run on their own
+        }
         syncShortcut(Feature.ORE_VISION, XrayMode.ORE_ESP);
         syncShortcut(Feature.CHEST_ESP, XrayMode.BLOCK_ESP);
         syncShortcut(Feature.MOB_GLOW, XrayMode.ENTITY_ESP);
@@ -125,7 +128,7 @@ final class XrayBridge {
         List<MenuEntry> list = new ArrayList<>();
         for (XrayMode mode : XrayMode.values()) {
             list.add(new MenuEntry("xray:mode:" + mode.id, "Xray " + mode.displayName(), mode.description(), null, MenuEntry.Kind.HACK,
-                    () -> XrayConfig.get().isOn(mode), (client, parent) -> XrayKeys.toggle(client, mode), false));
+                    () -> XrayConfig.get().isOn(mode), (client, parent) -> XrayKeys.toggle(client, mode), XrayConfig.get().allowMultiplayer));
         }
         for (XrayPreset preset : PresetManager.all()) {
             list.add(new MenuEntry("xray:preset:" + preset.name, "Xray " + preset.name,
@@ -133,11 +136,11 @@ final class XrayBridge {
                     () -> preset.name.equals(XrayConfig.get().activePreset), (client, parent) -> {
                         PresetManager.apply(preset.name, true);
                         XrayKeys.message(client, Text.translatable("minexray.preset.now", preset.name).formatted(Formatting.AQUA));
-                    }, false));
+                    }, XrayConfig.get().allowMultiplayer));
         }
         list.add(new MenuEntry("xray:scan", com.minexray.XrayHost.tr("minexray.entry.scan", "Xray Scan now"),
                 com.minexray.XrayHost.tr("minexray.entry.scan.desc", "List every vein around you."), null, MenuEntry.Kind.SCREEN, null,
-                (client, parent) -> client.setScreen(new XrayScreen(parent, XrayScreen.Page.SCANNER, true)), false));
+                (client, parent) -> client.setScreen(new XrayScreen(parent, XrayScreen.Page.SCANNER, true)), XrayConfig.get().allowMultiplayer));
         list.add(new MenuEntry("xray:open", com.minexray.XrayHost.tr("minexray.entry.open", "Xray: open MineXray"),
                 com.minexray.XrayHost.tr("minexray.entry.open.desc", "X-ray and ESP modes, block list, presets and scanner."), null,
                 MenuEntry.Kind.SCREEN, null, (client, parent) -> client.setScreen(new XrayScreen(parent, XrayScreen.Page.OVERVIEW, false)), true));

@@ -13,6 +13,7 @@ import net.minecraft.util.Formatting;
 /** Settings: performance (Adaptive range, memory limit), the cost test, keys, and reset. */
 final class SettingsPage implements XrayPage {
     private static boolean confirmReset;
+    private static boolean confirmServers;
     private int x;
     private int infoY;
 
@@ -43,6 +44,21 @@ final class SettingsPage implements XrayPage {
             }
             screen.rebuild();
         }).dimensions(x, y + 44, w, 20).build());
+        // 4.0: MineXray on multiplayer servers, only if you switch it on (two clicks, with a warning).
+        Text serversLabel = confirmServers ? Text.translatable("minexray.settings.servers_confirm").formatted(Formatting.GOLD)
+                : Text.translatable("minexray.settings.servers").append(": ").append(Widgets.onOff(c.allowMultiplayer));
+        screen.add(ButtonWidget.builder(serversLabel, b -> {
+            if (c.allowMultiplayer) {
+                c.allowMultiplayer = false;
+            } else if (!confirmServers) {
+                confirmServers = true;
+            } else {
+                confirmServers = false;
+                c.allowMultiplayer = true;
+            }
+            XrayConfig.markDirty();
+            screen.rebuild();
+        }).dimensions(x + w + 6, y + 44, w, 20).tooltip(Tooltip.of(Text.translatable("minexray.settings.servers.tooltip"))).build());
         infoY = y + 74;
     }
 
@@ -52,5 +68,11 @@ final class SettingsPage implements XrayPage {
         context.drawTextWithShadow(text, Text.translatable("minexray.settings.adaptive.info").formatted(Formatting.GRAY), x, infoY, 0xFFFFFF);
         context.drawTextWithShadow(text, Text.translatable("minexray.settings.safe_mode").formatted(Formatting.GRAY), x, infoY + 12, 0xFFFFFF);
         context.drawTextWithShadow(text, Text.translatable("minexray.settings.files").formatted(Formatting.DARK_GRAY), x, infoY + 24, 0xFFFFFF);
+        int wrap = screen.width - x - 10;
+        int y = infoY + 40;
+        for (var line : text.wrapLines(Text.translatable("minexray.settings.servers.info").formatted(XrayConfig.get().allowMultiplayer ? Formatting.GOLD : Formatting.GRAY), wrap)) {
+            context.drawTextWithShadow(text, line, x, y, 0xFFFFFF);
+            y += 10;
+        }
     }
 }

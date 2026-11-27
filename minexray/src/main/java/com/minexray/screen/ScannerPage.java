@@ -2,6 +2,7 @@ package com.minexray.screen;
 
 import com.minexray.XrayHost;
 import com.minexray.scan.ScanJob;
+import com.minexray.MineXrayClient;
 import com.minexray.XrayActions;
 import com.minexray.scan.ScanCache;
 import com.minexray.scan.SectionScanner;
@@ -93,15 +94,18 @@ final class ScannerPage implements XrayPage {
             ButtonWidget waypoint = screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.waypoint"), b -> XrayActions.waypoint(vein))
                     .dimensions(bx, ry, 40, 20).tooltip(Tooltip.of(Text.translatable(XrayActions.waypointsAvailable()
                             ? "minexray.scanner.waypoint.tooltip" : "minexray.scanner.waypoint.needs_minemenu"))).build());
-            waypoint.active = XrayActions.waypointsAvailable();
+            waypoint.active = XrayActions.waypointsAvailable() && MineXrayClient.ownWorld();
             screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.show"), b -> XrayActions.show(vein))
                     .dimensions(bx + 42, ry, 40, 20).tooltip(Tooltip.of(Text.translatable("minexray.scanner.show.tooltip"))).build());
-            screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.teleport"), b -> {
+            boolean own = MineXrayClient.ownWorld();
+            ButtonWidget teleport = screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.teleport"), b -> {
                 XrayActions.teleport(vein);
                 screen.close();
-            }).dimensions(bx + 84, ry, 40, 20).tooltip(Tooltip.of(Text.translatable("minexray.scanner.teleport.tooltip"))).build());
-            screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.mine"), b -> XrayActions.mine(vein))
-                    .dimensions(bx + 126, ry, 40, 20).tooltip(Tooltip.of(Text.translatable("minexray.scanner.mine.tooltip"))).build());
+            }).dimensions(bx + 84, ry, 40, 20).tooltip(Tooltip.of(Text.translatable(own ? "minexray.scanner.teleport.tooltip" : "minexray.scanner.own_world_only"))).build());
+            teleport.active = own;
+            ButtonWidget mine = screen.add(ButtonWidget.builder(Text.translatable("minexray.scanner.mine"), b -> XrayActions.mine(vein))
+                    .dimensions(bx + 126, ry, 40, 20).tooltip(Tooltip.of(Text.translatable(own ? "minexray.scanner.mine.tooltip" : "minexray.scanner.own_world_only"))).build());
+            mine.active = own;
         }
     }
 

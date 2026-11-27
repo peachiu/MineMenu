@@ -114,6 +114,7 @@ public class StandaloneTest implements ClientModInitializer {
             check("Open key: Right Shift on its own", XrayKeys.openTab.getDefaultKey().getCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT);
             check("9 built-in presets", PresetManager.all().stream().filter(p -> p.builtIn).count() >= 9);
             check("Allowed in singleplayer", MineXrayClient.allowed());
+            check("Servers: off unless you switch it on", !XrayConfig.get().allowMultiplayer);
             XrayConfig.get().adaptiveRange = false;
             run(() -> {
                 ServerPlayerEntity p = host();

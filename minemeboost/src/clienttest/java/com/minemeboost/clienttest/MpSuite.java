@@ -117,8 +117,35 @@ class MpSuite extends Harness {
             c.setScreen(new MineMenuScreen());
         });
         step(10, c -> { shot(c, "mp_menu.png"); c.setScreen(new com.minexray.screen.XrayScreen(null, com.minexray.screen.XrayScreen.Page.OVERVIEW, false)); });
-        step(10, c -> { shot(c, "mp_xray_tab.png"); for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, false);
-            c.setScreen(new BoostScreen(null, c.options)); });
+        step(10, c -> { shot(c, "mp_xray_tab.png"); c.setScreen(null);
+            for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, mode == com.minexray.XrayMode.ORE_ESP
+                    || mode == com.minexray.XrayMode.BLOCK_ESP || mode == com.minexray.XrayMode.ENTITY_ESP);
+            com.minexray.XrayConfig.get().adaptiveRange = false;
+            com.minexray.XrayConfig.get().allowMultiplayer = true; // 4.0: switched on by the player
+        });
+        step(200, c -> {
+            check("Multiplayer (allowed): MineXray runs on the server", com.minexray.MineXrayClient.allowed() && com.minexray.MineXrayClient.active(com.minexray.XrayMode.ORE_ESP));
+            check("Multiplayer (allowed): sections scanned on the client (" + com.minexray.scan.ScanCache.size() + ")", com.minexray.scan.ScanCache.size() > 0);
+            check("Multiplayer (allowed): world-changing actions stay off (teleport, mine, waypoints)", !com.minexray.MineXrayClient.ownWorld());
+            check("Multiplayer (allowed): MineMenu cheats still off (no flying)", !c.player.getAbilities().allowFlying);
+            shot(c, "mp_xray_allowed.png");
+            c.setScreen(new com.minexray.screen.XrayScreen(null, com.minexray.screen.XrayScreen.Page.SCANNER, false));
+        });
+        step(10, c -> {
+            boolean teleportOff = false;
+            for (var child : c.currentScreen.children()) {
+                if (child instanceof net.minecraft.client.gui.widget.ButtonWidget b && b.getMessage().getString().equals("TP")) teleportOff = !b.active;
+            }
+            log.add("INFO scanner page opened on the server (teleport buttons greyed out: " + teleportOff + ")");
+            shot(c, "mp_xray_scanner.png");
+            c.setScreen(null);
+            com.minexray.XrayConfig.get().allowMultiplayer = false;
+        });
+        step(40, c -> {
+            check("Multiplayer: switching it off again stops it and frees everything", !com.minexray.MineXrayClient.allowed() && com.minexray.scan.ScanCache.size() == 0);
+            for (com.minexray.XrayMode mode : com.minexray.XrayMode.values()) com.minexray.XrayConfig.get().set(mode, false);
+            c.setScreen(new BoostScreen(null, c.options));
+        });
         step(10, c -> { shot(c, "mp_boost.png"); c.setScreen(null); BoostConfig.get().renderScale = 75; });
         step(20, c -> { shot(c, "mp_renderscale75.png"); check("Multiplayer: Render Scale works", com.mineboost.renderscale.RenderScale.active(c)); BoostConfig.get().renderScale = 100; });
         step(5, c -> { for (Feature f : Feature.values()) off(f); });

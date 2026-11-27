@@ -71,7 +71,8 @@ public final class Hub {
                         Text.translatable("minemeboost.text.minexray").formatted(Formatting.AQUA, Formatting.BOLD),
                         b -> open(Tab.MINEXRAY))
                 .width(TAB_WIDTH)
-                .tooltip(Tooltip.of(singleplayer ? Text.translatable("minemeboost.text.minexray.tooltip") : Text.translatable("minexray.singleplayer_only")))
+                .tooltip(Tooltip.of(singleplayer || com.minexray.XrayConfig.get().allowMultiplayer ? Text.translatable("minemeboost.text.minexray.tooltip")
+                        : Text.translatable("minemeboost.text.minexray.servers")))
                 .build();
         xrayTab.active = current != Tab.MINEXRAY;
 

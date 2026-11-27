@@ -36,8 +36,8 @@ public class MineMeBoostClient implements ClientModInitializer {
         XrayBridge.install();
         com.minexray.MineXrayClient.init();
         XrayBridge.connect();
-        com.minemenu.ui.WhatsNewScreen.VERSION = "3.6.0";
-        com.minemenu.ui.WhatsNewScreen.LINES = java.util.List.of("minexray.whats_new.title", "", "minexray.whats_new.xray", "",
+        com.minemenu.ui.WhatsNewScreen.VERSION = "4.0.0";
+        com.minemenu.ui.WhatsNewScreen.LINES = java.util.List.of("minexray.whats_new.title", "", "minexray.whats_new.servers", "", "minexray.whats_new.xray", "",
                 "minexray.whats_new.esp", "", "minexray.whats_new.tools", "", "minexray.whats_new.moved");
     }
 

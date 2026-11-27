@@ -48,7 +48,7 @@ public final class XrayActions {
     }
 
     public static void waypoint(VeinMerger.Vein vein) {
-        if (XrayHost.waypoints == null) {
+        if (XrayHost.waypoints == null || !MineXrayClient.ownWorld()) {
             return;
         }
         String name = name(vein) + " x" + vein.count();
@@ -66,6 +66,9 @@ public final class XrayActions {
 
     /** Singleplayer only: teleports you to the nearest safe air next to the vein. */
     public static void teleport(VeinMerger.Vein vein) {
+        if (!MineXrayClient.ownWorld()) {
+            return; // on a server there's no world here to change
+        }
         BlockPos target = vein.nearest();
         XrayHost.onServer(player -> {
             BlockPos spot = safeSpot(player.getServerWorld(), target);
@@ -128,6 +131,9 @@ public final class XrayActions {
 
     /** Vein Miner: breaks every touching block of the vein (up to 128) with your tool; drops go to you. */
     public static void mine(VeinMerger.Vein vein) {
+        if (!MineXrayClient.ownWorld()) {
+            return; // on a server there's no world here to change
+        }
         BlockPos start = vein.nearest();
         XrayHost.onServer(player -> {
             ServerWorld world = player.getServerWorld();

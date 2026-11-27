@@ -214,7 +214,7 @@
   "minexray.settings.reset_confirm": "Clica outra vez para repor",
   "minexray.settings.safe_mode": "Modo Seguro: se um modo der erro, só esse modo se desliga.",
   "minexray.settings.files": "Ficheiros: config/minemeboost/minexray.json e xray-presets/",
-  "minexray.whats_new.title": "§bMineMeBoostXray 3.6.0",
+  "minexray.whats_new.title": "§bMineMeBoostXray 4.0.0",
   "minexray.whats_new.xray": "§bNovo separador, MineXray: §fRaio-X Clássico (X), Ore ESP com veios inteiros, etiquetas e linhas-guia (G), Detetor de Grutas, Ver Fluidos e Aviso de Lava. Só em modo de um jogador.",
   "minexray.whats_new.esp": "§eBlock ESP e Entity ESP: §fbaús, geradores, cofres, portais, sculk... cada um com uma cor; mobs por tipo.",
   "minexray.whats_new.tools": "§aFerramentas: §fum editor com todos os blocos (também de mods), 9 presets que mudam por dimensão, um scanner de veios (waypoint, ver, teletransportar, minerar) e um HUD.",
@@ -224,5 +224,13 @@
   "minexray.safe_mode.details": "Detalhes em logs/latest.log",
   "minexray.safe_mode.caught": "MineXray: foi apanhado um erro em %s",
   "minexray.settings.cost_test.needs_mineboost": "Precisa do MineBoost (parte do MineMeBoostXray).",
-  "minexray.scanner.waypoint.needs_minemenu": "Os waypoints vêm do MineMenu (parte do MineMeBoostXray)."
+  "minexray.scanner.waypoint.needs_minemenu": "Os waypoints vêm do MineMenu (parte do MineMeBoostXray).",
+  "minexray.servers_off": "O MineXray está desligado em servidores. Para o usar aqui, liga Definições > Permitir em servidores.",
+  "minexray.settings.servers": "Permitir em servidores",
+  "minexray.settings.servers_confirm": "Clica outra vez: permitir em servidores",
+  "minexray.settings.servers.tooltip": "Deixa o MineXray funcionar em servidores multijogador. Muitos servidores proíbem X-ray (podes ser banido) e escondem os minérios com anti-xray.",
+  "minexray.settings.servers.info": "Em servidores: usa-o só onde o X-ray é permitido. Servidores com anti-xray enviam minérios falsos ou escondidos, por isso o ESP pode não mostrar nada ou mostrar blocos errados. Teletransportar, Minar e waypoints só funcionam nos teus mundos. O MineXray nunca envia nada ao servidor.",
+  "minexray.scanner.own_world_only": "Só nos teus mundos (um jogador ou um mundo LAN que abriste)",
+  "minemeboost.text.minexray.servers": "O MineXray está desligado neste servidor (pode ser permitido em MineXray > Definições).",
+  "minexray.whats_new.servers": "§6Novo na 4.0: §fo MineXray também pode funcionar em servidores multijogador. Fica desligado até ligares MineXray > Definições > Permitir em servidores. Muitos servidores proíbem X-ray e escondem os minérios, por isso usa-o só onde é permitido. Os cheats do MineMenu continuam só para um jogador."
 }

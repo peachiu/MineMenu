@@ -96,7 +96,7 @@ public final class XrayKeys {
             return false;
         }
         if (!MineXrayClient.allowed()) {
-            message(client, Text.translatable("minexray.singleplayer_only").formatted(Formatting.RED));
+            message(client, Text.translatable("minexray.servers_off").formatted(Formatting.RED));
             return false;
         }
         return true;

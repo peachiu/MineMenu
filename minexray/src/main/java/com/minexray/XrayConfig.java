@@ -94,6 +94,9 @@ public final class XrayConfig {
     public boolean autoDimension = true;
     public Map<String, String> dimensionPresets = new LinkedHashMap<>();
 
+    // Multiplayer (4.0): off unless you switch it on (many servers forbid X-ray and hide ores with anti-xray)
+    public boolean allowMultiplayer = false;
+
     // Performance
     public boolean adaptiveRange = true;
     public int memoryLimitMb = 64;
